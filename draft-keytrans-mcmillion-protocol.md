@@ -180,32 +180,174 @@ entry where the prefix tree at that entry contains the desired key-version pair.
 As such, the entry that a user arrives at through binary search contains the
 update that they're looking for, even though the log itself is not sorted.
 
-Binary search also ensures that all users will check the same or similar entries
-when searching for the same key, which is necessary for the efficient auditing
-of a Transparency Log. To maximize this effect, users start their binary search
-at the entry whose index is the largest power of two less than the size of the
-log, and move left or right by consecutively smaller powers of two.
+Following a binary search also ensures that all users will check the same or
+similar entries when searching for the same key, which is necessary for the
+efficient auditing of a Transparency Log. To maximize this effect, users rely on
+an implicit binary tree structure constructed over the leaves of the log tree
+(distinct from the structure of the log tree itself).
 
-So for example in a log with 70 entries, instead of starting a search at the
-"middle" with entry 35, users would start at entry 64. If the next step in the
-search is to move right, instead of moving to the middle of entries 64 and 70,
-which would be entry 67, users would move 4 steps (the largest power of two
-possible) to the right to entry 68. As more entries are added to the log, users
-will consistently revisit entries 64 and 68, while they may never revisit
-entries 35 or 67 after even a single new entry is added to the log.
+### Implicit Binary Search Tree
 
-While users searching for a specific version of a key jump right into a binary
-search for it, other users may instead wish to search
-for the "most recent" version of a key. That is, the key with the highest
-version possible. Users looking up the most recent version of a key start by
-fetching the **frontier** of the log, which they use to determine what the
-highest version of a key is.
+Intuitively, the leaves of the log tree can be considered a flat array
+representation of a left-balanced binary tree. In this representation, "leaf"
+nodes are stored in even-numbered indices, while "intermediate" nodes are stored
+in odd-numbered indices:
 
-The frontier of a log consists of the entry whose index is the largest power of
-two less than the size of the log, followed by the entry the largest power of
-two possible to the right, repeated until the last entry of the log is reached.
-So for example in a log with 70 entries, the frontier consists of entries 64,
-68, and 69 (with 69 being the last entry).
+~~~ aasvg
+                             X
+                             |
+                   .---------+---------.
+                  /                     \
+                 X                       X
+                 |                       |
+             .---+---.               .---+---.
+            /         \             /         \
+           X           X           X           X
+          / \         / \         / \         /
+         /   \       /   \       /   \       /
+        X     X     X     X     X     X     X
+
+Index:  0  1  2  3  4  5  6  7  8  9 10 11 12 13
+~~~
+{: title="A binary tree constructed from 14 entries in a log" }
+
+Following the structure of this binary tree when executing searches makes
+auditing the Transparency Log much more efficient because users can easily
+reason about which nodes will be accessed when conducting a search. As such,
+only nodes along a specific search path need to be checked for correctness.
+
+The following Python code demonstrates the computations used for following this
+tree structure:
+
+~~~ python
+# The exponent of the largest power of 2 less than x. Equivalent to:
+#   int(math.floor(math.log(x, 2)))
+def log2(x):
+    if x == 0:
+        return 0
+    k = 0
+    while (x >> k) > 0:
+        k += 1
+    return k-1
+
+# The level of a node in the tree. Leaves are level 0, their parents
+# are level 1, etc. If a node's children are at different levels,
+# then its level is the max level of its children plus one.
+def level(x):
+    if x & 0x01 == 0:
+        return 0
+    k = 0
+    while ((x >> k) & 0x01) == 1:
+        k += 1
+    return k
+
+def left_step(x):
+    k = level(x)
+    if k == 0:
+        raise Exception('leaf node has no children')
+    return x ^ (0x01 << (k - 1))
+
+def right_step(x):
+    k = level(x)
+    if k == 0:
+        raise Exception('leaf node has no children')
+    return x ^ (0x03 << (k - 1))
+
+def move_within(x, start, n):
+    while x < start or x >= n:
+        if x < start: x = right_step(x)
+        else: x = left_step(x)
+    return x
+
+# The root index of a search, if the first instance of a key is at
+# `start` and the log has `n` entries.
+def root(start, n):
+    return move_within((1 << log2(n)) - 1, start, n)
+
+# The left child of an intermediate node.
+def left(x, start, n):
+    return move_within(left_step(x), start, n)
+
+# The right child of an intermediate node.
+def right(x, start, n):
+    return move_within(right_step(x), start, n)
+~~~
+
+The `root` function returns the index in the log at which a search should
+start. The `left` and `right` functions determine the subsequent index to be
+accessed, depending on whether the search moves left or right.
+
+For example, in a search where the first instance of the key is at index 10 and
+the log has 60 entries, instead of starting the search at the typical "middle"
+entry of `10+60/2 = 35`, users would start at entry `root(10, 60) = 31`. If the
+next step in the search is to move right, the next index to access would be
+`right(31, 10, 60) = 47`. As more entries are added to the log, users will
+consistently revisit entries 31 and 47, while they may never revisit entry 35
+after even a single new entry is added to the log.
+
+Additionally, while users searching for a specific version of a key can jump
+right into a binary search for that key-version pair, other users may
+instead wish to search for the "most recent" version of a key. That is, the key
+with the highest counter possible. Users looking up the most recent version of a
+key start by fetching the **frontier**, which they use to determine
+what the highest counter for a key is.
+
+The frontier consists of the root node of a search, followed by the entries
+produced by repeatedly calling `right` until reaching the last entry of the log.
+Using the same example of a search where the first instance of a key is at index
+10 and the log has 60 entries, the frontier would be entries: 31, 47, 55, 59.
+
+If we can assume that the log operator is behaving honestly, then checking only
+the last entry of the log would be sufficient to find the most recent version of
+any key. However, we can't assume this. Checking each entry along the frontier
+is functionally the same as checking only the last entry, but also allows the
+user to verify that the entire search path leading to the last entry is
+constructed correctly.
+
+### Monitoring
+
+As new entries are added to the log tree, the search path that's traversed to
+find a specific version of a key may change. New intermediate nodes may become
+established in between the search root and the leaf, or a new search root may be
+created. The goal of monitoring a key is to efficiently ensure that, when these
+new parent nodes are created, they're created correctly so that searches for the
+same versions continue converging to the same entries in the log.
+
+To monitor a given search key, users maintain a small amount of state: a map
+from a position in the log to a version counter. The version counter is the
+highest version of the search key that exists in the log at that position. Users
+initially populate this map by setting the position of an entry they've looked
+up, to map to the version of the key stored in that entry. A map may track
+several different versions of a search key simultaneously, if a user has been
+shown different versions of the same search key.
+
+To update this map, users receive the most recent tree head from the server and
+follow these steps, for each entry in the map:
+
+1. Compute the entry's direct path (in terms of the Implicit Binary Search Tree)
+   based on the current tree size.
+2. If there are no entries in the direct path that are to the right of the
+   current entry, then skip updating this entry (there's no new information to
+   update it with).
+3. For each entry in the direct path that's to the right of the current entry,
+   from low to high:
+   1. Obtain a proof from the server that the highest version of the search key
+      present in the prefix tree at that entry is greater than or equal to the
+      current version.
+   2. If the above check was successful, remove the current position-version pair
+      from the map and replace it with a position-version pair corresponding to
+      the entry in the log that was just checked.
+
+This algorithm progressively moves up the tree as new intermediate/root nodes
+are established and verifies that they're constructed correctly. Note that users
+can often execute this process with the output of Search or Update operations
+for a key, without waiting to make explicit Monitor queries.
+
+It is also worth noting that the work required to monitor several versions of
+the same key scales sublinearly, due to the fact that the direct paths of the
+different versions will often intersect. Intersections reduce the total number
+of entries in the map and therefore the amount of work that will be needed to
+monitor the key from then on.
 
 
 # Ciphersuites
