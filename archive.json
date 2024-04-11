@@ -1,0 +1,71 @@
+{
+  "magic": "E!vIA5L86J2I",
+  "timestamp": "2024-04-11T00:07:40.933816+00:00",
+  "repo": "Bren2010/draft-keytrans",
+  "labels": [
+    {
+      "name": "bug",
+      "description": "Something isn't working",
+      "color": "d73a4a"
+    },
+    {
+      "name": "documentation",
+      "description": "Improvements or additions to documentation",
+      "color": "0075ca"
+    },
+    {
+      "name": "duplicate",
+      "description": "This issue or pull request already exists",
+      "color": "cfd3d7"
+    },
+    {
+      "name": "enhancement",
+      "description": "New feature or request",
+      "color": "a2eeef"
+    },
+    {
+      "name": "good first issue",
+      "description": "Good for newcomers",
+      "color": "7057ff"
+    },
+    {
+      "name": "help wanted",
+      "description": "Extra attention is needed",
+      "color": "008672"
+    },
+    {
+      "name": "invalid",
+      "description": "This doesn't seem right",
+      "color": "e4e669"
+    },
+    {
+      "name": "question",
+      "description": "Further information is requested",
+      "color": "d876e3"
+    },
+    {
+      "name": "wontfix",
+      "description": "This will not be worked on",
+      "color": "ffffff"
+    }
+  ],
+  "issues": [
+    {
+      "number": 1,
+      "id": "I_kwDOLrnaA86FSxiE",
+      "title": "Provide a way to bulk-initialize a log",
+      "url": "https://github.com/Bren2010/draft-keytrans/issues/1",
+      "state": "OPEN",
+      "author": "Bren2010",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "There are two aspects to this:\r\n\r\n1. We want to be able to add a certain number of fake entries to hide the actual size of the log.\r\n2. We want to be able to add pre-existing key-value pairs without having one log entry per pair (like we would for key-value pairs added after log creation).\r\n\r\nIt should be very efficient to have a large number of fake prefix tree entries. We also want to not leak the number of real entries that a log starts with",
+      "createdAt": "2024-04-10T19:33:46Z",
+      "updatedAt": "2024-04-10T19:33:46Z",
+      "closedAt": null,
+      "comments": []
+    }
+  ],
+  "pulls": []
+}
