@@ -33,6 +33,7 @@ timely manner.
 
 --- middle
 
+
 # Introduction
 
 TODO Introduction
@@ -171,9 +172,10 @@ added.
 In the combined tree structure, which is based on {{Merkle2}}, a log tree
 maintains a record of each time a key's value is updated, while a prefix tree
 maintains the set of key-version pairs. Importantly, the root value of the
-prefix tree after adding the new key-version pair is stored in the log tree
-alongside the record of the update. With some caveats, this combined structure
-supports both efficient consistency proofs and can be efficiently searched.
+prefix tree after adding the new key-version pair is stored in a leaf of the log
+tree alongside the record of the update. With some caveats, this combined
+structure supports both efficient consistency proofs and can be efficiently
+searched.
 
 To search the combined structure, users do a binary search for the first log
 entry where the prefix tree at that entry contains the desired key-version pair.
@@ -189,9 +191,10 @@ an implicit binary tree structure constructed over the leaves of the log tree
 ### Implicit Binary Search Tree
 
 Intuitively, the leaves of the log tree can be considered a flat array
-representation of a left-balanced binary tree. In this representation, "leaf"
-nodes are stored in even-numbered indices, while "intermediate" nodes are stored
-in odd-numbered indices:
+representation of a binary tree. This structure is similar to the log tree, but
+distinguished by the fact that not all parent nodes have two children. In this
+representation, "leaf" nodes are stored in even-numbered indices, while
+"intermediate" nodes are stored in odd-numbered indices:
 
 ~~~ aasvg
                              X
@@ -372,6 +375,10 @@ defined in {{kt-ciphersuites}}.
 
 # Cryptographic Computations
 
+## VRF
+
+TODO how are search key and version combined in vrf input?
+
 ## Commitment
 
 As discussed in {{combined-tree}}, commitments are stored in the leaves of the
@@ -450,7 +457,6 @@ nodeValue(node):
 ~~~
 
 where `Hash` denotes the ciphersuite hash function.
-
 
 ## Log Tree {#crypto-log-tree}
 
@@ -540,6 +546,86 @@ struct {
   opaque root_value<Hash.Nh>;
 } TreeHeadTBS;
 ~~~
+
+
+# Tree Proofs
+
+## Log Tree
+
+An inclusion proof for a single leaf in a log tree is given by providing the
+copath values of a leaf. Similarly, a bulk inclusion proof for any number of
+leaves is given by providing the fewest node values that can be hashed together
+with the specified leaves to produce the root value. Such a proof is encoded as:
+
+~~~ tls-presentation
+opaque NodeValue<Hash.Nh>;
+
+struct {
+  NodeValue elements<0..2^16-1>;
+} InclusionProof;
+~~~
+
+Each `NodeValue` is a uniform size, computed by passing the relevant `LogLeaf`
+or `LogParent` structures through the `nodeValue` function in
+{{crypto-log-tree}}. For individual inclusion proofs, the contents of the
+`elements` array is kept in bottom-to-top order. For batch inclusion proofs, the
+contents of the `elements` array is kept in left-to-right order: if a node is
+present in the root's left subtree, its value must be listed before any values
+provided from nodes that are in the root's right subtree, and so on recursively.
+
+Consistency proofs are encoded similarly:
+
+~~~ tls-presentation
+struct {
+  NodeValue elements<0..2^8-1>;
+} ConsistencyProof;
+~~~
+
+Again, each `NodeValue` is computed by passing the relevant `LogLeaf` or
+`LogParent` structure through the `nodeValue` function. The nodes chosen
+correspond to those output by the algorithm in Section 2.1.2 of {{RFC6962}}.
+
+## Prefix Tree
+
+A proof from a prefix tree authenticates that a search was done correctly for a
+given search key. Such a proof is encoded as:
+
+~~~ tls
+enum {
+  reserved(0),
+  inclusion(1),
+  nonInclusionLeaf(2),
+  nonInclusionParent(3),
+} PrefixSearchResult;
+
+struct {
+  PrefixSearchResult result;
+  NodeValue elements<0..2^16-1>;
+  select (PrefixProof.result) {
+    case nonInclusionLeaf:
+      PrefixLeaf leaf;
+  };
+} PrefixProof;
+~~~
+
+The `result` field indicates what the terminal node of the search was:
+
+- `inclusion` for a leaf node matching the requested key
+- `nonInclusionLeaf` for a leaf node not matching the requested key
+- `nonInclusionParent` for a parent node that lacks the desired child
+
+The `elements` array consists of the copath of the terminal node, in
+bottom-to-top order. That is, the terminal node's sibling would be first,
+followed by the terminal node's parent's sibling, and so on. In the event that a
+node is not present, an all-zero byte string of length `Hash.Nh` is listed
+instead.
+
+The proof is verified by hashing together the provided elements, in the
+left/right arrangement dictated by the search key, and checking that the result
+equals the root value of the prefix tree.
+
+For proofs with a result type of `nonInclusionLeaf`, the terminal node's value
+is provided, given that it can not be inferred.
 
 
 # Security Considerations
