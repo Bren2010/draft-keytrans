@@ -19,6 +19,16 @@ author:
 normative:
 
 informative:
+  Merkle2:
+    target: https://eprint.iacr.org/2021/453
+    title: "Merkle^2: A Low-Latency Transparency Log System"
+    date: 2021-04-08
+    author:
+      - name: Yuncong Hu
+      - name: Kian Hooshmand
+      - name: Harika Kalidhindi
+      - name: Seung Jin Yang
+      - name: Raluca Ada Popa
 
 
 --- abstract
@@ -46,8 +56,10 @@ TODO Introduction
 This document uses the TLS presentation language {{!RFC8446}} to describe the
 structure of protocol messages, but does not require the use of a specific
 transport protocol. As such, implementations do not necessarily need to transmit
-messages according to the TLS format, and can chose whichever encoding method
-best suits their application.
+messages according to the TLS format and can chose whichever encoding method
+best suits their application. However, cryptographic computations MUST be done
+with the TLS presentation language format to ensure the protocol's security
+properties are maintained.
 
 
 # Tree Construction
@@ -150,7 +162,7 @@ The value of a leaf node is the encoded set member, while the value of a
 parent node is the hash of the combined values of its left and right children
 (or a stand-in value when one of the children doesn't exist).
 
-An proof of membership is given by providing the leaf value, along with the hash
+A proof of membership is given by providing the leaf value, along with the hash
 of each copath entry along the search path. A proof of non-membership is given
 by providing an abridged proof of membership that follows the search path for
 the intended value, but ends either at a stand-in value or a leaf for a
@@ -170,7 +182,7 @@ prefix tree contains the same data as a previous version with only new values
 added.
 
 In the combined tree structure, which is based on {{Merkle2}}, a log tree
-maintains a record of each time a key's value is updated, while a prefix tree
+maintains a record of each time any key's value is updated, while a prefix tree
 maintains the set of key-version pairs. Importantly, the root value of the
 prefix tree after adding the new key-version pair is stored in a leaf of the log
 tree alongside the record of the update. With some caveats, this combined
@@ -244,49 +256,38 @@ def level(x):
         k += 1
     return k
 
-def left_step(x):
+# The root index of a search if the log has `n` entries.
+def root(n):
+    return (1 << log2(n)) - 1
+
+# The left child of an intermediate node.
+def left(x):
     k = level(x)
     if k == 0:
         raise Exception('leaf node has no children')
     return x ^ (0x01 << (k - 1))
 
-def right_step(x):
+# The right child of an intermediate node.
+def right(x, n):
     k = level(x)
     if k == 0:
         raise Exception('leaf node has no children')
-    return x ^ (0x03 << (k - 1))
-
-def move_within(x, start, n):
-    while x < start or x >= n:
-        if x < start: x = right_step(x)
-        else: x = left_step(x)
+    x = x ^ (0x03 << (k - 1))
+    while x >= n:
+        x = left(x)
     return x
-
-# The root index of a search, if the first instance of a key is at
-# `start` and the log has `n` entries.
-def root(start, n):
-    return move_within((1 << log2(n)) - 1, start, n)
-
-# The left child of an intermediate node.
-def left(x, start, n):
-    return move_within(left_step(x), start, n)
-
-# The right child of an intermediate node.
-def right(x, start, n):
-    return move_within(right_step(x), start, n)
 ~~~
 
 The `root` function returns the index in the log at which a search should
 start. The `left` and `right` functions determine the subsequent index to be
 accessed, depending on whether the search moves left or right.
 
-For example, in a search where the first instance of the key is at index 10 and
-the log has 60 entries, instead of starting the search at the typical "middle"
-entry of `10+60/2 = 35`, users would start at entry `root(10, 60) = 31`. If the
-next step in the search is to move right, the next index to access would be
-`right(31, 10, 60) = 47`. As more entries are added to the log, users will
-consistently revisit entries 31 and 47, while they may never revisit entry 35
-after even a single new entry is added to the log.
+For example, in a search where the log has 50 entries, instead of starting the
+search at the typical "middle" entry of `50/2 = 25`, users would start at entry
+`root(50) = 31`. If the next step in the search is to move right, the next index
+to access would be `right(31, 50) = 47`. As more entries are added to the log,
+users will consistently revisit entries 31 and 47, while they may never revisit
+entry 25 after even a single new entry is added to the log.
 
 Additionally, while users searching for a specific version of a key can jump
 right into a binary search for that key-version pair, other users may
@@ -297,8 +298,8 @@ what the highest counter for a key is.
 
 The frontier consists of the root node of a search, followed by the entries
 produced by repeatedly calling `right` until reaching the last entry of the log.
-Using the same example of a search where the first instance of a key is at index
-10 and the log has 60 entries, the frontier would be entries: 31, 47, 55, 59.
+Using the same example of a search where the log has 50 entries, the frontier
+would be entries: 31, 47, 49.
 
 If we can assume that the log operator is behaving honestly, then checking only
 the last entry of the log would be sufficient to find the most recent version of
@@ -323,6 +324,8 @@ initially populate this map by setting the position of an entry they've looked
 up, to map to the version of the key stored in that entry. A map may track
 several different versions of a search key simultaneously, if a user has been
 shown different versions of the same search key.
+
+<!-- Does this still work for new search structure? -->
 
 To update this map, users receive the most recent tree head from the server and
 follow these steps, for each entry in the map:
@@ -383,7 +386,7 @@ TODO how are search key and version combined in vrf input?
 
 As discussed in {{combined-tree}}, commitments are stored in the leaves of the
 log tree and correspond to updates of a key's value. Commitments are computed
-with HMAC {{RFC2104}}, using the hash function specified by the ciphersuite. To
+with HMAC {{!RFC2104}}, using the hash function specified by the ciphersuite. To
 produce a new commitment, the application generates a random 16 byte value
 called `opening` and computes:
 <!-- TODO Opening size should be determined by ciphersuite? -->
@@ -501,16 +504,14 @@ represented as:
 ~~~ tls-presentation
 struct {
   uint64 tree_size;
-  uint64 timestamp;
   opaque signature<0..2^16-1>;
 } TreeHead;
 ~~~
 
-where `tree_size` counts the number of entries in the log tree and `timestamp`
-is the time that the structure was generated in milliseconds since the Unix
-epoch. If the Transparency Log is deployed with Third-party Management then the
-public key used to verify the signature belongs to the third-party manager;
-otherwise the public key used belongs to the service operator.
+where `tree_size` counts the number of entries in the log tree. If the
+Transparency Log is deployed with Third-party Management then the public key
+used to verify the signature belongs to the third-party manager; otherwise the
+public key used belongs to the service operator.
 
 The signature itself is computed over a `TreeHeadTBS` structure, which
 incorporates the log's current state as well as long-term log configuration:
@@ -567,11 +568,10 @@ struct {
 
 Each `NodeValue` is a uniform size, computed by passing the relevant `LogLeaf`
 or `LogParent` structures through the `nodeValue` function in
-{{crypto-log-tree}}. For individual inclusion proofs, the contents of the
-`elements` array is kept in bottom-to-top order. For batch inclusion proofs, the
-contents of the `elements` array is kept in left-to-right order: if a node is
-present in the root's left subtree, its value must be listed before any values
-provided from nodes that are in the root's right subtree, and so on recursively.
+{{crypto-log-tree}}. The contents of the `elements` array is kept in
+left-to-right order: if a node is present in the root's left subtree, its value
+must be listed before any values provided from nodes that are in the root's
+right subtree, and so on recursively.
 
 Consistency proofs are encoded similarly:
 
@@ -614,7 +614,7 @@ The `result` field indicates what the terminal node of the search was:
 - `nonInclusionLeaf` for a leaf node not matching the requested key
 - `nonInclusionParent` for a parent node that lacks the desired child
 
-The `elements` array consists of the copath of the terminal node, in
+The `elements` array consists of the copath of the terminal node in
 bottom-to-top order. That is, the terminal node's sibling would be first,
 followed by the terminal node's parent's sibling, and so on. In the event that a
 node is not present, an all-zero byte string of length `Hash.Nh` is listed
