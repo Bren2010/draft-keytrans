@@ -46,7 +46,7 @@ timely manner.
 
 # Introduction
 
-TODO Introduction
+<!-- TODO Introduction -->
 
 
 # Conventions and Definitions
@@ -98,13 +98,13 @@ constructed from the leaves present in the parent's own subtree. Given a list of
 elements as leaves. Note also that every parent always has both a left and right
 child.
 
-TODO diagram of example tree
+<!-- TODO diagram of example tree -->
 
 Log trees initially consist of a single leaf node. New leaves are added to the
 right-most edge of the tree along with a single parent node, to construct the
 left-balanced binary tree with `n+1` leaves.
 
-TODO diagram of adding a new leaf to a tree (specifically 5 leaves to 6 leaves to show level-skipping)
+<!-- TODO diagram of adding a new leaf to a tree (specifically 5 leaves to 6 leaves to show level-skipping) -->
 
 While leaves contain arbitrary data, the value of a parent node is always the
 hash of the combined values of its left and right children.
@@ -122,7 +122,7 @@ the minimum set of intermediate node values from the current tree that allows
 the verifier to compute both the old root value and the current root value. An
 algorithm for this is given in section 2.1.2 of {{!RFC6962}}.
 
-TODO diagram of inclusion and consistency proofs
+<!-- TODO diagram of inclusion and consistency proofs -->
 
 ## Prefix Tree
 
@@ -146,7 +146,7 @@ is 1. This is then repeated for the second bit, third bit, and so on until the
 search either terminates at a leaf node (which may or may not be for the desired
 value), or a parent node that lacks the desired child.
 
-TODO diagram
+<!-- TODO diagram -->
 
 New values are added to the tree by searching it according to the same process.
 If the search terminates at a parent without a left or right child, a new leaf
@@ -156,7 +156,7 @@ leaf and the existing leaf would no longer reside in the same place. That is,
 until we reach the first bit that differs between the new value and the existing
 value.
 
-TODO diagram of adding new value
+<!-- TODO diagram of adding new value -->
 
 The value of a leaf node is the encoded set member, while the value of a
 parent node is the hash of the combined values of its left and right children
@@ -169,6 +169,10 @@ the intended value, but ends either at a stand-in value or a leaf for a
 different value. In either case, the proof is verified by hashing together the
 leaf with the copath values and checking that the result equals the root value
 of the tree.
+
+### Binary Ladder
+
+<!-- TODO Write about binary search through prefix tree -->
 
 ## Combined Tree
 
@@ -325,8 +329,6 @@ up, to map to the version of the key stored in that entry. A map may track
 several different versions of a search key simultaneously, if a user has been
 shown different versions of the same search key.
 
-<!-- Does this still work for new search structure? -->
-
 To update this map, users receive the most recent tree head from the server and
 follow these steps, for each entry in the map:
 
@@ -355,6 +357,9 @@ different versions will often intersect. Intersections reduce the total number
 of entries in the map and therefore the amount of work that will be needed to
 monitor the key from then on.
 
+<!-- TODO This algorithm will need to be updated to handle partial knowledge of the
+highest version of a key at each entry. -->
+
 
 # Ciphersuites
 
@@ -380,7 +385,16 @@ defined in {{kt-ciphersuites}}.
 
 ## VRF
 
-TODO how are search key and version combined in vrf input?
+Each version of a search key that's inserted in a log will have a unique
+representation in the prefix tree. This is computed by providing the combined
+search key and version as inputs to the VRF:
+
+~~~ tls-presentation
+struct {
+  opaque search_key<0..2^8-1>;
+  uint32 version;
+} VrfInput;
+~~~
 
 ## Commitment
 
@@ -389,7 +403,7 @@ log tree and correspond to updates of a key's value. Commitments are computed
 with HMAC {{!RFC2104}}, using the hash function specified by the ciphersuite. To
 produce a new commitment, the application generates a random 16 byte value
 called `opening` and computes:
-<!-- TODO Opening size should be determined by ciphersuite? -->
+<!-- TODO Opening size should be determined by ciphersuite -->
 
 ~~~ pseudocode
 commitment = HMAC(fixedKey, CommitmentValue)
@@ -543,7 +557,6 @@ struct {
 struct {
   Configuration config;
   uint64 tree_size;
-  uint64 timestamp;
   opaque root_value<Hash.Nh>;
 } TreeHeadTBS;
 ~~~
@@ -587,8 +600,9 @@ correspond to those output by the algorithm in Section 2.1.2 of {{RFC6962}}.
 
 ## Prefix Tree
 
-A proof from a prefix tree authenticates that a search was done correctly for a
-given search key. Such a proof is encoded as:
+A proof from a prefix tree authenticates that a set of values are either members
+of, or are not members of, the total set of values represented by the prefix
+tree. Such a proof is encoded as:
 
 ~~~ tls
 enum {
@@ -596,42 +610,126 @@ enum {
   inclusion(1),
   nonInclusionLeaf(2),
   nonInclusionParent(3),
-} PrefixSearchResult;
+} PrefixSearchResultType;
 
 struct {
-  PrefixSearchResult result;
-  NodeValue elements<0..2^16-1>;
-  select (PrefixProof.result) {
+  PrefixSearchResultType result_type;
+  select (PrefixSearchResult.result_type) {
     case nonInclusionLeaf:
       PrefixLeaf leaf;
   };
+} PrefixSearchResult;
+
+struct {
+  PrefixSearchResult results<0..2^8-1>;
+  NodeValue elements<0..2^16-1>;
 } PrefixProof;
 ~~~
 
-The `result` field indicates what the terminal node of the search was:
+The `results` field contains the search result for each individual value. It is
+sorted lexicographically by corresponding value. The `result_type` field of each
+`PrefixSearchResult` struct indicates what the terminal node of the search for
+that value was:
 
-- `inclusion` for a leaf node matching the requested key
-- `nonInclusionLeaf` for a leaf node not matching the requested key
-- `nonInclusionParent` for a parent node that lacks the desired child
+- `inclusion` for a leaf node matching the requested value.
+- `nonInclusionLeaf` for a leaf node not matching the requested value. In this
+  case, the terminal node's value is provided given that it can not be inferred.
+- `nonInclusionParent` for a parent node that lacks the desired child.
 
-The `elements` array consists of the copath of the terminal node in
-bottom-to-top order. That is, the terminal node's sibling would be first,
-followed by the terminal node's parent's sibling, and so on. In the event that a
-node is not present, an all-zero byte string of length `Hash.Nh` is listed
-instead.
+The `elements` array consists of the fewest node values that can be hashed
+together with the provided leaves to produce the root. The contents of the
+`elements` array is kept in left-to-right order: if a node is present in the
+root's left subtree, its value must be listed before any values provided from
+nodes that are in the root's right subtree, and so on recursively. In the event
+that a node is not present, an all-zero byte string of length `Hash.Nh` is
+listed instead.
 
 The proof is verified by hashing together the provided elements, in the
 left/right arrangement dictated by the search key, and checking that the result
 equals the root value of the prefix tree.
 
-For proofs with a result type of `nonInclusionLeaf`, the terminal node's value
-is provided, given that it can not be inferred.
+## Combined Tree {#proof-combined-tree}
+
+A proof from a combined log and prefix tree follows the execution of a binary
+search through the leaves of the log tree, as described in {{combined-tree}}. It
+is serialized as follows:
+
+~~~ tls-presentation
+
+struct {
+  opaque proof<VRF.Np>;
+} VRFProof;
+
+struct {
+  uint8 successful;
+  PrefixProof prefix_proof;
+  opaque commitment<Hash.Nh>;
+} ProofStep;
+
+struct {
+  optional<uint32> version;
+  VRFProof vrf_proofs<0..2^8-1>;
+  ProofStep steps<0..2^8-1>;
+  InclusionProof inclusion;
+} SearchProof;
+~~~
+
+If searching for the most recent version of a key, the most recent version is
+provided in `version`. If searching for a specific version, this field is
+omitted.
+
+Each element of `vrf_proofs` contains the output of evaluating the VRF on a
+different version. The versions chosen correspond to the binary ladder described
+in {{binary-ladder}}.
+
+Each `ProofStep` structure in `steps` is one leaf that was inspected as part of
+the binary search. The first step corresponds to the "middle" leaf of the log
+tree (calculated with the `root` function in {{implicit-binary-search-tree}}).
+From there, each subsequent step moves left or right in the tree, based on
+previous results.
+
+The `successful` field of a `ProofStep` contains the number of steps of the
+binary ladder where the result of looking up the corresponding VRF output in the
+prefix tree yields the expected result.
+
+The `prefix_proof` field of a `ProofStep` is the output of searching the prefix
+tree for the first `successful+1` steps of the binary ladder, excluding:
+
+- Any ladder entries for which a **proof of inclusion** is expected, and a proof
+  of inclusion was already provided in a previous `ProofStep` for a log entry to
+  the **left** of the current one.
+- Any ladder entries for which a **proof of non-inclusion** is expected, and a
+  proof of non-inclusion was already provided in a previous `ProofStep` for a
+  log entry to the **right** of the current one.
+
+Whether or not a ladder entry is expected to produce a proof of inclusion or
+non-inclusion, for the purpose of computing this exclusion, includes the
+assumption that the ladder entry with index `successful+1` (if it exists) will
+produce the opposite result.
+<!-- TODO Does this ever actually result in excluding any ladder entries? -->
+
+The `commitment` field of a `ProofStep` contains the commitment to the update at
+that leaf. The `inclusion` field of `SearchProof` contains a batch inclusion
+proof for all of the leaves accessed by the binary search.
+
+The proof can be verified by checking that:
+
+1. The elements of `steps` represent a monotonic series over the leaves of the
+   log, and
+2. The `steps` array has the expected number of entries (no more or less than
+   are necessary to execute the binary search).
+
+Once the validity of the search steps has been established, the verifier can
+compute the root of each prefix tree represented by a `prefix_proof` and combine
+it with the corresponding `commitment` to obtain the value of each leaf. These
+leaf values can then be combined with the proof in `inclusion` to check that the
+output matches the root of the log tree.
 
 
 # Security Considerations
 
-TODO Security
-TODO Say that transport layer should be encrypted, provide auth
+<!-- TODO Security -->
+<!-- TODO Say that transport layer should be encrypted, provide auth -->
 
 
 # IANA Considerations
@@ -653,11 +751,11 @@ this document
 uint16 CipherSuite;
 ~~~
 
-TODO
+<!-- TODO -->
 
 ## KT Designated Expert Pool {#de}
 
-TODO
+<!-- TODO -->
 
 
 --- back
@@ -665,4 +763,4 @@ TODO
 # Acknowledgments
 {:numbered="false"}
 
-TODO acknowledge.
+<!-- TODO acknowledge. -->
