@@ -702,7 +702,7 @@ tree for the first `successful+1` steps of the binary ladder, excluding:
   proof of non-inclusion was already provided in a previous `ProofStep` for a
   log entry to the **right** of the current one.
 
-Whether or not a ladder entry is expected to produce a proof of inclusion or
+Whether a ladder entry is expected to produce a proof of inclusion or
 non-inclusion, for the purpose of computing this exclusion, includes the
 assumption that the ladder entry with index `successful+1` (if it exists) will
 produce the opposite result.
@@ -718,6 +718,7 @@ The proof can be verified by checking that:
    log, and
 2. The `steps` array has the expected number of entries (no more or less than
    are necessary to execute the binary search).
+<!-- TODO Specify this verification in MUCH more detail -->
 
 Once the validity of the search steps has been established, the verifier can
 compute the root of each prefix tree represented by a `prefix_proof` and combine
@@ -765,6 +766,74 @@ provided by the user, not the VRF output), `version` contains the new key
 version, and `value` contains the same contents as `UpdateValue.value`. Clients
 MUST successfully verify this signature before consuming `UpdateValue.value`.
 
+
+# User Operations
+
+The basic user operations are organized as a request-response protocol between a
+user and the Transparency Log operator.
+
+<!-- Generally, users MUST retain the most
+recent `TreeHead` they've successfully verified as part of any query response,
+and populate the `last` field of any query request with the `tree_size` from
+this `TreeHead`. This ensures that all operations performed by the user return
+consistent results.
+
+~~~ tls-presentation
+struct {
+  TreeHead tree_head;
+  optional<ConsistencyProof> consistency;
+  select (Configuration.mode) {
+    case thirdPartyAuditing:
+      AuditorTreeHead auditor_tree_head;
+  };
+} FullTreeHead;
+~~~
+
+If `last` is present, then the Transparency Log MUST provide a consistency proof
+between the current tree and the tree when it was this size, in the
+`consistency` field of `FullTreeHead`. -->
+
+## Search
+
+Users initiate a Search operation by submitting a SearchRequest to the
+Transparency Log containing the key that they're interested in. Users can
+optionally specify a version of the key that they'd like to receive, if not the
+most recent one.
+
+~~~ tls-presentation
+struct {
+  optional<Consistency> consistency;
+
+  opaque search_key<0..2^8-1>;
+  optional<uint32> version;
+} SearchRequest;
+~~~
+
+In turn, the Transparency Log responds with a SearchResponse structure:
+
+~~~ tls-presentation
+struct {
+  FullTreeHead full_tree_head;
+
+  SearchProof search;
+  opaque opening<16>;
+  UpdateValue value;
+} SearchResponse;
+~~~
+
+Users verify a search response by following these steps:
+
+1. Evaluate the search proof in `search` according to the steps in
+   {{proof-combined-tree}}. This will produce a verdict as to whether the search
+   was executed correctly and also a candidate root value for the tree. If it's
+   determined that the search was executed incorrectly, abort with an error.
+2. With the candidate root value for the tree, verify the given `FullTreeHead`.
+3. Verify that the commitment in the terminal search step opens to
+   `SearchResponse.value` with opening `SearchResponse.opening`.
+
+Depending on the deployment mode of the Transparency Log, the `value` field may
+or may not require additional verification, specified in {{update-format}},
+before its contents may be consumed.
 
 # Security Considerations
 
