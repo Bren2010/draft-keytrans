@@ -835,6 +835,39 @@ Depending on the deployment mode of the Transparency Log, the `value` field may
 or may not require additional verification, specified in {{update-format}},
 before its contents may be consumed.
 
+## Update
+
+Users initiate an Update operation by submitting an UpdateRequest to the
+Transparency Log containing the new key and value to store.
+
+~~~ tls-presentation
+struct {
+  optional<Consistency> consistency;
+
+  opaque search_key<0..2^8-1>;
+  opaque value<0..2^32-1>;
+} UpdateRequest;
+~~~
+
+If the request passes application-layer policy checks, the Transparency Log adds
+the new key-value pair to the log and returns an UpdateResponse structure:
+
+~~~ tls-presentation
+struct {
+  FullTreeHead full_tree_head;
+
+  SearchProof search;
+  opaque opening<16>;
+  UpdatePrefix prefix;
+} UpdateResponse;
+~~~
+
+Users verify the UpdateResponse as if it were a SearchResponse for the most
+recent version of `search_key`. To aid verification, the update response
+provides the `UpdatePrefix` structure necessary to reconstruct the
+`UpdateValue`.
+
+
 # Security Considerations
 
 <!-- TODO Security -->
