@@ -87,13 +87,16 @@ Table of Contents
      6.1.  Log Tree
      6.2.  Prefix Tree
      6.3.  Combined Tree
-   7.  Security Considerations
-   8.  IANA Considerations
-     8.1.  KT Ciphersuites
-     8.2.  KT Designated Expert Pool
-   9.  References
-     9.1.  Normative References
-     9.2.  Informative References
+   7.  Update Format
+   8.  User Operations
+     8.1.  Search
+   9.  Security Considerations
+   10. IANA Considerations
+     10.1.  KT Ciphersuites
+     10.2.  KT Designated Expert Pool
+   11. References
+     11.1.  Normative References
+     11.2.  Informative References
    Acknowledgments
    Author's Address
 
@@ -448,7 +451,7 @@ Table of Contents
    One of the VRF algorithms from [RFC9381] must be used.
 
    Ciphersuites are represented with the CipherSuite type.  The
-   ciphersuites are defined in Section 8.1.
+   ciphersuites are defined in Section 10.1.
 
 5.  Cryptographic Computations
 
@@ -748,10 +751,10 @@ Table of Contents
       previous ProofStep for a log entry to the *right* of the current
       one.
 
-   Whether or not a ladder entry is expected to produce a proof of
-   inclusion or non-inclusion, for the purpose of computing this
-   exclusion, includes the assumption that the ladder entry with index
-   successful+1 (if it exists) will produce the opposite result.
+   Whether a ladder entry is expected to produce a proof of inclusion or
+   non-inclusion, for the purpose of computing this exclusion, includes
+   the assumption that the ladder entry with index successful+1 (if it
+   exists) will produce the opposite result.
 
    The commitment field of a ProofStep contains the commitment to the
    update at that leaf.  The inclusion field of SearchProof contains a
@@ -773,32 +776,117 @@ Table of Contents
    combined with the proof in inclusion to check that the output matches
    the root of the log tree.
 
-7.  Security Considerations
+7.  Update Format
 
-8.  IANA Considerations
+   The updates committed to by a combined tree structure contain the new
+   value of a search key, along with additional information depending on
+   the deployment mode of the Transparency Log. They are serialized as
+   follows:
+
+   struct {
+     select (Configuration.mode) {
+       case thirdPartyManagement:
+         opaque signature<0..2^16-1>;
+     };
+   } UpdatePrefix;
+
+   struct {
+     UpdatePrefix prefix;
+     opaque value<0..2^32-1>;
+   } UpdateValue;
+
+   The value field contains the new value of the search key.
+
+   In the event that third-party management is used, the prefix field
+   contains a signature from the service operator, using the public key
+   from Configuration.leaf_public_key, over the following structure:
+
+   struct {
+     opaque search_key<0..2^8-1>;
+     uint32 version;
+     opaque value<0..2^32-1>;
+   } UpdateTBS;
+
+   The search_key field contains the search key being updated (the
+   search key provided by the user, not the VRF output), version
+   contains the new key version, and value contains the same contents as
+   UpdateValue.value.  Clients MUST successfully verify this signature
+   before consuming UpdateValue.value.
+
+8.  User Operations
+
+   The basic user operations are organized as a request-response
+   protocol between a user and the Transparency Log operator.
+
+8.1.  Search
+
+   Users initiate a Search operation by submitting a SearchRequest to
+   the Transparency Log containing the key that they're interested in.
+   Users can optionally specify a version of the key that they'd like to
+   receive, if not the most recent one.
+
+   struct {
+     optional<Consistency> consistency;
+
+     opaque search_key<0..2^8-1>;
+     optional<uint32> version;
+   } SearchRequest;
+
+   In turn, the Transparency Log responds with a SearchResponse
+   structure:
+
+   struct {
+     FullTreeHead full_tree_head;
+
+     SearchProof search;
+     opaque opening<16>;
+     UpdateValue value;
+   } SearchResponse;
+
+   Users verify a search response by following these steps:
+
+   1.  Evaluate the search proof in search according to the steps in
+       Section 6.3.  This will produce a verdict as to whether the
+       search was executed correctly and also a candidate root value for
+       the tree.  If it's determined that the search was executed
+       incorrectly, abort with an error.
+
+   2.  With the candidate root value for the tree, verify the given
+       FullTreeHead.
+
+   3.  Verify that the commitment in the terminal search step opens to
+       SearchResponse.value with opening SearchResponse.opening.
+
+   Depending on the deployment mode of the Transparency Log, the value
+   field may or may not require additional verification, specified in
+   Section 7, before its contents may be consumed.
+
+9.  Security Considerations
+
+10.  IANA Considerations
 
    This document requests the creation of the following new IANA
    registries:
 
-   *  KT Ciphersuites (Section 8.1)
+   *  KT Ciphersuites (Section 10.1)
 
    All of these registries should be under a heading of "Key
    Transparency", and assignments are made via the Specification
-   Required policy [RFC8126].  See Section 8.2 for additional
+   Required policy [RFC8126].  See Section 10.2 for additional
    information about the KT Designated Experts (DEs).
 
    RFC EDITOR: Please replace XXXX throughout with the RFC number
    assigned to this document
 
-8.1.  KT Ciphersuites
+10.1.  KT Ciphersuites
 
    uint16 CipherSuite;
 
-8.2.  KT Designated Expert Pool
+10.2.  KT Designated Expert Pool
 
-9.  References
+11.  References
 
-9.1.  Normative References
+11.1.  Normative References
 
    [RFC2104]  Krawczyk, H., Bellare, M., and R. Canetti, "HMAC: Keyed-
               Hashing for Message Authentication", RFC 2104,
@@ -832,7 +920,7 @@ Table of Contents
               DOI 10.17487/RFC9381, August 2023,
               <https://www.rfc-editor.org/rfc/rfc9381>.
 
-9.2.  Informative References
+11.2.  Informative References
 
    [Merkle2]  Hu, Y., Hooshmand, K., Kalidhindi, H., Yang, S. J., and R.
               A. Popa, "Merkle^2: A Low-Latency Transparency Log
