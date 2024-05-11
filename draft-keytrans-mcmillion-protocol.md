@@ -726,6 +726,46 @@ leaf values can then be combined with the proof in `inclusion` to check that the
 output matches the root of the log tree.
 
 
+# Update Format
+
+The updates committed to by a combined tree structure contain the new value of a
+search key, along with additional information depending on the deployment mode
+of the Transparency Log. They are serialized as follows:
+
+~~~ tls-presentation
+struct {
+  select (Configuration.mode) {
+    case thirdPartyManagement:
+      opaque signature<0..2^16-1>;
+  };
+} UpdatePrefix;
+
+struct {
+  UpdatePrefix prefix;
+  opaque value<0..2^32-1>;
+} UpdateValue;
+~~~
+
+The `value` field contains the new value of the search key.
+
+In the event that third-party management is used, the `prefix` field contains a
+signature from the service operator, using the public key from
+`Configuration.leaf_public_key`, over the following structure:
+
+~~~ tls-presentation
+struct {
+  opaque search_key<0..2^8-1>;
+  uint32 version;
+  opaque value<0..2^32-1>;
+} UpdateTBS;
+~~~
+
+The `search_key` field contains the search key being updated (the search key
+provided by the user, not the VRF output), `version` contains the new key
+version, and `value` contains the same contents as `UpdateValue.value`. Clients
+MUST successfully verify this signature before consuming `UpdateValue.value`.
+
+
 # Security Considerations
 
 <!-- TODO Security -->
