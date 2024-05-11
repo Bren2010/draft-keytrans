@@ -1210,6 +1210,9 @@ timely manner.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.1">
                 <p id="section-toc.1-1.8.2.1.1"><a href="#section-8.1" class="auto internal xref">8.1</a>.  <a href="#name-search" class="internal xref">Search</a></p>
 </li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.2">
+                <p id="section-toc.1-1.8.2.2.1"><a href="#section-8.2" class="auto internal xref">8.2</a>.  <a href="#name-update" class="internal xref">Update</a></p>
+</li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
@@ -2126,6 +2129,42 @@ determined that the search was executed incorrectly, abort with an error.<a href
 <p id="section-8.1-7">Depending on the deployment mode of the Transparency Log, the <code>value</code> field may
 or may not require additional verification, specified in <a href="#update-format" class="auto internal xref">Section 7</a>,
 before its contents may be consumed.<a href="#section-8.1-7" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="update">
+<section id="section-8.2">
+        <h3 id="name-update">
+<a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-update" class="section-name selfRef">Update</a>
+        </h3>
+<p id="section-8.2-1">Users initiate an Update operation by submitting an UpdateRequest to the
+Transparency Log containing the new key and value to store.<a href="#section-8.2-1" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-8.2-2">
+<pre>
+struct {
+  optional&lt;Consistency&gt; consistency;
+
+  opaque search_key&lt;0..2^8-1&gt;;
+  opaque value&lt;0..2^32-1&gt;;
+} UpdateRequest;
+</pre><a href="#section-8.2-2" class="pilcrow">¶</a>
+</div>
+<p id="section-8.2-3">If the request passes application-layer policy checks, the Transparency Log adds
+the new key-value pair to the log and returns an UpdateResponse structure:<a href="#section-8.2-3" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-8.2-4">
+<pre>
+struct {
+  FullTreeHead full_tree_head;
+
+  SearchProof search;
+  opaque opening&lt;16&gt;;
+  UpdatePrefix prefix;
+} UpdateResponse;
+</pre><a href="#section-8.2-4" class="pilcrow">¶</a>
+</div>
+<p id="section-8.2-5">Users verify the UpdateResponse as if it were a SearchResponse for the most
+recent version of <code>search_key</code>. To aid verification, the update response
+provides the <code>UpdatePrefix</code> structure necessary to reconstruct the
+<code>UpdateValue</code>.<a href="#section-8.2-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>

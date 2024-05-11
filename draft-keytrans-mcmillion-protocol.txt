@@ -90,6 +90,7 @@ Table of Contents
    7.  Update Format
    8.  User Operations
      8.1.  Search
+     8.2.  Update
    9.  Security Considerations
    10. IANA Considerations
      10.1.  KT Ciphersuites
@@ -860,6 +861,35 @@ Table of Contents
    Depending on the deployment mode of the Transparency Log, the value
    field may or may not require additional verification, specified in
    Section 7, before its contents may be consumed.
+
+8.2.  Update
+
+   Users initiate an Update operation by submitting an UpdateRequest to
+   the Transparency Log containing the new key and value to store.
+
+   struct {
+     optional<Consistency> consistency;
+
+     opaque search_key<0..2^8-1>;
+     opaque value<0..2^32-1>;
+   } UpdateRequest;
+
+   If the request passes application-layer policy checks, the
+   Transparency Log adds the new key-value pair to the log and returns
+   an UpdateResponse structure:
+
+   struct {
+     FullTreeHead full_tree_head;
+
+     SearchProof search;
+     opaque opening<16>;
+     UpdatePrefix prefix;
+   } UpdateResponse;
+
+   Users verify the UpdateResponse as if it were a SearchResponse for
+   the most recent version of search_key.  To aid verification, the
+   update response provides the UpdatePrefix structure necessary to
+   reconstruct the UpdateValue.
 
 9.  Security Considerations
 
