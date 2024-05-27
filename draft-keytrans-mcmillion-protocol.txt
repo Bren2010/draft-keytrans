@@ -3,9 +3,9 @@
 
 
 KEYTRANS Working Group                                      B. McMillion
-Internet-Draft                                               11 May 2024
+Internet-Draft                                               27 May 2024
 Intended status: Informational                                          
-Expires: 12 November 2024
+Expires: 28 November 2024
 
 
                        Key Transparency Protocol
@@ -49,7 +49,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 12 November 2024.
+   This Internet-Draft will expire on 28 November 2024.
 
 Copyright Notice
 
@@ -102,6 +102,21 @@ Table of Contents
    Author's Address
 
 1.  Introduction
+
+   End-to-end encrypted communication services rely on the secure
+   exchange of public keys to ensure that messages remain confidential.
+   It is typically assumed that service providers correctly manage the
+   public keys associated with each user's account.  However, this is
+   not always true.  A service provider that is compromised or malicious
+   can change the public keys associated with a user's account without
+   their knowledge, thereby allowing the provider to eavesdrop on and
+   impersonate that user.
+
+   This document describes a protocol that enables a group of users to
+   ensure that they all have the same view of the public keys associated
+   with each other's accounts.  Ensuring a consistent view of public
+   keys allows users to detect when unauthorized keys have been
+   associated with their account, indicating a potential compromise.
 
 2.  Conventions and Definitions
 
