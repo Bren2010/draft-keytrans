@@ -46,8 +46,19 @@ timely manner.
 
 # Introduction
 
-<!-- TODO Introduction -->
+End-to-end encrypted communication services rely on the secure exchange of
+public keys to ensure that messages remain confidential. It is typically assumed
+that service providers correctly manage the public keys associated with each
+user's account. However, this is not always true. A service provider that is
+compromised or malicious can change the public keys associated with a user's
+account without their knowledge, thereby allowing the provider to eavesdrop on
+and impersonate that user.
 
+This document describes a protocol that enables a group of users to ensure that
+they all have the same view of the public keys associated with each other's
+accounts. Ensuring a consistent view of public keys allows users to detect when
+unauthorized keys have been associated with their account, indicating a
+potential compromise.
 
 # Conventions and Definitions
 
