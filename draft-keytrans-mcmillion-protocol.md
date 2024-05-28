@@ -316,36 +316,60 @@ entry 25 after even a single new entry is added to the log.
 
 ## Binary Ladder
 
-While users searching for a specific version of a key can jump right into a
-binary search for that key-version pair, other users may instead wish to search
-for the "most recent" version of a key. That is, the key with the highest
-counter possible.
+When executing searches on a Transparency Log, the implicit tree described in
+{{implicit-binary-search-tree}} is navigated according to a binary search. At
+each individual log entry, the binary search needs to determine whether it
+should move left or right. That is, it needs to determine, out of the set of
+key-version pairs stored in the prefix tree, whether the highest version present
+at a given log entry is higher than, equal to, or lower than a target version.
 
-The highest version of a key that's available at a given log entry is proved by
-producing a **binary ladder**. A binary ladder is a series of lookups in the
-prefix tree:
+A **binary ladder** is a series of lookups in a single log entry's prefix tree,
+which is used to establish a bound on the highest version of a key that's
+available at that log entry.
 
-1. First, version `x` of the key is looked up, where `x` is consecutively higher
-   powers of two minus one (0, 1, 3, 7, ...). This is repeated until the first
-   proof of non-inclusion is produced.
+To determine the highest version of a key that's present at a given log entry,
+the following lookups are done:
+
+1. First, version `x` of the key is looked up, where `x` is a consecutively
+   higher power of two minus one (0, 1, 3, 7, ...). This is repeated until the
+   first proof of non-inclusion is produced.
 2. Once the first proof of non-inclusion is produced, a binary search is
    conducted between the highest version that was proved to be included, and the
    version that was proved to not be included. Each step of the binary search
    produces either a proof of inclusion or non-inclusion, which guides the
    search left or right, until it terminates.
 
-This identifies the highest version of a key that is present at a specific log
-entry. To find the highest version of a key in the entire log, users request
-this ladder for each node on the **frontier** of the log. The frontier consists
-of the root node of a search, followed by the entries produced by repeatedly
-calling `right` until reaching the last entry of the log. Using the same example
-of a search where the log has 50 entries, the frontier would be entries: 31, 47,
-49.
+However, note that it's not always necessary to find the *exact* highest version
+of the key that exists at each log entry. It's sufficient just to determine
+whether that version is greater than or less than the target version. As such, a
+binary ladder consists of this series of lookups, truncated at the point where
+further lookups would no longer impact the binary search's decision.
 
-Checking each entry along the frontier is functionally the same as checking only
-the last entry, but also allows the user to verify that the entire search path
-leading to the last entry is constructed correctly, thereby preventing log
-misbehavior.
+When executing a search in a Transparency Log for a specific version of a key, a
+binary ladder is provided for each node on the search path, verifiably guiding
+the search toward the log entry where the desired key-version pair was first
+inserted (and therefore, the log entry with the desired update).
+
+## Most Recent Version
+
+Often, users wish to search for the "most recent" version of a key. That is, the
+key with the highest counter possible.
+
+To determine this, users request a full (non-truncated) binary ladder for each
+node on the **frontier** of the log. The frontier consists of the root node of a
+search, followed by the entries produced by repeatedly calling `right` until
+reaching the last entry of the log. Using the same example of a search where the
+log has 50 entries, the frontier would be entries: 31, 47, 49.
+
+For the purpose of finding the highest version possible, inspecting each entry
+along the frontier is functionally the same as inspecting only the last entry.
+However, inspecting the frontier allows the user to verify that the entire
+search path leading to the last entry represents a monotonic series of version
+increases, thereby preventing log misbehavior.
+
+Once the user has verified that the frontier lookups are monotonic and
+determined the highest version, the user then continues a binary search for this
+specific version.
 
 ## Monitoring
 
@@ -418,7 +442,7 @@ defined in {{kt-ciphersuites}}.
 
 # Cryptographic Computations
 
-## VRF
+## Verifiable Random Function
 
 Each version of a search key that's inserted in a log will have a unique
 representation in the prefix tree. This is computed by providing the combined
