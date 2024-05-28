@@ -15,6 +15,9 @@ author:
  -
     fullname: "Brendan McMillion"
     email: "brendanmcmillion@gmail.com"
+ -
+    fullname: "Felix Linker"
+    email: "linkerfelix@gmail.com"
 
 normative:
 
