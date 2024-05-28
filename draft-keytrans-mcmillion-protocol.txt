@@ -3,9 +3,9 @@
 
 
 KEYTRANS Working Group                                      B. McMillion
-Internet-Draft                                               27 May 2024
+Internet-Draft                                               28 May 2024
 Intended status: Informational                                          
-Expires: 28 November 2024
+Expires: 29 November 2024
 
 
                        Key Transparency Protocol
@@ -49,7 +49,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 28 November 2024.
+   This Internet-Draft will expire on 29 November 2024.
 
 Copyright Notice
 
@@ -72,32 +72,34 @@ Table of Contents
    3.  Tree Construction
      3.1.  Log Tree
      3.2.  Prefix Tree
-       3.2.1.  Binary Ladder
      3.3.  Combined Tree
-       3.3.1.  Implicit Binary Search Tree
-       3.3.2.  Monitoring
-   4.  Ciphersuites
-   5.  Cryptographic Computations
-     5.1.  VRF
-     5.2.  Commitment
-     5.3.  Prefix Tree
-     5.4.  Log Tree
-     5.5.  Tree Head Signature
-   6.  Tree Proofs
-     6.1.  Log Tree
-     6.2.  Prefix Tree
-     6.3.  Combined Tree
-   7.  Update Format
-   8.  User Operations
-     8.1.  Search
-     8.2.  Update
-   9.  Security Considerations
-   10. IANA Considerations
-     10.1.  KT Ciphersuites
-     10.2.  KT Designated Expert Pool
-   11. References
-     11.1.  Normative References
-     11.2.  Informative References
+   4.  Searching the Tree
+     4.1.  Implicit Binary Search Tree
+     4.2.  Binary Ladder
+     4.3.  Most Recent Version
+     4.4.  Monitoring
+   5.  Ciphersuites
+   6.  Cryptographic Computations
+     6.1.  Verifiable Random Function
+     6.2.  Commitment
+     6.3.  Prefix Tree
+     6.4.  Log Tree
+     6.5.  Tree Head Signature
+   7.  Tree Proofs
+     7.1.  Log Tree
+     7.2.  Prefix Tree
+     7.3.  Combined Tree
+   8.  Update Format
+   9.  User Operations
+     9.1.  Search
+     9.2.  Update
+   10. Security Considerations
+   11. IANA Considerations
+     11.1.  KT Ciphersuites
+     11.2.  KT Designated Expert Pool
+   12. References
+     12.1.  Normative References
+     12.2.  Informative References
    Acknowledgments
    Author's Address
 
@@ -114,9 +116,13 @@ Table of Contents
 
    This document describes a protocol that enables a group of users to
    ensure that they all have the same view of the public keys associated
-   with each other's accounts.  Ensuring a consistent view of public
-   keys allows users to detect when unauthorized keys have been
-   associated with their account, indicating a potential compromise.
+   with each other's accounts.  Ensuring a consistent view allows users
+   to detect when unauthorized public keys have been associated with
+   their account, indicating a potential compromise.
+
+   More detailed information about the protocol participants and the
+   ways the protocol can be deployed can be found in
+   [I-D.ietf-keytrans-architecture].
 
 2.  Conventions and Definitions
 
@@ -141,7 +147,7 @@ Table of Contents
    trees.  This section describes the operation of both at a high level
    and the way that they're combined.  More precise algorithms for
    computing the intermediate and root values of the trees are given in
-   Section 5.
+   Section 6.
 
    Both types of trees consist of _nodes_ which have a byte string as
    their _value_. A node is either a _leaf_ if it has no children, or a
@@ -247,8 +253,6 @@ Table of Contents
    values and checking that the result equals the root value of the
    tree.
 
-3.2.1.  Binary Ladder
-
 3.3.  Combined Tree
 
    Log trees are desirable because they can provide efficient
@@ -265,16 +269,26 @@ Table of Contents
    tree maintains a record of each time any key's value is updated,
    while a prefix tree maintains the set of key-version pairs.
    Importantly, the root value of the prefix tree after adding the new
-   key-version pair is stored in a leaf of the log tree alongside the
-   record of the update.  With some caveats, this combined structure
-   supports both efficient consistency proofs and can be efficiently
-   searched.
+   key-version pair is stored in a leaf of the log tree alongside a
+   privacy-preserving commitment to the update.  With some caveats, this
+   combined structure supports both efficient consistency proofs and can
+   be efficiently searched.
 
-   To search the combined structure, users do a binary search for the
-   first log entry where the prefix tree at that entry contains the
-   desired key-version pair.  As such, the entry that a user arrives at
-   through binary search contains the update that they're looking for,
-   even though the log itself is not sorted.
+   Note that, although the Transparency Log maintains a single logical
+   prefix tree, each modification of this tree results in a new root
+   hash, which is then stored in the log tree.  Therefore, when
+   instructions refer to "looking up a key in the prefix tree at a given
+   log entry," this actually means searching in the specific version of
+   the prefix tree that corresponds to the root hash stored at that log
+   entry.
+
+4.  Searching the Tree
+
+   To search the combined tree structure described in Section 3.3, users
+   do a binary search for the first log entry where the prefix tree at
+   that entry contains the desired key-version pair.  As such, the entry
+   that a user arrives at through binary search contains the update that
+   they're looking for, even though the log itself is not sorted.
 
    Following a binary search also ensures that all users will check the
    same or similar entries when searching for the same key, which is
@@ -283,7 +297,7 @@ Table of Contents
    constructed over the leaves of the log tree (distinct from the
    structure of the log tree itself).
 
-3.3.1.  Implicit Binary Search Tree
+4.1.  Implicit Binary Search Tree
 
    Intuitively, the leaves of the log tree can be considered a flat
    array representation of a binary tree.  This structure is similar to
@@ -373,28 +387,72 @@ Table of Contents
    revisit entries 31 and 47, while they may never revisit entry 25
    after even a single new entry is added to the log.
 
-   Additionally, while users searching for a specific version of a key
-   can jump right into a binary search for that key-version pair, other
-   users may instead wish to search for the "most recent" version of a
-   key.  That is, the key with the highest counter possible.  Users
-   looking up the most recent version of a key start by fetching the
-   *frontier*, which they use to determine what the highest counter for
-   a key is.
+4.2.  Binary Ladder
 
-   The frontier consists of the root node of a search, followed by the
-   entries produced by repeatedly calling right until reaching the last
-   entry of the log.  Using the same example of a search where the log
-   has 50 entries, the frontier would be entries: 31, 47, 49.
+   When executing searches on a Transparency Log, the implicit tree
+   described in Section 4.1 is navigated according to a binary search.
+   At each individual log entry, the binary search needs to determine
+   whether it should move left or right.  That is, it needs to
+   determine, out of the set of key-version pairs stored in the prefix
+   tree, whether the highest version present at a given log entry is
+   higher than, equal to, or lower than a target version.
 
-   If we can assume that the log operator is behaving honestly, then
-   checking only the last entry of the log would be sufficient to find
-   the most recent version of any key.  However, we can't assume this.
-   Checking each entry along the frontier is functionally the same as
-   checking only the last entry, but also allows the user to verify that
-   the entire search path leading to the last entry is constructed
-   correctly.
+   A *binary ladder* is a series of lookups in a single log entry's
+   prefix tree, which is used to establish a bound on the highest
+   version of a key that's available at that log entry.
 
-3.3.2.  Monitoring
+   To determine the highest version of a key that's present at a given
+   log entry, the following lookups are done:
+
+   1.  First, version x of the key is looked up, where x is a
+       consecutively higher power of two minus one (0, 1, 3, 7, ...).
+       This is repeated until the first proof of non-inclusion is
+       produced.
+
+   2.  Once the first proof of non-inclusion is produced, a binary
+       search is conducted between the highest version that was proved
+       to be included, and the version that was proved to not be
+       included.  Each step of the binary search produces either a proof
+       of inclusion or non-inclusion, which guides the search left or
+       right, until it terminates.
+
+   However, note that it's not always necessary to find the _exact_
+   highest version of the key that exists at each log entry.  It's
+   sufficient just to determine whether that version is greater than or
+   less than the target version.  As such, a binary ladder consists of
+   this series of lookups, truncated at the point where further lookups
+   would no longer impact the binary search's decision.
+
+   When executing a search in a Transparency Log for a specific version
+   of a key, a binary ladder is provided for each node on the search
+   path, verifiably guiding the search toward the log entry where the
+   desired key-version pair was first inserted (and therefore, the log
+   entry with the desired update).
+
+4.3.  Most Recent Version
+
+   Often, users wish to search for the "most recent" version of a key.
+   That is, the key with the highest counter possible.
+
+   To determine this, users request a full (non-truncated) binary ladder
+   for each node on the *frontier* of the log.  The frontier consists of
+   the root node of a search, followed by the entries produced by
+   repeatedly calling right until reaching the last entry of the log.
+   Using the same example of a search where the log has 50 entries, the
+   frontier would be entries: 31, 47, 49.
+
+   For the purpose of finding the highest version possible, inspecting
+   each entry along the frontier is functionally the same as inspecting
+   only the last entry.  However, inspecting the frontier allows the
+   user to verify that the entire search path leading to the last entry
+   represents a monotonic series of version increases, thereby
+   preventing log misbehavior.
+
+   Once the user has verified that the frontier lookups are monotonic
+   and determined the highest version, the user then continues a binary
+   search for this specific version.
+
+4.4.  Monitoring
 
    As new entries are added to the log tree, the search path that's
    traversed to find a specific version of a key may change.  New
@@ -448,7 +506,7 @@ Table of Contents
    therefore the amount of work that will be needed to monitor the key
    from then on.
 
-4.  Ciphersuites
+5.  Ciphersuites
 
    Each Transparency Log uses a single fixed ciphersuite, chosen when
    the log is initially created, that specifies the following primitives
@@ -467,11 +525,11 @@ Table of Contents
    One of the VRF algorithms from [RFC9381] must be used.
 
    Ciphersuites are represented with the CipherSuite type.  The
-   ciphersuites are defined in Section 10.1.
+   ciphersuites are defined in Section 11.1.
 
-5.  Cryptographic Computations
+6.  Cryptographic Computations
 
-5.1.  VRF
+6.1.  Verifiable Random Function
 
    Each version of a search key that's inserted in a log will have a
    unique representation in the prefix tree.  This is computed by
@@ -482,7 +540,7 @@ Table of Contents
      uint32 version;
    } VrfInput;
 
-5.2.  Commitment
+6.2.  Commitment
 
    As discussed in Section 3.3, commitments are stored in the leaves of
    the log tree and correspond to updates of a key's value.  Commitments
@@ -513,7 +571,7 @@ Table of Contents
    The output value commitment may be published, while opening should be
    kept private until the commitment is meant to be revealed.
 
-5.3.  Prefix Tree
+6.3.  Prefix Tree
 
    The leaf nodes of a prefix tree are serialized as:
 
@@ -548,7 +606,7 @@ Table of Contents
 
    where Hash denotes the ciphersuite hash function.
 
-5.4.  Log Tree
+6.4.  Log Tree
 
    The leaf and parent nodes of a log tree are serialized as:
 
@@ -579,7 +637,7 @@ Table of Contents
      else if node.type == parentNode:
        return node.value
 
-5.5.  Tree Head Signature
+6.5.  Tree Head Signature
 
    The head of a Transparency Log, which represents the log's most
    recent state, is represented as:
@@ -628,9 +686,9 @@ Table of Contents
      opaque root_value<Hash.Nh>;
    } TreeHeadTBS;
 
-6.  Tree Proofs
+7.  Tree Proofs
 
-6.1.  Log Tree
+7.1.  Log Tree
 
    An inclusion proof for a single leaf in a log tree is given by
    providing the copath values of a leaf.  Similarly, a bulk inclusion
@@ -646,7 +704,7 @@ Table of Contents
 
    Each NodeValue is a uniform size, computed by passing the relevant
    LogLeaf or LogParent structures through the nodeValue function in
-   Section 5.4.  The contents of the elements array is kept in left-to-
+   Section 6.4.  The contents of the elements array is kept in left-to-
    right order: if a node is present in the root's left subtree, its
    value must be listed before any values provided from nodes that are
    in the root's right subtree, and so on recursively.
@@ -662,7 +720,7 @@ Table of Contents
    correspond to those output by the algorithm in Section 2.1.2 of
    [RFC6962].
 
-6.2.  Prefix Tree
+7.2.  Prefix Tree
 
    A proof from a prefix tree authenticates that a set of values are
    either members of, or are not members of, the total set of values
@@ -713,7 +771,7 @@ Table of Contents
    the left/right arrangement dictated by the search key, and checking
    that the result equals the root value of the prefix tree.
 
-6.3.  Combined Tree
+7.3.  Combined Tree
 
    A proof from a combined log and prefix tree follows the execution of
    a binary search through the leaves of the log tree, as described in
@@ -742,12 +800,12 @@ Table of Contents
 
    Each element of vrf_proofs contains the output of evaluating the VRF
    on a different version.  The versions chosen correspond to the binary
-   ladder described in Section 3.2.1.
+   ladder described in Section 4.2.
 
    Each ProofStep structure in steps is one leaf that was inspected as
    part of the binary search.  The first step corresponds to the
    "middle" leaf of the log tree (calculated with the root function in
-   Section 3.3.1).  From there, each subsequent step moves left or right
+   Section 4.1).  From there, each subsequent step moves left or right
    in the tree, based on previous results.
 
    The successful field of a ProofStep contains the number of steps of
@@ -792,7 +850,7 @@ Table of Contents
    combined with the proof in inclusion to check that the output matches
    the root of the log tree.
 
-7.  Update Format
+8.  Update Format
 
    The updates committed to by a combined tree structure contain the new
    value of a search key, along with additional information depending on
@@ -829,12 +887,12 @@ Table of Contents
    UpdateValue.value.  Clients MUST successfully verify this signature
    before consuming UpdateValue.value.
 
-8.  User Operations
+9.  User Operations
 
    The basic user operations are organized as a request-response
    protocol between a user and the Transparency Log operator.
 
-8.1.  Search
+9.1.  Search
 
    Users initiate a Search operation by submitting a SearchRequest to
    the Transparency Log containing the key that they're interested in.
@@ -862,7 +920,7 @@ Table of Contents
    Users verify a search response by following these steps:
 
    1.  Evaluate the search proof in search according to the steps in
-       Section 6.3.  This will produce a verdict as to whether the
+       Section 7.3.  This will produce a verdict as to whether the
        search was executed correctly and also a candidate root value for
        the tree.  If it's determined that the search was executed
        incorrectly, abort with an error.
@@ -875,9 +933,9 @@ Table of Contents
 
    Depending on the deployment mode of the Transparency Log, the value
    field may or may not require additional verification, specified in
-   Section 7, before its contents may be consumed.
+   Section 8, before its contents may be consumed.
 
-8.2.  Update
+9.2.  Update
 
    Users initiate an Update operation by submitting an UpdateRequest to
    the Transparency Log containing the new key and value to store.
@@ -906,32 +964,39 @@ Table of Contents
    update response provides the UpdatePrefix structure necessary to
    reconstruct the UpdateValue.
 
-9.  Security Considerations
+10.  Security Considerations
 
-10.  IANA Considerations
+11.  IANA Considerations
 
    This document requests the creation of the following new IANA
    registries:
 
-   *  KT Ciphersuites (Section 10.1)
+   *  KT Ciphersuites (Section 11.1)
 
    All of these registries should be under a heading of "Key
    Transparency", and assignments are made via the Specification
-   Required policy [RFC8126].  See Section 10.2 for additional
+   Required policy [RFC8126].  See Section 11.2 for additional
    information about the KT Designated Experts (DEs).
 
    RFC EDITOR: Please replace XXXX throughout with the RFC number
    assigned to this document
 
-10.1.  KT Ciphersuites
+11.1.  KT Ciphersuites
 
    uint16 CipherSuite;
 
-10.2.  KT Designated Expert Pool
+11.2.  KT Designated Expert Pool
 
-11.  References
+12.  References
 
-11.1.  Normative References
+12.1.  Normative References
+
+   [I-D.ietf-keytrans-architecture]
+              McMillion, B., "Key Transparency Architecture", Work in
+              Progress, Internet-Draft, draft-ietf-keytrans-
+              architecture-01, 4 March 2024,
+              <https://datatracker.ietf.org/doc/html/draft-ietf-
+              keytrans-architecture-01>.
 
    [RFC2104]  Krawczyk, H., Bellare, M., and R. Canetti, "HMAC: Keyed-
               Hashing for Message Authentication", RFC 2104,
@@ -965,7 +1030,7 @@ Table of Contents
               DOI 10.17487/RFC9381, August 2023,
               <https://www.rfc-editor.org/rfc/rfc9381>.
 
-11.2.  Informative References
+12.2.  Informative References
 
    [Merkle2]  Hu, Y., Hooshmand, K., Kalidhindi, H., Yang, S. J., and R.
               A. Popa, "Merkle^2: A Low-Latency Transparency Log
