@@ -56,9 +56,12 @@ and impersonate that user.
 
 This document describes a protocol that enables a group of users to ensure that
 they all have the same view of the public keys associated with each other's
-accounts. Ensuring a consistent view of public keys allows users to detect when
-unauthorized keys have been associated with their account, indicating a
-potential compromise.
+accounts. Ensuring a consistent view allows users to detect when unauthorized
+public keys have been associated with their account, indicating a potential
+compromise.
+
+More detailed information about the protocol participants and the ways the
+protocol can be deployed can be found in {{!I-D.ietf-keytrans-architecture}}.
 
 # Conventions and Definitions
 
@@ -181,10 +184,6 @@ different value. In either case, the proof is verified by hashing together the
 leaf with the copath values and checking that the result equals the root value
 of the tree.
 
-### Binary Ladder
-
-<!-- TODO Write about binary search through prefix tree -->
-
 ## Combined Tree
 
 Log trees are desirable because they can provide efficient consistency proofs to
@@ -200,14 +199,25 @@ In the combined tree structure, which is based on {{Merkle2}}, a log tree
 maintains a record of each time any key's value is updated, while a prefix tree
 maintains the set of key-version pairs. Importantly, the root value of the
 prefix tree after adding the new key-version pair is stored in a leaf of the log
-tree alongside the record of the update. With some caveats, this combined
-structure supports both efficient consistency proofs and can be efficiently
-searched.
+tree alongside a privacy-preserving commitment to the update. With some caveats,
+this combined structure supports both efficient consistency proofs and can be
+efficiently searched.
 
-To search the combined structure, users do a binary search for the first log
-entry where the prefix tree at that entry contains the desired key-version pair.
-As such, the entry that a user arrives at through binary search contains the
-update that they're looking for, even though the log itself is not sorted.
+Note that, although the Transparency Log maintains a single logical prefix tree,
+each modification of this tree results in a new root hash, which is then stored
+in the log tree. Therefore, when instructions refer to "looking up a key in the
+prefix tree at a given log entry," this actually means searching in the specific
+version of the prefix tree that corresponds to the root hash stored at that log
+entry.
+
+
+# Searching the Tree
+
+To search the combined tree structure described in {{combined-tree}}, users do a
+binary search for the first log entry where the prefix tree at that entry
+contains the desired key-version pair. As such, the entry that a user arrives at
+through binary search contains the update that they're looking for, even though
+the log itself is not sorted.
 
 Following a binary search also ensures that all users will check the same or
 similar entries when searching for the same key, which is necessary for the
@@ -215,7 +225,7 @@ efficient auditing of a Transparency Log. To maximize this effect, users rely on
 an implicit binary tree structure constructed over the leaves of the log tree
 (distinct from the structure of the log tree itself).
 
-### Implicit Binary Search Tree
+## Implicit Binary Search Tree
 
 Intuitively, the leaves of the log tree can be considered a flat array
 representation of a binary tree. This structure is similar to the log tree, but
@@ -304,26 +314,40 @@ to access would be `right(31, 50) = 47`. As more entries are added to the log,
 users will consistently revisit entries 31 and 47, while they may never revisit
 entry 25 after even a single new entry is added to the log.
 
-Additionally, while users searching for a specific version of a key can jump
-right into a binary search for that key-version pair, other users may
-instead wish to search for the "most recent" version of a key. That is, the key
-with the highest counter possible. Users looking up the most recent version of a
-key start by fetching the **frontier**, which they use to determine
-what the highest counter for a key is.
+## Binary Ladder
 
-The frontier consists of the root node of a search, followed by the entries
-produced by repeatedly calling `right` until reaching the last entry of the log.
-Using the same example of a search where the log has 50 entries, the frontier
-would be entries: 31, 47, 49.
+While users searching for a specific version of a key can jump right into a
+binary search for that key-version pair, other users may instead wish to search
+for the "most recent" version of a key. That is, the key with the highest
+counter possible.
 
-If we can assume that the log operator is behaving honestly, then checking only
-the last entry of the log would be sufficient to find the most recent version of
-any key. However, we can't assume this. Checking each entry along the frontier
-is functionally the same as checking only the last entry, but also allows the
-user to verify that the entire search path leading to the last entry is
-constructed correctly.
+The highest version of a key that's available at a given log entry is proved by
+producing a **binary ladder**. A binary ladder is a series of lookups in the
+prefix tree:
 
-### Monitoring
+1. First, version `x` of the key is looked up, where `x` is consecutively higher
+   powers of two minus one (0, 1, 3, 7, ...). This is repeated until the first
+   proof of non-inclusion is produced.
+2. Once the first proof of non-inclusion is produced, a binary search is
+   conducted between the highest version that was proved to be included, and the
+   version that was proved to not be included. Each step of the binary search
+   produces either a proof of inclusion or non-inclusion, which guides the
+   search left or right, until it terminates.
+
+This identifies the highest version of a key that is present at a specific log
+entry. To find the highest version of a key in the entire log, users request
+this ladder for each node on the **frontier** of the log. The frontier consists
+of the root node of a search, followed by the entries produced by repeatedly
+calling `right` until reaching the last entry of the log. Using the same example
+of a search where the log has 50 entries, the frontier would be entries: 31, 47,
+49.
+
+Checking each entry along the frontier is functionally the same as checking only
+the last entry, but also allows the user to verify that the entire search path
+leading to the last entry is constructed correctly, thereby preventing log
+misbehavior.
+
+## Monitoring
 
 As new entries are added to the log tree, the search path that's traversed to
 find a specific version of a key may change. New intermediate nodes may become
