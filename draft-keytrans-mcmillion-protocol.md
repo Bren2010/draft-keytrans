@@ -499,7 +499,8 @@ The leaf nodes of a prefix tree are serialized as:
 
 ~~~ tls
 struct {
-    opaque key_version<VRF.Nh>;
+  opaque value<Hash.Nh>
+  opaque key_version<VRF.Nh>;
 } PrefixLeaf;
 ~~~
 
@@ -514,22 +515,20 @@ struct {
 } PrefixParent;
 ~~~
 
-where `Hash.Nh` is the output length of the ciphersuite hash function. The value
-of a parent node is computed by hashing together the values of its left and
-right children:
+where `Hash.Nh` is the output length of the ciphersuite hash function.
+
+The value of a node is computed as follows:
 
 ~~~ pseudocode
-parent.value = Hash(0x01 ||
-                   nodeValue(parent.leftChild) ||
-                   nodeValue(parent.rightChild))
-
 nodeValue(node):
   if node.type == emptyNode:
     return make([]byte, Hash.Nh)
   else if node.type == leafNode:
     return Hash(0x00 || node.key_version)
   else if node.type == parentNode:
-    return node.value
+    return Hash(0x01 ||
+                nodeValue(node.leftChild) ||
+                nodeValue(node.rightChild))
 ~~~
 
 where `Hash` denotes the ciphersuite hash function.
@@ -540,6 +539,7 @@ The leaf and parent nodes of a log tree are serialized as:
 
 ~~~ tls-presentation
 struct {
+  opaque value<Hash.Nh>;
   opaque commitment<Hash.Nh>;
   opaque prefix_tree<Hash.Nh>;
 } LogLeaf;
@@ -549,24 +549,21 @@ struct {
 } LogParent;
 ~~~
 
-The value of a parent node is computed by hashing together the values of its
-left and right children:
+The value of a node is computed as follows:
 
 ~~~ pseudocode
-parent.value = Hash(hashContent(parent.leftChild) ||
-                    hashContent(parent.rightChild))
+nodeValue(node):
+  if node.type == leafNode:
+    return Hash(node.commitment || node.prefix_tree)
+  else if node.type == parentNode:
+    return Hash(hashContent(node.leftChild) ||
+                hashContent(node.rightChild))
 
 hashContent(node):
   if node.type == leafNode:
     return 0x00 || nodeValue(node)
   else if node.type == parentNode:
     return 0x01 || nodeValue(node)
-
-nodeValue(node):
-  if node.type == leafNode:
-    return Hash(node.commitment || node.prefix_tree)
-  else if node.type == parentNode:
-    return node.value
 ~~~
 
 ## Tree Head Signature
