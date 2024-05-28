@@ -79,8 +79,8 @@ properties are maintained.
 # Tree Construction
 
 KT allows clients of a service to query the keys of other clients of the same
-service. To do so, KT maintains two types of maps. One map associates *version
-indices* with *key material*, the other map associates *anonymized search keys*
+service. To do so, KT maintains two types of maps: (i) one associates *version
+indices* with *key material*, (ii) the other associates *anonymized search keys*
 with sets of *version indices*. Most likely, search keys will represent user
 pseudonyms. When clients query a KT service, they require a means to
 authenticate the responses of the KT service. To provide for this, the KT
@@ -91,10 +91,10 @@ underlying data structure, thus are guaranteed to always see the same results to
 their queries.
 
 The combined hash tree structure consists of two types of trees: log trees and
-prefix trees. This section describes the operation of both at a high level and
-the way that they're combined. More precise algorithms for computing the
-intermediate and root values of the trees are given in
-{{cryptographic-computations}}.
+prefix trees. The log tree commits to map (i), the prefix tree commits to map
+(ii). This section describes the operation of both at a high level and the way
+that they're combined. More precise algorithms for computing the intermediate
+and root values of the trees are given in {{cryptographic-computations}}.
 
 Both types of trees consist of *nodes* which have a byte string as their
 *value*. A node is either a *leaf* if it has no children, or a *parent* if it
