@@ -3,9 +3,9 @@
 
 
 KEYTRANS Working Group                                      B. McMillion
-Internet-Draft                                               28 May 2024
-Intended status: Informational                                          
-Expires: 29 November 2024
+Internet-Draft                                                          
+Intended status: Informational                                 F. Linker
+Expires: 29 November 2024                                    28 May 2024
 
 
                        Key Transparency Protocol
@@ -101,7 +101,7 @@ Table of Contents
      12.1.  Normative References
      12.2.  Informative References
    Acknowledgments
-   Author's Address
+   Authors' Addresses
 
 1.  Introduction
 
@@ -1038,7 +1038,11 @@ Table of Contents
 
 Acknowledgments
 
-Author's Address
+Authors' Addresses
 
    Brendan McMillion
    Email: brendanmcmillion@gmail.com
+
+
+   Felix Linker
+   Email: linkerfelix@gmail.com
