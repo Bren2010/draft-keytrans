@@ -79,28 +79,29 @@ properties are maintained.
 # Tree Construction
 
 KT allows clients of a service to query the keys of other clients of the same
-service. To do so, KT maintains two types of maps: (i) one associates *version
-indices* with *key material*, (ii) the other associates *anonymized search keys*
-with sets of *version indices*. Most likely, search keys will represent user
-pseudonyms. When clients query a KT service, they require a means to
-authenticate the responses of the KT service. To provide for this, the KT
-service maintains a *combined hash tree structure*, which commits to both these
-maps. Such a tree hash structure is associated with a *root hash*. As long as
-clients use a consistent root hash, they are guaranteed to always query the same
-underlying data structure, thus are guaranteed to always see the same results to
-their queries.
+service. To do so, KT maintains two maps: (i) one associates key-update counters
+with key updates, (ii) the other associates anonymized pairs of pseudonyms and
+version numbers with key-update counters. When clients query a KT service, they
+require a means to authenticate the responses of the KT service. To provide for
+this, the KT service maintains a *combined hash tree structure*, which commits
+to both these maps. Such a tree hash structure is associated with a *root hash*.
+As long as clients use a consistent root hash, they are guaranteed to always
+query the same underlying data structure, thus are guaranteed to always see the
+same results to their queries.
 
 The combined hash tree structure consists of two types of trees: log trees and
-prefix trees. The log tree commits to map (i), the prefix tree commits to map
-(ii). This section describes the operation of both at a high level and the way
-that they're combined. More precise algorithms for computing the intermediate
-and root values of the trees are given in {{cryptographic-computations}}.
+prefix trees. The log tree commits to map (i) and the most recent prefix tree,
+the prefix tree commits to map (ii). This section describes the operation of
+both at a high level and the way that they're combined. More precise algorithms
+for computing the intermediate and root values of the trees are given in
+{{cryptographic-computations}}.
 
-Both types of trees consist of *nodes* which have a byte string as their
-*value*. A node is either a *leaf* if it has no children, or a *parent* if it
-has either a *left child* or a *right child*. A node is the *root* of a tree if
-it has no parents, and an *intermediate* if it has both children and parents.
-Nodes are *siblings* if they share the same parent.
+Both types of trees commit to a set of index-value pairs. They consist of
+*nodes* which have a byte string as their *hash value*. A node is either a
+*leaf* (committing to an index-value pair) if it has no children, or a *parent*
+if it has either a *left child* or a *right child*. A node is the *root* of a
+tree if it has no parents, and an *intermediate* if it has both children and
+parents. Nodes are *siblings* if they share the same parent.
 
 The *descendants* of a node are that node, its children, and the descendants of
 its children. A *subtree* of a tree is the tree given by the descendants of a
@@ -114,7 +115,10 @@ of all the nodes in its direct path, excluding the root.
 ## Log Tree
 
 Log trees are used for storing information in the chronological order that it
-was added and are constructed as *left-balanced* binary trees.
+was added and are constructed as *left-balanced* binary trees. The log tree that
+we utilize here will have incrementing counters as its indices and pairs of
+key-updates and prefix-tree hashes as its values. The log tree's leaves are
+ordered by their respective index (counter value) ascending from left to right.
 
 A binary tree is *balanced* if its size is a power of two and for any parent
 node in the tree, its left and right subtrees have the same size. A binary tree
@@ -127,14 +131,15 @@ child.
 
 <!-- TODO diagram of example tree -->
 
-Log trees initially consist of a single leaf node. New leaves are added to the
-right-most edge of the tree along with a single parent node, to construct the
-left-balanced binary tree with `n+1` leaves.
+Log trees initially consist of a single leaf node with index 0. New leaves are
+added to the right-most edge of the tree along with a single parent node, to
+construct the left-balanced binary tree with `n+1` leaves.
 
 <!-- TODO diagram of adding a new leaf to a tree (specifically 5 leaves to 6 leaves to show level-skipping) -->
 
-While leaves contain arbitrary data, the value of a parent node is always the
-hash of the combined values of its left and right children.
+The hash value of a leaf node is a hash of its value, and the hash value of a
+parent node is the hash of the combined hash values of its left and right
+children.
 
 Log trees are powerful in that they can provide both *inclusion proofs*, which
 demonstrate that a leaf is included in a log, and *consistency proofs*, which
@@ -143,59 +148,58 @@ log.
 
 An inclusion proof is given by providing the copath values of a leaf. The proof
 is verified by hashing together the leaf with the copath values and checking
-that the result equals the root value of the log. Consistency proofs are a more
-general version of the same idea. With a consistency proof, the prover provides
-the minimum set of intermediate node values from the current tree that allows
-the verifier to compute both the old root value and the current root value. An
-algorithm for this is given in section 2.1.2 of {{!RFC6962}}.
+that the result equals the root hash value of the log. Consistency proofs are a
+more general version of the same idea. With a consistency proof, the prover
+provides the minimum set of intermediate node values from the current tree that
+allows the verifier to compute both the old root value and the current root
+value. An algorithm for this is given in section 2.1.2 of {{!RFC6962}}.
 
 <!-- TODO diagram of inclusion and consistency proofs -->
 
 ## Prefix Tree
 
 Prefix trees are used for storing a set of values while preserving the ability
-to efficiently produce proofs of membership and non-membership in the set.
+to efficiently produce proofs of membership and non-membership in the set. The
+prefix trees that we utilize here will have anonymized pairs of pseudonyms and
+version counters as its indices and the log tree's indices as values.
 
-Each leaf node in a prefix tree represents a specific value, while each parent
-node represents some prefix which all values in the subtree headed by that node
-have in common. The subtree headed by a parent's left child contains all values
-that share its prefix followed by an additional 0 bit, while the subtree headed
-by a parent's right child contains all values that share its prefix followed by
-an additional 1 bit.
-
-The root node, in particular, represents the empty string as a prefix. The
-root's left child contains all values that begin with a 0 bit, while the right
-child contains all values that begin with a 1 bit.
+The prefix tree is ordered by the shortest prefixes of its leaves. The prefix
+tree's root represents the empty prefix. All indices of the root's left subtree
+begin with a 0 bit, all indices of the root's right subtree start with a 1 bit.
+More generally speaking. The subtree headed by a parent's left child contains
+all values that share its prefix followed by an additional 0 bit, while the
+subtree headed by a parent's right child contains all values that share its
+prefix followed by an additional 1 bit.
 
 A prefix tree can be searched by starting at the root node, and moving to the
-left child if the first bit of a value is 0, or the right child if the first bit
-is 1. This is then repeated for the second bit, third bit, and so on until the
-search either terminates at a leaf node (which may or may not be for the desired
-value), or a parent node that lacks the desired child.
+left child if the first bit of an index is 0, or the right child if the first
+bit is 1. This is then repeated for the second bit, third bit, and so on until
+the search either terminates at a leaf node (which may or may not be for the
+desired value), or a parent node that lacks the desired child.
 
 <!-- TODO diagram -->
 
-New values are added to the tree by searching it according to the same process.
-If the search terminates at a parent without a left or right child, a new leaf
-is simply added as the parent's missing child. If the search terminates at a
-leaf for the wrong value, one or more intermediate nodes are added until the new
-leaf and the existing leaf would no longer reside in the same place. That is,
-until we reach the first bit that differs between the new value and the existing
-value.
+New index-value pairs are added to the tree by searching it according to the
+same process. If the search terminates at a parent without a left or right
+child, a new leaf is added as the parent's missing child. If the search
+terminates at a leaf for the wrong index, one or more intermediate nodes are
+added until the new leaf and the existing leaf would no longer reside in the
+same place. That is, until we reach the first bit that differs between the new
+index and the existing index.
 
 <!-- TODO diagram of adding new value -->
 
-The value of a leaf node is the encoded set member, while the value of a
-parent node is the hash of the combined values of its left and right children
-(or a stand-in value when one of the children doesn't exist).
+The hash value of a leaf node is the hash of its value, while the hash value of
+a parent node is the hash of the combined hash values of its left and right
+children (or a stand-in value when one of the children doesn't exist).
 
-A proof of membership is given by providing the leaf value, along with the hash
-of each copath entry along the search path. A proof of non-membership is given
-by providing an abridged proof of membership that follows the search path for
-the intended value, but ends either at a stand-in value or a leaf for a
+A proof of membership is given by providing the leaf hash value, along with the
+hash value of each copath entry along the search path. A proof of non-membership
+is given by providing an abridged proof of membership that follows the search
+path for the intended value, but ends either at a stand-in value or a leaf for a
 different value. In either case, the proof is verified by hashing together the
-leaf with the copath values and checking that the result equals the root value
-of the tree.
+leaf with the copath hash values and checking that the result equals the root
+hash value of the tree.
 
 ## Combined Tree
 
@@ -210,8 +214,8 @@ added.
 
 In the combined tree structure, which is based on {{Merkle2}}, a log tree
 maintains a record of each time any key's value is updated, while a prefix tree
-maintains the set of key-version pairs. Importantly, the root value of the
-prefix tree after adding the new key-version pair is stored in a leaf of the log
+maintains the set of pseudonym-version pairs. Importantly, the root hash value of the
+prefix tree after adding a new pseudonym-version pair is stored in a leaf of the log
 tree alongside a privacy-preserving commitment to the update. With some caveats,
 this combined structure supports both efficient consistency proofs and can be
 efficiently searched.
