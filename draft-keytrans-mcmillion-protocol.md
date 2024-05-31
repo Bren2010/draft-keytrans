@@ -85,9 +85,8 @@ version numbers with key-update counters. When clients query a KT service, they
 require a means to authenticate the responses of the KT service. To provide for
 this, the KT service maintains a *combined hash tree structure*, which commits
 to both these maps. Such a tree hash structure is associated with a *root hash*.
-As long as clients use a consistent root hash, they are guaranteed to always
-query the same underlying data structure, thus are guaranteed to always see the
-same results to their queries.
+Two clients which have the same root hash are guaranteed to have the same view
+of the tree, and thus would always receive the same result for the same query.
 
 The combined hash tree structure consists of two types of trees: log trees and
 prefix trees. The log tree commits to map (i) and the most recent prefix tree,
