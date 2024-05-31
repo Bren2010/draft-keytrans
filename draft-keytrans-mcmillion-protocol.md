@@ -130,7 +130,7 @@ child.
 
 <!-- TODO diagram of example tree -->
 
-Log trees initially consist of a single leaf node with index 0. New leaves are
+Log trees initially consist of a single leaf node. New leaves are
 added to the right-most edge of the tree along with a single parent node, to
 construct the left-balanced binary tree with `n+1` leaves.
 
