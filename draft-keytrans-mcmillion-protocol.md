@@ -79,25 +79,25 @@ properties are maintained.
 # Tree Construction
 
 KT allows clients of a service to query the keys of other clients of the same
-service. To do so, KT maintains two maps: (i) one associates key-update counters
-with key updates, (ii) the other associates anonymized pairs of pseudonyms and
-version numbers with key-update counters. When clients query a KT service, they
+service. To do so, KT maintains two structures: (i) a log of each change to any
+key's value, and (ii) a set containing all of the key-version pairs that have been
+logged. When clients query a KT service, they
 require a means to authenticate the responses of the KT service. To provide for
 this, the KT service maintains a *combined hash tree structure*, which commits
-to both these maps. Such a tree hash structure is associated with a *root hash*.
+to both these structures with a *root hash*.
 Two clients which have the same root hash are guaranteed to have the same view
 of the tree, and thus would always receive the same result for the same query.
 
 The combined hash tree structure consists of two types of trees: log trees and
-prefix trees. The log tree commits to map (i) and the most recent prefix tree,
-the prefix tree commits to map (ii). This section describes the operation of
+prefix trees. The log tree commits to (i) and 
+the prefix tree commits to (ii). This section describes the operation of
 both at a high level and the way that they're combined. More precise algorithms
 for computing the intermediate and root values of the trees are given in
 {{cryptographic-computations}}.
 
-Both types of trees commit to a set of index-value pairs. They consist of
+Both types of trees consist of
 *nodes* which have a byte string as their *hash value*. A node is either a
-*leaf* (committing to an index-value pair) if it has no children, or a *parent*
+*leaf* if it has no children, or a *parent*
 if it has either a *left child* or a *right child*. A node is the *root* of a
 tree if it has no parents, and an *intermediate* if it has both children and
 parents. Nodes are *siblings* if they share the same parent.
@@ -114,10 +114,7 @@ of all the nodes in its direct path, excluding the root.
 ## Log Tree
 
 Log trees are used for storing information in the chronological order that it
-was added and are constructed as *left-balanced* binary trees. The log tree that
-we utilize here will have incrementing counters as its indices and pairs of
-key-updates and prefix-tree hashes as its values. The log tree's leaves are
-ordered by their respective index (counter value) ascending from left to right.
+was added and are constructed as *left-balanced* binary trees.
 
 A binary tree is *balanced* if its size is a power of two and for any parent
 node in the tree, its left and right subtrees have the same size. A binary tree
@@ -136,9 +133,8 @@ construct the left-balanced binary tree with `n+1` leaves.
 
 <!-- TODO diagram of adding a new leaf to a tree (specifically 5 leaves to 6 leaves to show level-skipping) -->
 
-The hash value of a leaf node is a hash of its value, and the hash value of a
-parent node is the hash of the combined hash values of its left and right
-children.
+While leaves contain arbitrary data, the value of a parent node is always the
+hash of the combined values of its left and right children.
 
 Log trees are powerful in that they can provide both *inclusion proofs*, which
 demonstrate that a leaf is included in a log, and *consistency proofs*, which
@@ -171,7 +167,7 @@ subtree headed by a parent's right child contains all values that share its
 prefix followed by an additional 1 bit.
 
 A prefix tree can be searched by starting at the root node, and moving to the
-left child if the first bit of an index is 0, or the right child if the first
+left child if the first bit of a value is 0, or the right child if the first
 bit is 1. This is then repeated for the second bit, third bit, and so on until
 the search either terminates at a leaf node (which may or may not be for the
 desired value), or a parent node that lacks the desired child.
@@ -213,8 +209,8 @@ added.
 
 In the combined tree structure, which is based on {{Merkle2}}, a log tree
 maintains a record of each time any key's value is updated, while a prefix tree
-maintains the set of pseudonym-version pairs. Importantly, the root hash value of the
-prefix tree after adding a new pseudonym-version pair is stored in a leaf of the log
+maintains the set of index-version pairs. Importantly, the root hash value of the
+prefix tree after adding a new index-version pair is stored in a leaf of the log
 tree alongside a privacy-preserving commitment to the update. With some caveats,
 this combined structure supports both efficient consistency proofs and can be
 efficiently searched.
