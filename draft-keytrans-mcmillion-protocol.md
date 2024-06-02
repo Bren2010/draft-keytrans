@@ -81,16 +81,29 @@ properties are maintained.
 
 # Tree Construction
 
-KT relies on two combined hash tree structures: log trees and prefix trees. This
-section describes the operation of both at a high level and the way that they're
-combined. More precise algorithms for computing the intermediate and root values
-of the trees are given in {{cryptographic-computations}}.
+KT allows clients of a service to query the keys of other clients of the same
+service. To do so, KT maintains two structures: (i) a log of each change to any
+key's value, and (ii) a set containing all of the key-version pairs that have been
+logged. When clients query a KT service, they
+require a means to authenticate the responses of the KT service. To provide for
+this, the KT service maintains a *combined hash tree structure*, which commits
+to both these structures with a *root hash*.
+Two clients which have the same root hash are guaranteed to have the same view
+of the tree, and thus would always receive the same result for the same query.
 
-Both types of trees consist of *nodes* which have a byte string as their
-*value*. A node is either a *leaf* if it has no children, or a *parent* if it
-has either a *left child* or a *right child*. A node is the *root* of a tree if
-it has no parents, and an *intermediate* if it has both children and parents.
-Nodes are *siblings* if they share the same parent.
+The combined hash tree structure consists of two types of trees: log trees and
+prefix trees. The log tree commits to (i) and 
+the prefix tree commits to (ii). This section describes the operation of
+both at a high level and the way that they're combined. More precise algorithms
+for computing the intermediate and root values of the trees are given in
+{{cryptographic-computations}}.
+
+Both types of trees consist of
+*nodes* which have a byte string as their *hash value*. A node is either a
+*leaf* if it has no children, or a *parent*
+if it has either a *left child* or a *right child*. A node is the *root* of a
+tree if it has no parents, and an *intermediate* if it has both children and
+parents. Nodes are *siblings* if they share the same parent.
 
 The *descendants* of a node are that node, its children, and the descendants of
 its children. A *subtree* of a tree is the tree given by the descendants of a
@@ -117,9 +130,9 @@ child.
 
 <!-- TODO diagram of example tree -->
 
-Log trees initially consist of a single leaf node. New leaves are added to the
-right-most edge of the tree along with a single parent node, to construct the
-left-balanced binary tree with `n+1` leaves.
+Log trees initially consist of a single leaf node. New leaves are
+added to the right-most edge of the tree along with a single parent node, to
+construct the left-balanced binary tree with `n+1` leaves.
 
 <!-- TODO diagram of adding a new leaf to a tree (specifically 5 leaves to 6 leaves to show level-skipping) -->
 
@@ -133,11 +146,11 @@ log.
 
 An inclusion proof is given by providing the copath values of a leaf. The proof
 is verified by hashing together the leaf with the copath values and checking
-that the result equals the root value of the log. Consistency proofs are a more
-general version of the same idea. With a consistency proof, the prover provides
-the minimum set of intermediate node values from the current tree that allows
-the verifier to compute both the old root value and the current root value. An
-algorithm for this is given in section 2.1.2 of {{!RFC6962}}.
+that the result equals the root hash value of the log. Consistency proofs are a
+more general version of the same idea. With a consistency proof, the prover
+provides the minimum set of intermediate node values from the current tree that
+allows the verifier to compute both the old root value and the current root
+value. An algorithm for this is given in section 2.1.2 of {{!RFC6962}}.
 
 <!-- TODO diagram of inclusion and consistency proofs -->
 
@@ -179,13 +192,13 @@ The value of a leaf node is the encoded set member, while the value of a
 parent node is the hash of the combined values of its left and right children
 (or a stand-in value when one of the children doesn't exist).
 
-A proof of membership is given by providing the leaf value, along with the hash
-of each copath entry along the search path. A proof of non-membership is given
-by providing an abridged proof of membership that follows the search path for
-the intended value, but ends either at a stand-in value or a leaf for a
+A proof of membership is given by providing the leaf hash value, along with the
+hash value of each copath entry along the search path. A proof of non-membership
+is given by providing an abridged proof of membership that follows the search
+path for the intended value, but ends either at a stand-in value or a leaf for a
 different value. In either case, the proof is verified by hashing together the
-leaf with the copath values and checking that the result equals the root value
-of the tree.
+leaf with the copath hash values and checking that the result equals the root
+hash value of the tree.
 
 ## Combined Tree
 
@@ -200,8 +213,8 @@ added.
 
 In the combined tree structure, which is based on {{Merkle2}}, a log tree
 maintains a record of each time any key's value is updated, while a prefix tree
-maintains the set of key-version pairs. Importantly, the root value of the
-prefix tree after adding the new key-version pair is stored in a leaf of the log
+maintains the set of index-version pairs. Importantly, the root hash value of the
+prefix tree after adding a new index-version pair is stored in a leaf of the log
 tree alongside a privacy-preserving commitment to the update. With some caveats,
 this combined structure supports both efficient consistency proofs and can be
 efficiently searched.
