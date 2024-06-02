@@ -324,14 +324,52 @@ When executing searches on a Transparency Log, the implicit tree described in
 each individual log entry, the binary search needs to determine whether it
 should move left or right. That is, it needs to determine, out of the set of
 key-version pairs stored in the prefix tree, whether the highest version present
-at a given log entry is higher than, equal to, or lower than a target version.
+at a given log entry is greater than, equal to, or less than a target version.
 
 A **binary ladder** is a series of lookups in a single log entry's prefix tree,
-which is used to establish a bound on the highest version of a key that's
-available at that log entry.
+which is used to establish whether the target version of a key is present or
+not. It consists of the following lookups, stopping after the first lookup that
+produces a proof of non-inclusion:
 
-To determine the highest version of a key that's present at a given log entry,
-the following lookups are done:
+1. First, version `x` of the key is looked up, where `x` is consecutively higher
+   powers of two minus one (0, 1, 3, 7, ...). This is repeated until `x` is the
+   largest such value less than or equal to the target version.
+2. Second, the largest `x` that was looked up is retained, and consecutively
+   smaller powers of two are added to it until it equals the target version.
+   Each time a power of two is added, this version of the key is looked up.
+
+As an example, if the target version of a key to lookup is 20, a binary ladder
+would consist of the following versions: 0, 1, 3, 7, 15, 19, 20. If all of the
+lookups succeed (i.e., result in proofs of inclusion), this indicates that the
+target version of the key exists in the log. If the ladder stops early because a
+proof of non-inclusion was produced, this indicates that the target version of
+the key did not exist, as of the given log entry.
+
+When executing a search in a Transparency Log for a specific version of a key, a
+binary ladder is provided for each node on the search path, verifiably guiding
+the search toward the log entry where the desired key-version pair was first
+inserted (and therefore, the log entry with the desired update).
+
+Requiring proof that this series of versions are present in the prefix tree,
+instead of requesting proof of just version 20, ensures that all users are able
+to agree on which version of the key is *most recent*, which is discussed
+further in the next section.
+
+## Most Recent Version
+
+Often, users wish to search for the "most recent" version of a key. That is, the
+key with the highest counter possible.
+
+To determine this, users request a **full binary ladder** for each
+node on the **frontier** of the log. The frontier consists of the root node of a
+search, followed by the entries produced by repeatedly calling `right` until
+reaching the last entry of the log. Using the same example of a search where the
+log has 50 entries, the frontier would be entries: 31, 47, 49.
+
+A full binary ladder is similar to the binary ladder discussed in the previous
+section, except that it identifies the exact highest version of a key that
+exists, as of a particular log entry, rather than stopping at a target version.
+It consists of the following lookups:
 
 1. First, version `x` of the key is looked up, where `x` is a consecutively
    higher power of two minus one (0, 1, 3, 7, ...). This is repeated until the
@@ -342,33 +380,12 @@ the following lookups are done:
    produces either a proof of inclusion or non-inclusion, which guides the
    search left or right, until it terminates.
 
-However, note that it's not always necessary to find the *exact* highest version
-of the key that exists at each log entry. It's sufficient just to determine
-whether that version is greater than or less than the target version. As such, a
-binary ladder consists of this series of lookups, truncated at the point where
-further lookups would no longer impact the binary search's decision.
-
-When executing a search in a Transparency Log for a specific version of a key, a
-binary ladder is provided for each node on the search path, verifiably guiding
-the search toward the log entry where the desired key-version pair was first
-inserted (and therefore, the log entry with the desired update).
-
-## Most Recent Version
-
-Often, users wish to search for the "most recent" version of a key. That is, the
-key with the highest counter possible.
-
-To determine this, users request a full (non-truncated) binary ladder for each
-node on the **frontier** of the log. The frontier consists of the root node of a
-search, followed by the entries produced by repeatedly calling `right` until
-reaching the last entry of the log. Using the same example of a search where the
-log has 50 entries, the frontier would be entries: 31, 47, 49.
-
-For the purpose of finding the highest version possible, inspecting each entry
-along the frontier is functionally the same as inspecting only the last entry.
-However, inspecting the frontier allows the user to verify that the entire
-search path leading to the last entry represents a monotonic series of version
-increases, thereby preventing log misbehavior.
+For the purpose of finding the highest version possible, requesting a full
+binary ladder for each entry along the frontier is functionally the same as
+doing so for only the last log entry. However, inspecting the entire frontier
+allows the user to verify that the search path leading to the last log entry
+represents a monotonic series of version increases, which minimizes
+opportunities for log misbehavior.
 
 Once the user has verified that the frontier lookups are monotonic and
 determined the highest version, the user then continues a binary search for this
@@ -385,11 +402,11 @@ same versions continue converging to the same entries in the log.
 
 To monitor a given search key, users maintain a small amount of state: a map
 from a position in the log to a version counter. The version counter is the
-highest version of the search key that exists in the log at that position. Users
-initially populate this map by setting the position of an entry they've looked
-up, to map to the version of the key stored in that entry. A map may track
-several different versions of a search key simultaneously, if a user has been
-shown different versions of the same search key.
+highest version of the search key that's been proven to exist at that log
+position. Users initially populate this map by setting the position of an entry
+they've looked up, to map to the version of the key stored in that entry. A map
+may track several different versions of a search key simultaneously, if a user
+has been shown different versions of the same search key.
 
 To update this map, users receive the most recent tree head from the server and
 follow these steps, for each entry in the map:
@@ -401,12 +418,13 @@ follow these steps, for each entry in the map:
    update it with).
 3. For each entry in the direct path that's to the right of the current entry,
    from low to high:
-   1. Obtain a proof from the server that the highest version of the search key
-      present in the prefix tree at that entry is greater than or equal to the
-      current version.
-   2. If the above check was successful, remove the current position-version pair
-      from the map and replace it with a position-version pair corresponding to
-      the entry in the log that was just checked.
+   1. Receive and verify a binary ladder from that log entry, for the version
+      currently in the map. This proves that, at the indicated log entry, the
+      highest version present is greater than or equal to the
+      previously-observed version.
+   2. If the above check was successful, remove the current position-version
+      pair from the map and replace it with a position-version pair
+      corresponding to the entry in the log that was just checked.
 
 This algorithm progressively moves up the tree as new intermediate/root nodes
 are established and verifies that they're constructed correctly. Note that users
@@ -418,9 +436,6 @@ the same key scales sublinearly, due to the fact that the direct paths of the
 different versions will often intersect. Intersections reduce the total number
 of entries in the map and therefore the amount of work that will be needed to
 monitor the key from then on.
-
-<!-- TODO This algorithm will need to be updated to handle partial knowledge of the
-highest version of a key at each entry. -->
 
 
 # Ciphersuites
