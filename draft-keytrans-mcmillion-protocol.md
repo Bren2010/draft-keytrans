@@ -154,39 +154,40 @@ value. An algorithm for this is given in section 2.1.2 of {{!RFC6962}}.
 ## Prefix Tree
 
 Prefix trees are used for storing a set of values while preserving the ability
-to efficiently produce proofs of membership and non-membership in the set. The
-prefix trees that we utilize here will have anonymized pairs of pseudonyms and
-version counters as its indices and the log tree's indices as values.
+to efficiently produce proofs of membership and non-membership in the set.
 
-The prefix tree is ordered by the shortest prefixes of its leaves. The prefix
-tree's root represents the empty prefix. All indices of the root's left subtree
-begin with a 0 bit, all indices of the root's right subtree start with a 1 bit.
-More generally speaking. The subtree headed by a parent's left child contains
-all values that share its prefix followed by an additional 0 bit, while the
-subtree headed by a parent's right child contains all values that share its
-prefix followed by an additional 1 bit.
+Each leaf node in a prefix tree represents a specific value, while each parent
+node represents some prefix which all values in the subtree headed by that node
+have in common. The subtree headed by a parent's left child contains all values
+that share its prefix followed by an additional 0 bit, while the subtree headed
+by a parent's right child contains all values that share its prefix followed by
+an additional 1 bit.
+
+The root node, in particular, represents the empty string as a prefix. The
+root's left child contains all values that begin with a 0 bit, while the right
+child contains all values that begin with a 1 bit.
 
 A prefix tree can be searched by starting at the root node, and moving to the
-left child if the first bit of a value is 0, or the right child if the first
-bit is 1. This is then repeated for the second bit, third bit, and so on until
-the search either terminates at a leaf node (which may or may not be for the
-desired value), or a parent node that lacks the desired child.
+left child if the first bit of a value is 0, or the right child if the first bit
+is 1. This is then repeated for the second bit, third bit, and so on until the
+search either terminates at a leaf node (which may or may not be for the desired
+value), or a parent node that lacks the desired child.
 
 <!-- TODO diagram -->
 
-New index-value pairs are added to the tree by searching it according to the
-same process. If the search terminates at a parent without a left or right
-child, a new leaf is added as the parent's missing child. If the search
-terminates at a leaf for the wrong index, one or more intermediate nodes are
-added until the new leaf and the existing leaf would no longer reside in the
-same place. That is, until we reach the first bit that differs between the new
-index and the existing index.
+New values are added to the tree by searching it according to the same process.
+If the search terminates at a parent without a left or right child, a new leaf
+is simply added as the parent's missing child. If the search terminates at a
+leaf for the wrong value, one or more intermediate nodes are added until the new
+leaf and the existing leaf would no longer reside in the same place. That is,
+until we reach the first bit that differs between the new value and the existing
+value.
 
 <!-- TODO diagram of adding new value -->
 
-The hash value of a leaf node is the hash of its value, while the hash value of
-a parent node is the hash of the combined hash values of its left and right
-children (or a stand-in value when one of the children doesn't exist).
+The value of a leaf node is the encoded set member, while the value of a
+parent node is the hash of the combined values of its left and right children
+(or a stand-in value when one of the children doesn't exist).
 
 A proof of membership is given by providing the leaf hash value, along with the
 hash value of each copath entry along the search path. A proof of non-membership
