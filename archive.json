@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-06-02T00:08:41.479710+00:00",
+  "timestamp": "2024-06-04T00:07:56.648801+00:00",
   "repo": "Bren2010/draft-keytrans",
   "labels": [
     {
@@ -211,24 +211,26 @@
       "id": "PR_kwDOLrnaA85wxLKA",
       "title": "More intuition on tree construction",
       "url": "https://github.com/Bren2010/draft-keytrans/pull/3",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "felixlinker",
       "authorAssociation": "CONTRIBUTOR",
       "assignees": [],
       "labels": [],
       "body": "With this PR, I try to give a more high-level intuition of what happens in KT, but there is a discrepancy between what I write here (and the Merkle^2 paper) and what you write. I will open an issue separately for that.",
       "createdAt": "2024-05-28T13:48:13Z",
-      "updatedAt": "2024-05-31T17:29:11Z",
+      "updatedAt": "2024-06-02T22:31:48Z",
       "baseRepository": "Bren2010/draft-keytrans",
       "baseRefName": "main",
       "baseRefOid": "9002fc9b5634469fb3cdc4a474532e139ff150d5",
       "headRepository": "felixlinker/draft-keytrans",
       "headRefName": "new-intro",
-      "headRefOid": "f8a199c8c88745a894f22eaec0aa35522c6ea6e4",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "f851f0aa3519c9e2b87fd359e5117531cb35b7b1",
+      "closedAt": "2024-06-02T22:31:48Z",
+      "mergedAt": "2024-06-02T22:31:48Z",
+      "mergedBy": "Bren2010",
+      "mergeCommit": {
+        "oid": "48f57350664ab9417bd4b2ffb6046c4263b2b9cc"
+      },
       "comments": [],
       "reviews": [
         {
@@ -430,6 +432,69 @@
               "updatedAt": "2024-05-31T17:28:28Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOLrnaA858unmG",
+          "commit": {
+            "abbreviatedOid": "286578b"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2024-06-02T19:29:54Z",
+          "updatedAt": "2024-06-02T22:30:48Z",
+          "comments": [
+            {
+              "originalPosition": 70,
+              "body": "We should distinguish hash value from value. But in this text, we're talking about value. Talking about hash value adds an extra layer to understand",
+              "createdAt": "2024-06-02T19:29:54Z",
+              "updatedAt": "2024-06-02T22:30:48Z"
+            },
+            {
+              "originalPosition": 87,
+              "body": "When writing new text, 80 chars is good. When modifying existing text, the goal is to have a clear diff, so it's fine if lines end up uneven lengths",
+              "createdAt": "2024-06-02T19:32:39Z",
+              "updatedAt": "2024-06-02T22:30:48Z"
+            },
+            {
+              "originalPosition": 95,
+              "body": "```suggestion\r\nto efficiently produce proofs of membership and non-membership in the set.\r\n\r\nEach leaf node in a prefix tree represents a specific value, while each parent\r\nnode represents some prefix which all values in the subtree headed by that node\r\nhave in common. The subtree headed by a parent's left child contains all values\r\nthat share its prefix followed by an additional 0 bit, while the subtree headed\r\nby a parent's right child contains all values that share its prefix followed by\r\nan additional 1 bit.\r\n\r\nThe root node, in particular, represents the empty string as a prefix. The\r\nroot's left child contains all values that begin with a 0 bit, while the right\r\nchild contains all values that begin with a 1 bit.\r\n```",
+              "createdAt": "2024-06-02T22:27:12Z",
+              "updatedAt": "2024-06-02T22:30:48Z"
+            },
+            {
+              "originalPosition": 122,
+              "body": "```suggestion\r\nNew values are added to the tree by searching it according to the same process.\r\nIf the search terminates at a parent without a left or right child, a new leaf\r\nis simply added as the parent's missing child. If the search terminates at a\r\nleaf for the wrong value, one or more intermediate nodes are added until the new\r\nleaf and the existing leaf would no longer reside in the same place. That is,\r\nuntil we reach the first bit that differs between the new value and the existing\r\nvalue.\r\n```",
+              "createdAt": "2024-06-02T22:28:33Z",
+              "updatedAt": "2024-06-02T22:30:48Z"
+            },
+            {
+              "originalPosition": 105,
+              "body": "```suggestion\r\nleft child if the first bit of a value is 0, or the right child if the first bit\r\nis 1. This is then repeated for the second bit, third bit, and so on until the\r\nsearch either terminates at a leaf node (which may or may not be for the desired\r\nvalue), or a parent node that lacks the desired child.\r\n```",
+              "createdAt": "2024-06-02T22:28:51Z",
+              "updatedAt": "2024-06-02T22:30:48Z"
+            },
+            {
+              "originalPosition": 131,
+              "body": "```suggestion\r\nThe value of a leaf node is the encoded set member, while the value of a\r\nparent node is the hash of the combined values of its left and right children\r\n(or a stand-in value when one of the children doesn't exist).\r\n```",
+              "createdAt": "2024-06-02T22:30:21Z",
+              "updatedAt": "2024-06-02T22:30:48Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOLrnaA858usld",
+          "commit": {
+            "abbreviatedOid": "f851f0a"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2024-06-02T22:31:38Z",
+          "updatedAt": "2024-06-02T22:31:38Z",
+          "comments": []
         }
       ]
     },
