@@ -82,8 +82,8 @@ properties are maintained.
 # Tree Construction
 
 KT allows clients of a service to query the keys of other clients of the same
-service. To do so, KT maintains two structures: (i) a log of each change to any
-key's value, and (ii) a set containing all of the key-version pairs that have been
+service. To do so, KT maintains two structures: (i) a log of every
+key update, and (ii) a set containing all the pseudonym/key-version pairs for which key updates have been
 logged. When clients query a KT service, they
 require a means to authenticate the responses of the KT service. To provide for
 this, the KT service maintains a *combined hash tree structure*, which commits
@@ -288,9 +288,9 @@ prefix tree contains the same data as a previous version with only new values
 added.
 
 In the combined tree structure, which is based on {{Merkle2}}, a log tree
-maintains a record of each time any key's value is updated, while a prefix tree
-maintains the set of index-version pairs. Importantly, the root hash value of the
-prefix tree after adding a new index-version pair is stored in a leaf of the log
+maintains a record of each time a key is updated, while a prefix tree
+maintains the set of pseudonym/key-version pairs corresponding to the key updates. Importantly, the root hash value of the
+prefix tree after adding a new pseudonym/key-version pair is stored in a leaf of the log
 tree alongside a privacy-preserving commitment to the update. With some caveats,
 this combined structure supports both efficient consistency proofs and can be
 efficiently searched.
@@ -307,7 +307,7 @@ entry.
 
 To search the combined tree structure described in {{combined-tree}}, users do a
 binary search for the first log entry where the prefix tree at that entry
-contains the desired key-version pair. As such, the entry that a user arrives at
+contains the desired pseudonym/key-version pair. As such, the entry that a user arrives at
 through binary search contains the update that they're looking for, even though
 the log itself is not sorted.
 
@@ -412,7 +412,7 @@ When executing searches on a Transparency Log, the implicit tree described in
 {{implicit-binary-search-tree}} is navigated according to a binary search. At
 each individual log entry, the binary search needs to determine whether it
 should move left or right. That is, it needs to determine, out of the set of
-key-version pairs stored in the prefix tree, whether the highest version present
+pseudonym/key-version pairs stored in the prefix tree, whether the highest key version present
 at a given log entry is greater than, equal to, or less than a target version.
 
 A **binary ladder** is a series of lookups in a single log entry's prefix tree,
@@ -436,7 +436,7 @@ the key did not exist, as of the given log entry.
 
 When executing a search in a Transparency Log for a specific version of a key, a
 binary ladder is provided for each node on the search path, verifiably guiding
-the search toward the log entry where the desired key-version pair was first
+the search toward the log entry where the desired pseudonym/key-version pair was first
 inserted (and therefore, the log entry with the desired update).
 
 Requiring proof that this series of versions are present in the prefix tree,
@@ -565,7 +565,7 @@ struct {
 ## Commitment
 
 As discussed in {{combined-tree}}, commitments are stored in the leaves of the
-log tree and correspond to updates of a key's value. Commitments are computed
+log tree and correspond to key updates. Commitments are computed
 with HMAC {{!RFC2104}}, using the hash function specified by the ciphersuite. To
 produce a new commitment, the application generates a random 16 byte value
 called `opening` and computes:
@@ -610,7 +610,8 @@ struct {
 } PrefixLeaf;
 ~~~
 
-where `key_version` is the VRF output for the key-version pair, and `VRF.Nh` is
+<!-- TODO: Possible refactor key_version? People might think of this as "int only." Suggestion: `pseud_and_version` -->
+where `key_version` is the VRF output for the pseudonym/key-version pair, and `VRF.Nh` is
 the output size of the ciphersuite VRF in bytes.
 
 The parent nodes of a prefix tree are serialized as:
