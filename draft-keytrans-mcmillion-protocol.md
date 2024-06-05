@@ -307,15 +307,17 @@ entry.
 
 To search the combined tree structure described in {{combined-tree}}, users do a
 binary search for the first log entry where the prefix tree at that entry
-contains the desired pseudonym/key-version pair. As such, the entry that a user arrives at
-through binary search contains the update that they're looking for, even though
+contains the desired pseudonym/key-version pair. The entry that a user arrives at
+through binary search will contain the commitment to the key update that they're
+looking for, even though
 the log itself is not sorted.
 
-Following a binary search also ensures that all users will check the same or
-similar entries when searching for the same key, which is necessary for the
-efficient auditing of a Transparency Log. To maximize this effect, users rely on
-an implicit binary tree structure constructed over the leaves of the log tree
-(distinct from the structure of the log tree itself).
+The search is designed in such a way that all users will check the same or
+similar entries when searching for the same key, allowing for the
+efficient auditing of a Transparency Log. The binary search uses
+an *implicit binary search tree* constructed over the leaves of the log tree
+(distinct from the structure of the log tree itself), which allows the search to
+have a complexity logarithmic in the number of the log's leaves.
 
 ## Implicit Binary Search Tree
 
