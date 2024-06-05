@@ -128,13 +128,45 @@ constructed from the leaves present in the parent's own subtree. Given a list of
 elements as leaves. Note also that every parent always has both a left and right
 child.
 
-<!-- TODO diagram of example tree -->
+~~~ aasvg
+                             X
+                             |
+                   .---------+---------.
+                  /                     \
+                 X                       X
+                 |
+             .---+---.
+            /         \
+           X           X
+          / \         / \
+         /   \       /   \
+        X     X     X     X
+
+Index:  0     1     2     3              5
+~~~
+{: title="A log tree containing five leafs."}
 
 Log trees initially consist of a single leaf node. New leaves are
 added to the right-most edge of the tree along with a single parent node, to
 construct the left-balanced binary tree with `n+1` leaves.
 
-<!-- TODO diagram of adding a new leaf to a tree (specifically 5 leaves to 6 leaves to show level-skipping) -->
+~~~ aasvg
+                             X
+                             |
+                   .---------+---------.
+                  /                     \
+                 X                       X
+                 |                       |
+             .---+---.               .---+---.
+            /         \              |       |
+           X           X             X       X
+          / \         / \
+         /   \       /   \
+        X     X     X     X
+
+Index:  0     1     2     3          5       6
+~~~
+{: title="Example of inserting a new leaf with index 6 into the previously depicted log tree. Observe that only the nodes on the path from the new root to the new leaf change."}
 
 While leaves contain arbitrary data, the value of a parent node is always the
 hash of the combined values of its left and right children.
@@ -152,7 +184,42 @@ provides the minimum set of intermediate node values from the current tree that
 allows the verifier to compute both the old root value and the current root
 value. An algorithm for this is given in section 2.1.2 of {{!RFC6962}}.
 
-<!-- TODO diagram of inclusion and consistency proofs -->
+~~~ aasvg
+                             X
+                             |
+                   .---------+---------.
+                  /                     \
+                 X                      (X)
+                 |                       |
+             .---+---.               .---+---.
+            /         \              |       |
+          (X)          X             X       X
+          / \         / \
+         /   \       /   \
+        X     X     X    (X)
+
+Index:  0     1     2     3          5       6
+~~~
+{: title="Illustration of a proof of inclusion. To verify that leaf 2 is included in the tree, the server provides the client with the hashes of the nodes on its copath, i.e., all hashes that are required for the client to compute the root hash itself. In the figure, the copath consists of the nodes marked by `(X)`."}
+
+~~~ aasvg
+                             X
+                             |
+                   .---------+---------.
+                  /                     \
+                (X)                      X
+                 |                       |
+             .---+---.               .---+---.
+            /         \              |       |
+           X           X            (X)     [X]
+          / \         / \
+         /   \       /   \
+        X     X     X     X
+
+Index:  0     1     2     3          5       6
+~~~
+{: title="Illustration of a consistency proof. The server proves to the client that it correctly extended the tree by giving it the hashes of marked nodes (`[X]`/`(X)`).
+The client can verify that it can construct the old root hash form the hashes of nodes marked by `(X)`, and that it can construct the new root hash when also considering the hash of the node `[X]`."}
 
 ## Prefix Tree
 
