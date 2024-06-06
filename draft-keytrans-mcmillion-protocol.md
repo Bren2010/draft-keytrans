@@ -92,7 +92,7 @@ Two clients which have the same root hash are guaranteed to have the same view
 of the tree, and thus would always receive the same result for the same query.
 
 The combined hash tree structure consists of two types of trees: log trees and
-prefix trees. The log tree commits to (i) and 
+prefix trees. The log tree commits to (i) and
 the prefix tree commits to (ii). This section describes the operation of
 both at a high level and the way that they're combined. More precise algorithms
 for computing the intermediate and root values of the trees are given in
@@ -131,20 +131,20 @@ child.
 ~~~ aasvg
                              X
                              |
-                   .---------+---------.
-                  /                     \
-                 X                       X
-                 |
-             .---+---.
-            /         \
-           X           X
-          / \         / \
-         /   \       /   \
-        X     X     X     X
+                   .---------+-.
+                  /             \
+                 X              |
+                 |              |
+             .---+---.          |
+            /         \         |
+           X           X        |
+          / \         / \       |
+         /   \       /   \      |
+        X     X     X     X     X
 
-Index:  0     1     2     3              5
+Index:  0  1  2  3  4  5  6  7  8
 ~~~
-{: title="A log tree containing five leafs."}
+{: title="A log tree containing five leaves."}
 
 Log trees initially consist of a single leaf node. New leaves are
 added to the right-most edge of the tree along with a single parent node, to
@@ -153,20 +153,22 @@ construct the left-balanced binary tree with `n+1` leaves.
 ~~~ aasvg
                              X
                              |
-                   .---------+---------.
-                  /                     \
-                 X                       X
-                 |                       |
-             .---+---.               .---+---.
-            /         \              |       |
-           X           X             X       X
-          / \         / \
-         /   \       /   \
-        X     X     X     X
+                   .---------+----.
+                  /                \
+                 X                 |
+                 |                 |
+             .---+---.             |
+            /         \            |
+           X           X           X
+          / \         / \         / \
+         /   \       /   \       /   \
+        X     X     X     X     X     X
 
-Index:  0     1     2     3          5       6
+Index:  0  1  2  3  4  5  6  7  8  9  10
 ~~~
-{: title="Example of inserting a new leaf with index 6 into the previously depicted log tree. Observe that only the nodes on the path from the new root to the new leaf change."}
+{: title="Example of inserting a new leaf with index 10 into the previously
+depicted log tree. Observe that only the nodes on the path from the new root to
+the new leaf change."}
 
 While leaves contain arbitrary data, the value of a parent node is always the
 hash of the combined values of its left and right children.
@@ -187,39 +189,46 @@ value. An algorithm for this is given in section 2.1.2 of {{!RFC6962}}.
 ~~~ aasvg
                              X
                              |
-                   .---------+---------.
-                  /                     \
-                 X                      (X)
-                 |                       |
-             .---+---.               .---+---.
-            /         \              |       |
-          (X)          X             X       X
-          / \         / \
-         /   \       /   \
-        X     X     X    (X)
+                   .---------+----.
+                  /                \
+                 X                 |
+                 |                 |
+             .---+---.             |
+            /         \            |
+          (X)           X         (X)
+          / \         / \         / \
+         /   \       /   \       /   \
+        X     X     X   (X)    X     X
 
-Index:  0     1     2     3          5       6
+Index:  0  1  2  3  4  5  6  7  8  9  10
 ~~~
-{: title="Illustration of a proof of inclusion. To verify that leaf 2 is included in the tree, the server provides the client with the hashes of the nodes on its copath, i.e., all hashes that are required for the client to compute the root hash itself. In the figure, the copath consists of the nodes marked by `(X)`."}
+{: title="Illustration of a proof of inclusion. To verify that leaf 4 is
+included in the tree, the server provides the client with the hashes of the
+nodes on its copath, i.e., all hashes that are required for the client to
+compute the root hash itself. In the figure, the copath consists of the nodes
+marked by `(X)`."}
 
 ~~~ aasvg
                              X
                              |
-                   .---------+---------.
-                  /                     \
-                (X)                      X
-                 |                       |
-             .---+---.               .---+---.
-            /         \              |       |
-           X           X            (X)     [X]
-          / \         / \
-         /   \       /   \
-        X     X     X     X
+                   .---------+----.
+                  /                \
+                (X)                 |
+                 |                 |
+             .---+---.             |
+            /         \            |
+           X           X           X
+          / \         / \         / \
+         /   \       /   \       /   \
+        X     X     X     X    (X)   [X]
 
-Index:  0     1     2     3          5       6
+Index:  0  1  2  3  4  5  6  7  8  9  10
 ~~~
-{: title="Illustration of a consistency proof. The server proves to the client that it correctly extended the tree by giving it the hashes of marked nodes (`[X]`/`(X)`).
-The client can verify that it can construct the old root hash form the hashes of nodes marked by `(X)`, and that it can construct the new root hash when also considering the hash of the node `[X]`."}
+{: title="Illustration of a consistency proof. The server proves to the client
+that it correctly extended the tree by giving it the hashes of marked nodes
+(`[X]`/`(X)`). The client can verify that it can construct the old root hash
+form the hashes of nodes marked by `(X)`, and that it can construct the new root
+hash when also considering the hash of the node `[X]`."}
 
 ## Prefix Tree
 
