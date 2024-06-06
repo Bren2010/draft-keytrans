@@ -1035,7 +1035,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">McMillion &amp; Linker</td>
-<td class="center">Expires 4 December 2024</td>
+<td class="center">Expires 8 December 2024</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1048,12 +1048,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-keytrans-mcmillion-protocol-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2024-06-02" class="published">2 June 2024</time>
+<time datetime="2024-06-06" class="published">6 June 2024</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2024-12-04">4 December 2024</time></dd>
+<dd class="expires"><time datetime="2024-12-08">8 December 2024</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1106,7 +1106,7 @@ timely manner.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 4 December 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 8 December 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1302,22 +1302,34 @@ properties are maintained.<a href="#section-2-2" class="pilcrow">¶</a></p>
       <h2 id="name-tree-construction">
 <a href="#section-3" class="section-number selfRef">3. </a><a href="#name-tree-construction" class="section-name selfRef">Tree Construction</a>
       </h2>
-<p id="section-3-1">KT relies on two combined hash tree structures: log trees and prefix trees. This
-section describes the operation of both at a high level and the way that they're
-combined. More precise algorithms for computing the intermediate and root values
-of the trees are given in <a href="#cryptographic-computations" class="auto internal xref">Section 6</a>.<a href="#section-3-1" class="pilcrow">¶</a></p>
-<p id="section-3-2">Both types of trees consist of <em>nodes</em> which have a byte string as their
-<em>value</em>. A node is either a <em>leaf</em> if it has no children, or a <em>parent</em> if it
-has either a <em>left child</em> or a <em>right child</em>. A node is the <em>root</em> of a tree if
-it has no parents, and an <em>intermediate</em> if it has both children and parents.
-Nodes are <em>siblings</em> if they share the same parent.<a href="#section-3-2" class="pilcrow">¶</a></p>
-<p id="section-3-3">The <em>descendants</em> of a node are that node, its children, and the descendants of
+<p id="section-3-1">KT allows clients of a service to query the keys of other clients of the same
+service. To do so, KT maintains two structures: (i) a log of each change to any
+key's value, and (ii) a set containing all of the key-version pairs that have been
+logged. When clients query a KT service, they
+require a means to authenticate the responses of the KT service. To provide for
+this, the KT service maintains a <em>combined hash tree structure</em>, which commits
+to both these structures with a <em>root hash</em>.
+Two clients which have the same root hash are guaranteed to have the same view
+of the tree, and thus would always receive the same result for the same query.<a href="#section-3-1" class="pilcrow">¶</a></p>
+<p id="section-3-2">The combined hash tree structure consists of two types of trees: log trees and
+prefix trees. The log tree commits to (i) and
+the prefix tree commits to (ii). This section describes the operation of
+both at a high level and the way that they're combined. More precise algorithms
+for computing the intermediate and root values of the trees are given in
+<a href="#cryptographic-computations" class="auto internal xref">Section 6</a>.<a href="#section-3-2" class="pilcrow">¶</a></p>
+<p id="section-3-3">Both types of trees consist of
+<em>nodes</em> which have a byte string as their <em>hash value</em>. A node is either a
+<em>leaf</em> if it has no children, or a <em>parent</em>
+if it has either a <em>left child</em> or a <em>right child</em>. A node is the <em>root</em> of a
+tree if it has no parents, and an <em>intermediate</em> if it has both children and
+parents. Nodes are <em>siblings</em> if they share the same parent.<a href="#section-3-3" class="pilcrow">¶</a></p>
+<p id="section-3-4">The <em>descendants</em> of a node are that node, its children, and the descendants of
 its children. A <em>subtree</em> of a tree is the tree given by the descendants of a
-node, called the <em>head</em> of the subtree.<a href="#section-3-3" class="pilcrow">¶</a></p>
-<p id="section-3-4">The <em>direct path</em> of a root node is the empty list, and of any other node is the
+node, called the <em>head</em> of the subtree.<a href="#section-3-4" class="pilcrow">¶</a></p>
+<p id="section-3-5">The <em>direct path</em> of a root node is the empty list, and of any other node is the
 concatenation of that node's parent along with the parent's direct path. The
 <em>copath</em> of a node is the node's sibling concatenated with the list of siblings
-of all the nodes in its direct path, excluding the root.<a href="#section-3-4" class="pilcrow">¶</a></p>
+of all the nodes in its direct path, excluding the root.<a href="#section-3-5" class="pilcrow">¶</a></p>
 <div id="log-tree">
 <section id="section-3.1">
         <h3 id="name-log-tree">
@@ -1333,22 +1345,216 @@ constructed from the leaves present in the parent's own subtree. Given a list of
 <code>n</code> items, there is a unique left-balanced binary tree structure with these
 elements as leaves. Note also that every parent always has both a left and right
 child.<a href="#section-3.1-2" class="pilcrow">¶</a></p>
-<p id="section-3.1-3">Log trees initially consist of a single leaf node. New leaves are added to the
-right-most edge of the tree along with a single parent node, to construct the
-left-balanced binary tree with <code>n+1</code> leaves.<a href="#section-3.1-3" class="pilcrow">¶</a></p>
-<p id="section-3.1-4">While leaves contain arbitrary data, the value of a parent node is always the
-hash of the combined values of its left and right children.<a href="#section-3.1-4" class="pilcrow">¶</a></p>
-<p id="section-3.1-5">Log trees are powerful in that they can provide both <em>inclusion proofs</em>, which
+<span id="name-a-log-tree-containing-five-"></span><figure id="figure-1">
+          <div id="section-3.1-3.1">
+            <div class="alignLeft art-svg artwork" id="section-3.1-3.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="256" width="272" viewBox="0 0 272 256" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                <path d="M 144,112 L 144,128" fill="none" stroke="black"></path>
+                <path d="M 240,48 L 240,64" fill="none" stroke="black"></path>
+                <path d="M 264,96 L 264,192" fill="none" stroke="black"></path>
+                <path d="M 160,64 L 256,64" fill="none" stroke="black"></path>
+                <path d="M 112,128 L 176,128" fill="none" stroke="black"></path>
+                <path d="M 104,176 L 112,192" fill="none" stroke="black"></path>
+                <path d="M 176,128 L 184,144" fill="none" stroke="black"></path>
+                <path d="M 200,176 L 208,192" fill="none" stroke="black"></path>
+                <path d="M 256,64 L 264,80" fill="none" stroke="black"></path>
+                <path d="M 80,192 L 88,176" fill="none" stroke="black"></path>
+                <path d="M 104,144 L 112,128" fill="none" stroke="black"></path>
+                <path d="M 152,80 L 160,64" fill="none" stroke="black"></path>
+                <path d="M 176,192 L 184,176" fill="none" stroke="black"></path>
+                <g class="text">
+                  <text x="240" y="36">X</text>
+                  <text x="144" y="100">X</text>
+                  <text x="96" y="164">X</text>
+                  <text x="192" y="164">X</text>
+                  <text x="72" y="212">X</text>
+                  <text x="120" y="212">X</text>
+                  <text x="168" y="212">X</text>
+                  <text x="216" y="212">X</text>
+                  <text x="264" y="212">X</text>
+                  <text x="28" y="244">Index:</text>
+                  <text x="72" y="244">0</text>
+                  <text x="96" y="244">1</text>
+                  <text x="120" y="244">2</text>
+                  <text x="144" y="244">3</text>
+                  <text x="168" y="244">4</text>
+                  <text x="192" y="244">5</text>
+                  <text x="216" y="244">6</text>
+                  <text x="240" y="244">7</text>
+                  <text x="264" y="244">8</text>
+                </g>
+              </svg><a href="#section-3.1-3.1.1" class="pilcrow">¶</a>
+</div>
+</div>
+<figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
+<a href="#name-a-log-tree-containing-five-" class="selfRef">A log tree containing five leaves.</a>
+          </figcaption></figure>
+<p id="section-3.1-4">Log trees initially consist of a single leaf node. New leaves are
+added to the right-most edge of the tree along with a single parent node, to
+construct the left-balanced binary tree with <code>n+1</code> leaves.<a href="#section-3.1-4" class="pilcrow">¶</a></p>
+<span id="name-example-of-inserting-a-new-"></span><figure id="figure-2">
+          <div id="section-3.1-5.1">
+            <div class="alignLeft art-svg artwork" id="section-3.1-5.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="256" width="328" viewBox="0 0 328 256" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                <path d="M 144,112 L 144,128" fill="none" stroke="black"></path>
+                <path d="M 240,48 L 240,64" fill="none" stroke="black"></path>
+                <path d="M 288,96 L 288,144" fill="none" stroke="black"></path>
+                <path d="M 160,64 L 280,64" fill="none" stroke="black"></path>
+                <path d="M 112,128 L 176,128" fill="none" stroke="black"></path>
+                <path d="M 104,176 L 112,192" fill="none" stroke="black"></path>
+                <path d="M 176,128 L 184,144" fill="none" stroke="black"></path>
+                <path d="M 200,176 L 208,192" fill="none" stroke="black"></path>
+                <path d="M 296,176 L 304,192" fill="none" stroke="black"></path>
+                <path d="M 280,64 L 288,80" fill="none" stroke="black"></path>
+                <path d="M 80,192 L 88,176" fill="none" stroke="black"></path>
+                <path d="M 104,144 L 112,128" fill="none" stroke="black"></path>
+                <path d="M 152,80 L 160,64" fill="none" stroke="black"></path>
+                <path d="M 176,192 L 184,176" fill="none" stroke="black"></path>
+                <path d="M 272,192 L 280,176" fill="none" stroke="black"></path>
+                <g class="text">
+                  <text x="240" y="36">X</text>
+                  <text x="144" y="100">X</text>
+                  <text x="96" y="164">X</text>
+                  <text x="192" y="164">X</text>
+                  <text x="288" y="164">X</text>
+                  <text x="72" y="212">X</text>
+                  <text x="120" y="212">X</text>
+                  <text x="168" y="212">X</text>
+                  <text x="216" y="212">X</text>
+                  <text x="264" y="212">X</text>
+                  <text x="312" y="212">X</text>
+                  <text x="28" y="244">Index:</text>
+                  <text x="72" y="244">0</text>
+                  <text x="96" y="244">1</text>
+                  <text x="120" y="244">2</text>
+                  <text x="144" y="244">3</text>
+                  <text x="168" y="244">4</text>
+                  <text x="192" y="244">5</text>
+                  <text x="216" y="244">6</text>
+                  <text x="240" y="244">7</text>
+                  <text x="264" y="244">8</text>
+                  <text x="288" y="244">9</text>
+                  <text x="316" y="244">10</text>
+                </g>
+              </svg><a href="#section-3.1-5.1.1" class="pilcrow">¶</a>
+</div>
+</div>
+<figcaption><a href="#figure-2" class="selfRef">Figure 2</a>:
+<a href="#name-example-of-inserting-a-new-" class="selfRef">Example of inserting a new leaf with index 10 into the previously depicted log tree. Observe that only the nodes on the path from the new root to the new leaf change.</a>
+          </figcaption></figure>
+<p id="section-3.1-6">While leaves contain arbitrary data, the value of a parent node is always the
+hash of the combined values of its left and right children.<a href="#section-3.1-6" class="pilcrow">¶</a></p>
+<p id="section-3.1-7">Log trees are powerful in that they can provide both <em>inclusion proofs</em>, which
 demonstrate that a leaf is included in a log, and <em>consistency proofs</em>, which
 demonstrate that a new version of a log is an extension of a past version of the
-log.<a href="#section-3.1-5" class="pilcrow">¶</a></p>
-<p id="section-3.1-6">An inclusion proof is given by providing the copath values of a leaf. The proof
+log.<a href="#section-3.1-7" class="pilcrow">¶</a></p>
+<p id="section-3.1-8">An inclusion proof is given by providing the copath values of a leaf. The proof
 is verified by hashing together the leaf with the copath values and checking
-that the result equals the root value of the log. Consistency proofs are a more
-general version of the same idea. With a consistency proof, the prover provides
-the minimum set of intermediate node values from the current tree that allows
-the verifier to compute both the old root value and the current root value. An
-algorithm for this is given in section 2.1.2 of <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span>.<a href="#section-3.1-6" class="pilcrow">¶</a></p>
+that the result equals the root hash value of the log. Consistency proofs are a
+more general version of the same idea. With a consistency proof, the prover
+provides the minimum set of intermediate node values from the current tree that
+allows the verifier to compute both the old root value and the current root
+value. An algorithm for this is given in section 2.1.2 of <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span>.<a href="#section-3.1-8" class="pilcrow">¶</a></p>
+<span id="name-illustration-of-a-proof-of-"></span><figure id="figure-3">
+          <div id="section-3.1-9.1">
+            <div class="alignLeft art-svg artwork" id="section-3.1-9.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="256" width="328" viewBox="0 0 328 256" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                <path d="M 144,112 L 144,128" fill="none" stroke="black"></path>
+                <path d="M 240,48 L 240,64" fill="none" stroke="black"></path>
+                <path d="M 288,96 L 288,144" fill="none" stroke="black"></path>
+                <path d="M 160,64 L 280,64" fill="none" stroke="black"></path>
+                <path d="M 112,128 L 176,128" fill="none" stroke="black"></path>
+                <path d="M 104,176 L 112,192" fill="none" stroke="black"></path>
+                <path d="M 176,128 L 184,144" fill="none" stroke="black"></path>
+                <path d="M 200,176 L 212,200" fill="none" stroke="black"></path>
+                <path d="M 296,176 L 304,192" fill="none" stroke="black"></path>
+                <path d="M 280,64 L 288,80" fill="none" stroke="black"></path>
+                <path d="M 80,192 L 88,176" fill="none" stroke="black"></path>
+                <path d="M 104,144 L 112,128" fill="none" stroke="black"></path>
+                <path d="M 152,80 L 160,64" fill="none" stroke="black"></path>
+                <path d="M 176,192 L 184,176" fill="none" stroke="black"></path>
+                <path d="M 272,192 L 280,176" fill="none" stroke="black"></path>
+                <g class="text">
+                  <text x="240" y="36">X</text>
+                  <text x="144" y="100">X</text>
+                  <text x="96" y="164">(X)</text>
+                  <text x="200" y="164">X</text>
+                  <text x="288" y="164">(X)</text>
+                  <text x="72" y="212">X</text>
+                  <text x="120" y="212">X</text>
+                  <text x="168" y="212">X</text>
+                  <text x="208" y="212">(X)</text>
+                  <text x="256" y="212">X</text>
+                  <text x="304" y="212">X</text>
+                  <text x="28" y="244">Index:</text>
+                  <text x="72" y="244">0</text>
+                  <text x="96" y="244">1</text>
+                  <text x="120" y="244">2</text>
+                  <text x="144" y="244">3</text>
+                  <text x="168" y="244">4</text>
+                  <text x="192" y="244">5</text>
+                  <text x="216" y="244">6</text>
+                  <text x="240" y="244">7</text>
+                  <text x="264" y="244">8</text>
+                  <text x="288" y="244">9</text>
+                  <text x="316" y="244">10</text>
+                </g>
+              </svg><a href="#section-3.1-9.1.1" class="pilcrow">¶</a>
+</div>
+</div>
+<figcaption><a href="#figure-3" class="selfRef">Figure 3</a>:
+<a href="#name-illustration-of-a-proof-of-" class="selfRef">Illustration of a proof of inclusion. To verify that leaf 4 is included in the tree, the server provides the client with the hashes of the nodes on its copath, i.e., all hashes that are required for the client to compute the root hash itself. In the figure, the copath consists of the nodes marked by `(X)`.</a>
+          </figcaption></figure>
+<span id="name-illustration-of-a-consisten"></span><figure id="figure-4">
+          <div id="section-3.1-10.1">
+            <div class="alignLeft art-svg artwork" id="section-3.1-10.1.1">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="256" width="328" viewBox="0 0 328 256" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+                <path d="M 144,112 L 144,128" fill="none" stroke="black"></path>
+                <path d="M 240,48 L 240,64" fill="none" stroke="black"></path>
+                <path d="M 288,112 L 288,144" fill="none" stroke="black"></path>
+                <path d="M 160,64 L 280,64" fill="none" stroke="black"></path>
+                <path d="M 112,128 L 176,128" fill="none" stroke="black"></path>
+                <path d="M 104,176 L 112,192" fill="none" stroke="black"></path>
+                <path d="M 176,128 L 184,144" fill="none" stroke="black"></path>
+                <path d="M 200,176 L 208,192" fill="none" stroke="black"></path>
+                <path d="M 296,176 L 304,192" fill="none" stroke="black"></path>
+                <path d="M 280,64 L 296,96" fill="none" stroke="black"></path>
+                <path d="M 80,192 L 88,176" fill="none" stroke="black"></path>
+                <path d="M 104,144 L 112,128" fill="none" stroke="black"></path>
+                <path d="M 152,80 L 160,64" fill="none" stroke="black"></path>
+                <path d="M 176,192 L 184,176" fill="none" stroke="black"></path>
+                <path d="M 272,192 L 280,176" fill="none" stroke="black"></path>
+                <g class="text">
+                  <text x="240" y="36">X</text>
+                  <text x="144" y="100">(X)</text>
+                  <text x="96" y="164">X</text>
+                  <text x="192" y="164">X</text>
+                  <text x="288" y="164">X</text>
+                  <text x="72" y="212">X</text>
+                  <text x="120" y="212">X</text>
+                  <text x="168" y="212">X</text>
+                  <text x="216" y="212">X</text>
+                  <text x="264" y="212">(X)</text>
+                  <text x="312" y="212">[X]</text>
+                  <text x="28" y="244">Index:</text>
+                  <text x="72" y="244">0</text>
+                  <text x="96" y="244">1</text>
+                  <text x="120" y="244">2</text>
+                  <text x="144" y="244">3</text>
+                  <text x="168" y="244">4</text>
+                  <text x="192" y="244">5</text>
+                  <text x="216" y="244">6</text>
+                  <text x="240" y="244">7</text>
+                  <text x="264" y="244">8</text>
+                  <text x="288" y="244">9</text>
+                  <text x="316" y="244">10</text>
+                </g>
+              </svg><a href="#section-3.1-10.1.1" class="pilcrow">¶</a>
+</div>
+</div>
+<figcaption><a href="#figure-4" class="selfRef">Figure 4</a>:
+<a href="#name-illustration-of-a-consisten" class="selfRef">Illustration of a consistency proof. The server proves to the client that it correctly extended the tree by giving it the hashes of marked nodes (`[X]`/`(X)`). The client can verify that it can construct the old root hash form the hashes of nodes marked by `(X)`, and that it can construct the new root hash when also considering the hash of the node `[X]`.</a>
+          </figcaption></figure>
 </section>
 </div>
 <div id="prefix-tree">
@@ -1382,13 +1588,13 @@ value.<a href="#section-3.2-5" class="pilcrow">¶</a></p>
 <p id="section-3.2-6">The value of a leaf node is the encoded set member, while the value of a
 parent node is the hash of the combined values of its left and right children
 (or a stand-in value when one of the children doesn't exist).<a href="#section-3.2-6" class="pilcrow">¶</a></p>
-<p id="section-3.2-7">A proof of membership is given by providing the leaf value, along with the hash
-of each copath entry along the search path. A proof of non-membership is given
-by providing an abridged proof of membership that follows the search path for
-the intended value, but ends either at a stand-in value or a leaf for a
+<p id="section-3.2-7">A proof of membership is given by providing the leaf hash value, along with the
+hash value of each copath entry along the search path. A proof of non-membership
+is given by providing an abridged proof of membership that follows the search
+path for the intended value, but ends either at a stand-in value or a leaf for a
 different value. In either case, the proof is verified by hashing together the
-leaf with the copath values and checking that the result equals the root value
-of the tree.<a href="#section-3.2-7" class="pilcrow">¶</a></p>
+leaf with the copath hash values and checking that the result equals the root
+hash value of the tree.<a href="#section-3.2-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="combined-tree">
@@ -1406,8 +1612,8 @@ prefix tree contains the same data as a previous version with only new values
 added.<a href="#section-3.3-1" class="pilcrow">¶</a></p>
 <p id="section-3.3-2">In the combined tree structure, which is based on <span>[<a href="#Merkle2" class="cite xref">Merkle2</a>]</span>, a log tree
 maintains a record of each time any key's value is updated, while a prefix tree
-maintains the set of key-version pairs. Importantly, the root value of the
-prefix tree after adding the new key-version pair is stored in a leaf of the log
+maintains the set of index-version pairs. Importantly, the root hash value of the
+prefix tree after adding a new index-version pair is stored in a leaf of the log
 tree alongside a privacy-preserving commitment to the update. With some caveats,
 this combined structure supports both efficient consistency proofs and can be
 efficiently searched.<a href="#section-3.3-2" class="pilcrow">¶</a></p>
@@ -1446,7 +1652,7 @@ representation of a binary tree. This structure is similar to the log tree, but
 distinguished by the fact that not all parent nodes have two children. In this
 representation, "leaf" nodes are stored in even-numbered indices, while
 "intermediate" nodes are stored in odd-numbered indices:<a href="#section-4.1-1" class="pilcrow">¶</a></p>
-<span id="name-a-binary-tree-constructed-f"></span><figure id="figure-1">
+<span id="name-a-binary-tree-constructed-f"></span><figure id="figure-5">
           <div id="section-4.1-2.1">
             <div class="alignLeft art-svg artwork" id="section-4.1-2.1.1">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="256" width="392" viewBox="0 0 392 256" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
@@ -1503,7 +1709,7 @@ representation, "leaf" nodes are stored in even-numbered indices, while
               </svg><a href="#section-4.1-2.1.1" class="pilcrow">¶</a>
 </div>
 </div>
-<figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
+<figcaption><a href="#figure-5" class="selfRef">Figure 5</a>:
 <a href="#name-a-binary-tree-constructed-f" class="selfRef">A binary tree constructed from 14 entries in a log</a>
           </figcaption></figure>
 <p id="section-4.1-3">Following the structure of this binary tree when executing searches makes

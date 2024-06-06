@@ -5,7 +5,7 @@
 KEYTRANS Working Group                                      B. McMillion
 Internet-Draft                                                          
 Intended status: Informational                                 F. Linker
-Expires: 4 December 2024                                     2 June 2024
+Expires: 8 December 2024                                     6 June 2024
 
 
                        Key Transparency Protocol
@@ -49,7 +49,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 4 December 2024.
+   This Internet-Draft will expire on 8 December 2024.
 
 Copyright Notice
 
@@ -143,18 +143,30 @@ Table of Contents
 
 3.  Tree Construction
 
-   KT relies on two combined hash tree structures: log trees and prefix
-   trees.  This section describes the operation of both at a high level
-   and the way that they're combined.  More precise algorithms for
-   computing the intermediate and root values of the trees are given in
-   Section 6.
+   KT allows clients of a service to query the keys of other clients of
+   the same service.  To do so, KT maintains two structures: (i) a log
+   of each change to any key's value, and (ii) a set containing all of
+   the key-version pairs that have been logged.  When clients query a KT
+   service, they require a means to authenticate the responses of the KT
+   service.  To provide for this, the KT service maintains a _combined
+   hash tree structure_, which commits to both these structures with a
+   _root hash_. Two clients which have the same root hash are guaranteed
+   to have the same view of the tree, and thus would always receive the
+   same result for the same query.
+
+   The combined hash tree structure consists of two types of trees: log
+   trees and prefix trees.  The log tree commits to (i) and the prefix
+   tree commits to (ii).  This section describes the operation of both
+   at a high level and the way that they're combined.  More precise
+   algorithms for computing the intermediate and root values of the
+   trees are given in Section 6.
 
    Both types of trees consist of _nodes_ which have a byte string as
-   their _value_. A node is either a _leaf_ if it has no children, or a
-   _parent_ if it has either a _left child_ or a _right child_. A node
-   is the _root_ of a tree if it has no parents, and an _intermediate_
-   if it has both children and parents.  Nodes are _siblings_ if they
-   share the same parent.
+   their _hash value_. A node is either a _leaf_ if it has no children,
+   or a _parent_ if it has either a _left child_ or a _right child_. A
+   node is the _root_ of a tree if it has no parents, and an
+   _intermediate_ if it has both children and parents.  Nodes are
+   _siblings_ if they share the same parent.
 
    The _descendants_ of a node are that node, its children, and the
    descendants of its children.  A _subtree_ of a tree is the tree given
@@ -182,9 +194,45 @@ Table of Contents
    as leaves.  Note also that every parent always has both a left and
    right child.
 
+                                X
+                                |
+                      .---------+-.
+                     /             \
+                    X              |
+                    |              |
+                .---+---.          |
+               /         \         |
+              X           X        |
+             / \         / \       |
+            /   \       /   \      |
+           X     X     X     X     X
+
+   Index:  0  1  2  3  4  5  6  7  8
+
+                Figure 1: A log tree containing five leaves.
+
    Log trees initially consist of a single leaf node.  New leaves are
    added to the right-most edge of the tree along with a single parent
    node, to construct the left-balanced binary tree with n+1 leaves.
+
+                                X
+                                |
+                      .---------+----.
+                     /                \
+                    X                 |
+                    |                 |
+                .---+---.             |
+               /         \            |
+              X           X           X
+             / \         / \         / \
+            /   \       /   \       /   \
+           X     X     X     X     X     X
+
+   Index:  0  1  2  3  4  5  6  7  8  9  10
+
+      Figure 2: Example of inserting a new leaf with index 10 into the
+     previously depicted log tree.  Observe that only the nodes on the
+               path from the new root to the new leaf change.
 
    While leaves contain arbitrary data, the value of a parent node is
    always the hash of the combined values of its left and right
@@ -197,12 +245,55 @@ Table of Contents
 
    An inclusion proof is given by providing the copath values of a leaf.
    The proof is verified by hashing together the leaf with the copath
-   values and checking that the result equals the root value of the log.
-   Consistency proofs are a more general version of the same idea.  With
-   a consistency proof, the prover provides the minimum set of
+   values and checking that the result equals the root hash value of the
+   log.  Consistency proofs are a more general version of the same idea.
+   With a consistency proof, the prover provides the minimum set of
    intermediate node values from the current tree that allows the
    verifier to compute both the old root value and the current root
    value.  An algorithm for this is given in section 2.1.2 of [RFC6962].
+
+                                X
+                                |
+                      .---------+----.
+                     /                \
+                    X                 |
+                    |                 |
+                .---+---.             |
+               /         \            |
+             (X)           X         (X)
+             / \         / \         / \
+            /   \       /   \       /   \
+           X     X     X   (X)    X     X
+
+   Index:  0  1  2  3  4  5  6  7  8  9  10
+
+      Figure 3: Illustration of a proof of inclusion.  To verify that
+       leaf 4 is included in the tree, the server provides the client
+     with the hashes of the nodes on its copath, i.e., all hashes that
+      are required for the client to compute the root hash itself.  In
+       the figure, the copath consists of the nodes marked by `(X)`.
+
+                                X
+                                |
+                      .---------+----.
+                     /                \
+                   (X)                 |
+                    |                 |
+                .---+---.             |
+               /         \            |
+              X           X           X
+             / \         / \         / \
+            /   \       /   \       /   \
+           X     X     X     X    (X)   [X]
+
+   Index:  0  1  2  3  4  5  6  7  8  9  10
+
+     Figure 4: Illustration of a consistency proof.  The server proves
+       to the client that it correctly extended the tree by giving it
+      the hashes of marked nodes (`[X]`/`(X)`).  The client can verify
+      that it can construct the old root hash form the hashes of nodes
+     marked by `(X)`, and that it can construct the new root hash when
+                also considering the hash of the node `[X]`.
 
 3.2.  Prefix Tree
 
@@ -244,14 +335,14 @@ Table of Contents
    right children (or a stand-in value when one of the children doesn't
    exist).
 
-   A proof of membership is given by providing the leaf value, along
-   with the hash of each copath entry along the search path.  A proof of
-   non-membership is given by providing an abridged proof of membership
-   that follows the search path for the intended value, but ends either
-   at a stand-in value or a leaf for a different value.  In either case,
-   the proof is verified by hashing together the leaf with the copath
-   values and checking that the result equals the root value of the
-   tree.
+   A proof of membership is given by providing the leaf hash value,
+   along with the hash value of each copath entry along the search path.
+   A proof of non-membership is given by providing an abridged proof of
+   membership that follows the search path for the intended value, but
+   ends either at a stand-in value or a leaf for a different value.  In
+   either case, the proof is verified by hashing together the leaf with
+   the copath hash values and checking that the result equals the root
+   hash value of the tree.
 
 3.3.  Combined Tree
 
@@ -267,12 +358,12 @@ Table of Contents
 
    In the combined tree structure, which is based on [Merkle2], a log
    tree maintains a record of each time any key's value is updated,
-   while a prefix tree maintains the set of key-version pairs.
-   Importantly, the root value of the prefix tree after adding the new
-   key-version pair is stored in a leaf of the log tree alongside a
-   privacy-preserving commitment to the update.  With some caveats, this
-   combined structure supports both efficient consistency proofs and can
-   be efficiently searched.
+   while a prefix tree maintains the set of index-version pairs.
+   Importantly, the root hash value of the prefix tree after adding a
+   new index-version pair is stored in a leaf of the log tree alongside
+   a privacy-preserving commitment to the update.  With some caveats,
+   this combined structure supports both efficient consistency proofs
+   and can be efficiently searched.
 
    Note that, although the Transparency Log maintains a single logical
    prefix tree, each modification of this tree results in a new root
@@ -321,7 +412,7 @@ Table of Contents
 
    Index:  0  1  2  3  4  5  6  7  8  9 10 11 12 13
 
-        Figure 1: A binary tree constructed from 14 entries in a log
+        Figure 5: A binary tree constructed from 14 entries in a log
 
    Following the structure of this binary tree when executing searches
    makes auditing the Transparency Log much more efficient because users
