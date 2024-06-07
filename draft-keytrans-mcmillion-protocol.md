@@ -131,8 +131,8 @@ child.
 ~~~ aasvg
                              X
                              |
-                   .---------+-.
-                  /             \
+                   .---------+.
+                  /            \
                  X              |
                  |              |
              .---+---.          |
@@ -142,7 +142,7 @@ child.
          /   \       /   \      |
         X     X     X     X     X
 
-Index:  0  1  2  3  4  5  6  7  8
+Index:  0     1     2     3     4
 ~~~
 {: title="A log tree containing five leaves."}
 
@@ -153,8 +153,8 @@ construct the left-balanced binary tree with `n+1` leaves.
 ~~~ aasvg
                              X
                              |
-                   .---------+----.
-                  /                \
+                   .---------+---.
+                  /               \
                  X                 |
                  |                 |
              .---+---.             |
@@ -164,7 +164,7 @@ construct the left-balanced binary tree with `n+1` leaves.
          /   \       /   \       /   \
         X     X     X     X     X     X
 
-Index:  0  1  2  3  4  5  6  7  8  9  10
+Index:  0     1     2     3     4     5
 ~~~
 {: title="Example of inserting a new leaf with index 10 into the previously
 depicted log tree. Observe that only the nodes on the path from the new root to
@@ -189,8 +189,8 @@ value. An algorithm for this is given in section 2.1.2 of {{!RFC6962}}.
 ~~~ aasvg
                              X
                              |
-                   .---------+----.
-                  /                \
+                   .---------+---.
+                  /               \
                  X                 |
                  |                 |
              .---+---.             |
@@ -200,13 +200,13 @@ value. An algorithm for this is given in section 2.1.2 of {{!RFC6962}}.
          /   \       /   \       /   \
         X     X     X   (X)    X     X
 
-Index:  0  1  2  3  4  5  6  7  8  9  10
+Index:  0     1     2     3     4     5
 ~~~
 {: title="Illustration of a proof of inclusion. To verify that leaf 4 is
 included in the tree, the server provides the client with the hashes of the
 nodes on its copath, i.e., all hashes that are required for the client to
 compute the root hash itself. In the figure, the copath consists of the nodes
-marked by `(X)`."}
+marked by (X)."}
 
 ~~~ aasvg
                              X
@@ -222,13 +222,13 @@ marked by `(X)`."}
          /   \       /   \       /   \
         X     X     X     X    (X)   [X]
 
-Index:  0  1  2  3  4  5  6  7  8  9  10
+Index:  0     1     2     3     4     5
 ~~~
 {: title="Illustration of a consistency proof. The server proves to the client
 that it correctly extended the tree by giving it the hashes of marked nodes
-(`[X]`/`(X)`). The client can verify that it can construct the old root hash
-form the hashes of nodes marked by `(X)`, and that it can construct the new root
-hash when also considering the hash of the node `[X]`."}
+([X] / (X)). The client can verify that it can construct the old root hash
+form the hashes of nodes marked by (X), and that it can construct the new root
+hash when also considering the hash of the node [X]."}
 
 ## Prefix Tree
 
