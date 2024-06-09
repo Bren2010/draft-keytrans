@@ -784,6 +784,7 @@ struct {
     case nonInclusionLeaf:
       PrefixLeaf leaf;
   };
+  uint8 depth;
 } PrefixSearchResult;
 
 struct {
@@ -802,6 +803,9 @@ that value was:
   case, the terminal node's value is provided given that it can not be inferred.
 - `nonInclusionParent` for a parent node that lacks the desired child.
 
+The `depth` field indicates the depth of the terminal node of the search, and is
+provided to assist proof verification.
+
 The `elements` array consists of the fewest node values that can be hashed
 together with the provided leaves to produce the root. The contents of the
 `elements` array is kept in left-to-right order: if a node is present in the
@@ -811,8 +815,8 @@ that a node is not present, an all-zero byte string of length `Hash.Nh` is
 listed instead.
 
 The proof is verified by hashing together the provided elements, in the
-left/right arrangement dictated by the search key, and checking that the result
-equals the root value of the prefix tree.
+left/right arrangement dictated by the tree structure, and checking that the
+result equals the root value of the prefix tree.
 
 ## Combined Tree {#proof-combined-tree}
 
@@ -827,7 +831,6 @@ struct {
 } VRFProof;
 
 struct {
-  uint8 successful;
   PrefixProof prefix_proof;
   opaque commitment<Hash.Nh>;
 } ProofStep;
@@ -845,34 +848,23 @@ provided in `version`. If searching for a specific version, this field is
 omitted.
 
 Each element of `vrf_proofs` contains the output of evaluating the VRF on a
-different version. The versions chosen correspond to the binary ladder described
-in {{binary-ladder}}.
+different version of the search key. The versions chosen correspond either to
+the binary ladder described in {{binary-ladder}} (when searching for a specific
+version of a key), or to the full binary ladder described in
+{{most-recent-version}} (when searching for the most recent version of a key).
+The proofs are sorted from lowest version to highest version.
 
-Each `ProofStep` structure in `steps` is one leaf that was inspected as part of
-the binary search. The first step corresponds to the "middle" leaf of the log
-tree (calculated with the `root` function in {{implicit-binary-search-tree}}).
-From there, each subsequent step moves left or right in the tree, based on
-previous results.
+Each `ProofStep` structure in `steps` is one log entry that was inspected as
+part of the binary search. The first step corresponds to the "middle" leaf of
+the log tree (calculated with the `root` function in
+{{implicit-binary-search-tree}}). From there, each subsequent step moves left or
+right in the tree, according to the procedure discussed in {{binary-ladder}} and
+{{full-binary-ladder}}.
 
-The `successful` field of a `ProofStep` contains the number of steps of the
-binary ladder where the result of looking up the corresponding VRF output in the
-prefix tree yields the expected result.
-
-The `prefix_proof` field of a `ProofStep` is the output of searching the prefix
-tree for the first `successful+1` steps of the binary ladder, excluding:
-
-- Any ladder entries for which a **proof of inclusion** is expected, and a proof
-  of inclusion was already provided in a previous `ProofStep` for a log entry to
-  the **left** of the current one.
-- Any ladder entries for which a **proof of non-inclusion** is expected, and a
-  proof of non-inclusion was already provided in a previous `ProofStep` for a
-  log entry to the **right** of the current one.
-
-Whether a ladder entry is expected to produce a proof of inclusion or
-non-inclusion, for the purpose of computing this exclusion, includes the
-assumption that the ladder entry with index `successful+1` (if it exists) will
-produce the opposite result.
-<!-- TODO Does this ever actually result in excluding any ladder entries? -->
+The `prefix_proof` field of a `ProofStep` is the output of executing a binary
+ladder, excluding any ladder steps for which a proof of inclusion is expected,
+and a proof of inclusion was already provided in a previous `ProofStep` for a
+log entry to the left of the current one.
 
 The `commitment` field of a `ProofStep` contains the commitment to the update at
 that leaf. The `inclusion` field of `SearchProof` contains a batch inclusion
