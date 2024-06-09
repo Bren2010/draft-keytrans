@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-06-06T00:08:06.532394+00:00",
+  "timestamp": "2024-06-09T00:09:29.105131+00:00",
   "repo": "Bren2010/draft-keytrans",
   "labels": [
     {
@@ -73,7 +73,7 @@
       "url": "https://github.com/Bren2010/draft-keytrans/issues/5",
       "state": "CLOSED",
       "author": "felixlinker",
-      "authorAssociation": "CONTRIBUTOR",
+      "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Currently, the prefix tree commits to one key-version pair per leaf. I would argue that the leafs should commit to lists of key-version pairs (as the Merkle^2 paper suggests). This way, users can more easily monitor that the server did not include a fake key before to the current epoch.",
@@ -90,7 +90,7 @@
         },
         {
           "author": "felixlinker",
-          "authorAssociation": "CONTRIBUTOR",
+          "authorAssociation": "COLLABORATOR",
           "body": "Brendan and I clarified this issue in a call. My understanding of which indices are used in the prefix tree was wrong.",
           "createdAt": "2024-05-29T16:31:18Z",
           "updatedAt": "2024-05-29T16:31:18Z"
@@ -106,7 +106,7 @@
       "url": "https://github.com/Bren2010/draft-keytrans/pull/2",
       "state": "CLOSED",
       "author": "felixlinker",
-      "authorAssociation": "CONTRIBUTOR",
+      "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Hi Brendan,\r\n\r\nTwo suggestions.\r\n\r\n1. I made the recursion on the hash computation more explicit and gave also leaves the value field. I think this is clearer. The only downside is that you might need to store more information on disk, but the data structures will likely not be implemented like this anyways, no?\r\n2. I dropped that cryptographic computations must be done with the TLS presentation language, because in the algorithms, you reference individual `opaque` fields only anyways. Will this change with the definition of other primitives? Could be. But so far, I thought that this sentence would only falsely lead people to believe that they must use TLS datastructures, ASN.1 parsers, etc., in the library whereas my understanding is that they need not do that.\r\n\r\nCheers!\r\n\r\nFelix",
@@ -125,7 +125,7 @@
       "comments": [
         {
           "author": "felixlinker",
-          "authorAssociation": "CONTRIBUTOR",
+          "authorAssociation": "COLLABORATOR",
           "body": "Brendan and I discussed this PR in a call. I missed that the TLS data-structures to which I added the `value` field are used elsewhere in cryptographic computations.",
           "createdAt": "2024-05-29T16:31:58Z",
           "updatedAt": "2024-05-29T16:31:58Z"
@@ -170,7 +170,7 @@
             "abbreviatedOid": "d2e8b1f"
           },
           "author": "felixlinker",
-          "authorAssociation": "CONTRIBUTOR",
+          "authorAssociation": "COLLABORATOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2024-05-29T13:07:33Z",
@@ -190,7 +190,7 @@
             "abbreviatedOid": "d2e8b1f"
           },
           "author": "felixlinker",
-          "authorAssociation": "CONTRIBUTOR",
+          "authorAssociation": "COLLABORATOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2024-05-29T13:07:35Z",
@@ -213,7 +213,7 @@
       "url": "https://github.com/Bren2010/draft-keytrans/pull/3",
       "state": "MERGED",
       "author": "felixlinker",
-      "authorAssociation": "CONTRIBUTOR",
+      "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "With this PR, I try to give a more high-level intuition of what happens in KT, but there is a discrepancy between what I write here (and the Merkle^2 paper) and what you write. I will open an issue separately for that.",
@@ -339,7 +339,7 @@
             "abbreviatedOid": "f88f1db"
           },
           "author": "felixlinker",
-          "authorAssociation": "CONTRIBUTOR",
+          "authorAssociation": "COLLABORATOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2024-05-31T11:03:36Z",
@@ -359,7 +359,7 @@
             "abbreviatedOid": "f88f1db"
           },
           "author": "felixlinker",
-          "authorAssociation": "CONTRIBUTOR",
+          "authorAssociation": "COLLABORATOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2024-05-31T11:06:27Z",
@@ -379,7 +379,7 @@
             "abbreviatedOid": "f88f1db"
           },
           "author": "felixlinker",
-          "authorAssociation": "CONTRIBUTOR",
+          "authorAssociation": "COLLABORATOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2024-05-31T11:07:41Z",
@@ -399,7 +399,7 @@
             "abbreviatedOid": "f88f1db"
           },
           "author": "felixlinker",
-          "authorAssociation": "CONTRIBUTOR",
+          "authorAssociation": "COLLABORATOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2024-05-31T11:08:55Z",
@@ -419,7 +419,7 @@
             "abbreviatedOid": "f88f1db"
           },
           "author": "felixlinker",
-          "authorAssociation": "CONTRIBUTOR",
+          "authorAssociation": "COLLABORATOR",
           "state": "COMMENTED",
           "body": "",
           "createdAt": "2024-05-31T17:28:28Z",
@@ -505,7 +505,7 @@
       "url": "https://github.com/Bren2010/draft-keytrans/pull/4",
       "state": "MERGED",
       "author": "felixlinker",
-      "authorAssociation": "CONTRIBUTOR",
+      "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "",
@@ -539,26 +539,42 @@
       "id": "PR_kwDOLrnaA85xhltE",
       "title": "Figures",
       "url": "https://github.com/Bren2010/draft-keytrans/pull/6",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "felixlinker",
-      "authorAssociation": "CONTRIBUTOR",
+      "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2024-06-05T09:21:57Z",
-      "updatedAt": "2024-06-05T09:21:57Z",
+      "updatedAt": "2024-06-06T03:46:29Z",
       "baseRepository": "Bren2010/draft-keytrans",
       "baseRefName": "main",
       "baseRefOid": "48f57350664ab9417bd4b2ffb6046c4263b2b9cc",
       "headRepository": "felixlinker/draft-keytrans",
       "headRefName": "diagrams",
-      "headRefOid": "42fc050d4b4d418ca3a7396dbd930c5da6d411f8",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "729b821e90cabf8340da1916266e47b79e6e53e1",
+      "closedAt": "2024-06-06T03:46:29Z",
+      "mergedAt": "2024-06-06T03:46:29Z",
+      "mergedBy": "Bren2010",
+      "mergeCommit": {
+        "oid": "6e3f4698a915eca9f97575b524bb2e50e4f4b87a"
+      },
       "comments": [],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOLrnaA859Ns2r",
+          "commit": {
+            "abbreviatedOid": "729b821"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "Thank you!!",
+          "createdAt": "2024-06-06T03:46:15Z",
+          "updatedAt": "2024-06-06T03:46:15Z",
+          "comments": []
+        }
+      ]
     },
     {
       "number": 7,
@@ -567,7 +583,7 @@
       "url": "https://github.com/Bren2010/draft-keytrans/pull/7",
       "state": "OPEN",
       "author": "felixlinker",
-      "authorAssociation": "CONTRIBUTOR",
+      "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "",
