@@ -1025,6 +1025,126 @@ recent version of `search_key`. To aid verification, the update response
 provides the `UpdatePrefix` structure necessary to reconstruct the
 `UpdateValue`.
 
+## Monitor
+
+Users initiate a Monitor operation by submitting a MonitorRequest to the
+Transparency Log containing information about the keys they wish to monitor.
+
+~~~ tls-presentation
+struct {
+  opaque search_key<0..2^8-1>;
+  uint32 highest_version;
+  uint64 entries<0..2^8-1>;
+} MonitorKey;
+
+struct {
+  optional<Consistency> consistency;
+
+  MonitorKey owned_keys<0..2^8-1>;
+  MonitorKey contact_keys<0..2^8-1>;
+} MonitorRequest;
+~~~
+
+Users include each of the keys that they own in `owned_keys`. If the
+Transparency Log is deployed with Contact Monitoring (or simply if the user
+wants a higher degree of confidence in the log), they also include any keys
+they've looked up in `contact_keys`.
+
+Each `MonitorKey` structure contains the key being monitored in `search_key`,
+the highest version of the key that the user has observed in `highest_version`,
+and a list of `entries` in the log tree corresponding to the keys of the map
+described in {{monitoring}}.
+
+The Transparency Log verifies the MonitorRequest by following these steps, for
+each `MonitorKey` structure:
+
+1. Verify that the requested keys in `owned_keys` and `contact_keys` are all
+   distinct.
+2. Verify that the user owns every key in `owned_keys`, and is allowed (or was
+   previously allowed) to lookup every key in `contact_keys`, based on the
+   application's policy.
+3. Verify that the `highest_version` for each key is less than or equal to the
+   most recent version of each key.
+4. Verify that each `entries` array is sorted in ascending order, and that all
+   entries are within the bounds of the log.
+5. Verify each entry lies on the direct path of different versions of the key.
+
+If the request is valid, the Transparency Log responds with a MonitorResponse
+structure:
+
+~~~ tls-presentation
+struct {
+  uint32 version;
+  VRFProof vrf_proofs<0..2^8-1>;
+  ProofStep steps<0..2^8-1>;
+} MonitorProof;
+
+struct {
+  FullTreeHead full_tree_head;
+  MonitorProof owned_proofs<0..2^8-1>;
+  MonitorProof contact_proofs<0..2^8-1>;
+  InclusionProof inclusion;
+} MonitorResponse;
+~~~
+
+The elements of `owned_proofs` and `contact_proofs` correspond one-to-one with
+the elements of `owned_keys` and `contact_keys`. Each `MonitorProof` in
+`contact_proofs` is meant to convince the user that the key they looked up is
+still properly included in the log and has not been surreptitiously concealed.
+Each `MonitorProof` in `owned_proofs` conveys the same guarantee that no past
+lookups have been concealed, and also proves that `MonitorProof.version` is the
+most recent version of the key.
+
+The `version` field of a `MonitorProof` contains the version that was used for
+computing the binary ladder, and therefore the highest version of the key that
+will be proven to exist. The `vrf_proofs` field contains VRF proofs for
+different versions of the search key, starting at the first version that's
+different between the binary ladders for `MonitorKey.highest_version` and
+`MonitorProof.version`.
+
+The `steps` field of a `MonitorProof` contains the proofs required to update the
+user's monitoring data following the algorithm in {{monitoring}}. That is, each
+`ProofStep` of a `MonitorProof` contains a binary ladder for the version
+`MonitorProof.version`. The steps are provided in the order that they're
+consumed by the monitoring algorithm. If same proof is consumed by the
+monitoring algorithm multiple times, it is provided in the `MonitorProof`
+structure only the first time.
+
+For `MonitorProof` structures in `owned_keys`, it is also important to prove
+that `MonitorProof.version` is the highest version of the key available. This
+means that such a `MonitorProof` must contains full binary ladders for
+`MonitorProof.version` along the frontier of the log. As such, any `ProofStep`
+under the `owned_keys` field that's along the frontier of the log includes a
+full binary ladder for `MonitorProof.version` instead of a regular binary
+ladder. For additional entries on the frontier of the log that are to the right
+of the leftmost frontier entry already provided, an additional `ProofStep` is
+added to `MonitorProof`. This additional `ProofStep` contains only the proofs of
+non-inclusion from a full binary ladder.
+
+Users verify a MonitorResponse by following these steps:
+
+1. Verify that the lengths of `owned_proofs` and `contact_proofs` are the same
+   as the lengths of `owned_keys` and `contact_keys`.
+2. For each `MonitorProof` structure, verify that `MonitorProof.version` is
+   greater than or equal to the highest version of the key that's been
+   previously observed.
+3. For each `MonitorProof` structure, evalute the monitoring algorithm in
+   {{monitoring}}. Abort with an error if the monitoring algorithm detects that
+   the tree is constructed incorrectly, or if there are fewer or more steps
+   provided than would be expected (keeping in mind that extra steps may be
+   provided along the frontier of the log, if a `MonitorProof` is a member of
+   `owned_keys`).
+4. Construct a candidate root value for the tree by combining the
+   `PrefixProof` and commitment of `ProofStep`, with the provided inclusion
+   proof.
+5. With the candidate root value, verify the provided `FullTreeHead`.
+
+Some information is omitted from MonitorResponse in the interest of efficiency,
+due to the fact that the user would have already seen and verified it as part of
+conducting other queries. In particular, VRF proofs for different versions of
+each search key are not provided, given that these can be cached from the
+original Search or Update query.
+
 
 # Security Considerations
 
