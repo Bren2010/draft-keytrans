@@ -859,7 +859,7 @@ part of the binary search. The first step corresponds to the "middle" leaf of
 the log tree (calculated with the `root` function in
 {{implicit-binary-search-tree}}). From there, each subsequent step moves left or
 right in the tree, according to the procedure discussed in {{binary-ladder}} and
-{{full-binary-ladder}}.
+{{most-recent-version}}.
 
 The `prefix_proof` field of a `ProofStep` is the output of executing a binary
 ladder, excluding any ladder steps for which a proof of inclusion is expected,
