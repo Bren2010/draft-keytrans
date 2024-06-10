@@ -930,11 +930,10 @@ MUST successfully verify this signature before consuming `UpdateValue.value`.
 The basic user operations are organized as a request-response protocol between a
 user and the Transparency Log operator.
 
-<!-- Generally, users MUST retain the most
-recent `TreeHead` they've successfully verified as part of any query response,
-and populate the `last` field of any query request with the `tree_size` from
-this `TreeHead`. This ensures that all operations performed by the user return
-consistent results.
+Generally, users MUST retain the most recent `TreeHead` they've successfully
+verified as part of any query response, and populate the `last` field of any
+query request with the `tree_size` from this `TreeHead`. This ensures that all
+operations performed by the user return consistent results.
 
 ~~~ tls-presentation
 struct {
@@ -949,7 +948,7 @@ struct {
 
 If `last` is present, then the Transparency Log MUST provide a consistency proof
 between the current tree and the tree when it was this size, in the
-`consistency` field of `FullTreeHead`. -->
+`consistency` field of `FullTreeHead`.
 
 ## Search
 
@@ -960,7 +959,7 @@ most recent one.
 
 ~~~ tls-presentation
 struct {
-  optional<Consistency> consistency;
+  optional<uint32> last;
 
   opaque search_key<0..2^8-1>;
   optional<uint32> version;
@@ -1000,7 +999,7 @@ Transparency Log containing the new key and value to store.
 
 ~~~ tls-presentation
 struct {
-  optional<Consistency> consistency;
+  optional<uint32> last;
 
   opaque search_key<0..2^8-1>;
   opaque value<0..2^32-1>;
@@ -1038,7 +1037,7 @@ struct {
 } MonitorKey;
 
 struct {
-  optional<Consistency> consistency;
+  optional<uint32> last;
 
   MonitorKey owned_keys<0..2^8-1>;
   MonitorKey contact_keys<0..2^8-1>;
