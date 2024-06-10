@@ -1035,7 +1035,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">McMillion &amp; Linker</td>
-<td class="center">Expires 9 December 2024</td>
+<td class="center">Expires 12 December 2024</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1048,12 +1048,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-keytrans-mcmillion-protocol-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2024-06-07" class="published">7 June 2024</time>
+<time datetime="2024-06-10" class="published">10 June 2024</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2024-12-09">9 December 2024</time></dd>
+<dd class="expires"><time datetime="2024-12-12">12 December 2024</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1106,7 +1106,7 @@ timely manner.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 9 December 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 12 December 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1220,6 +1220,9 @@ timely manner.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.2">
                 <p id="section-toc.1-1.9.2.2.1"><a href="#section-9.2" class="auto internal xref">9.2</a>.  <a href="#name-update" class="internal xref">Update</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.3">
+                <p id="section-toc.1-1.9.2.3.1"><a href="#section-9.3" class="auto internal xref">9.3</a>.  <a href="#name-monitor" class="internal xref">Monitor</a></p>
 </li>
             </ul>
 </li>
@@ -2196,6 +2199,7 @@ struct {
     case nonInclusionLeaf:
       PrefixLeaf leaf;
   };
+  uint8 depth;
 } PrefixSearchResult;
 
 struct {
@@ -2220,16 +2224,18 @@ case, the terminal node's value is provided given that it can not be inferred.<a
             <p id="section-7.2-4.3.1"><code>nonInclusionParent</code> for a parent node that lacks the desired child.<a href="#section-7.2-4.3.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-7.2-5">The <code>elements</code> array consists of the fewest node values that can be hashed
+<p id="section-7.2-5">The <code>depth</code> field indicates the depth of the terminal node of the search, and is
+provided to assist proof verification.<a href="#section-7.2-5" class="pilcrow">¶</a></p>
+<p id="section-7.2-6">The <code>elements</code> array consists of the fewest node values that can be hashed
 together with the provided leaves to produce the root. The contents of the
 <code>elements</code> array is kept in left-to-right order: if a node is present in the
 root's left subtree, its value must be listed before any values provided from
 nodes that are in the root's right subtree, and so on recursively. In the event
 that a node is not present, an all-zero byte string of length <code>Hash.Nh</code> is
-listed instead.<a href="#section-7.2-5" class="pilcrow">¶</a></p>
-<p id="section-7.2-6">The proof is verified by hashing together the provided elements, in the
-left/right arrangement dictated by the search key, and checking that the result
-equals the root value of the prefix tree.<a href="#section-7.2-6" class="pilcrow">¶</a></p>
+listed instead.<a href="#section-7.2-6" class="pilcrow">¶</a></p>
+<p id="section-7.2-7">The proof is verified by hashing together the provided elements, in the
+left/right arrangement dictated by the tree structure, and checking that the
+result equals the root value of the prefix tree.<a href="#section-7.2-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="proof-combined-tree">
@@ -2247,7 +2253,6 @@ struct {
 } VRFProof;
 
 struct {
-  uint8 successful;
   PrefixProof prefix_proof;
   opaque commitment&lt;Hash.Nh&gt;;
 } ProofStep;
@@ -2264,53 +2269,40 @@ struct {
 provided in <code>version</code>. If searching for a specific version, this field is
 omitted.<a href="#section-7.3-3" class="pilcrow">¶</a></p>
 <p id="section-7.3-4">Each element of <code>vrf_proofs</code> contains the output of evaluating the VRF on a
-different version. The versions chosen correspond to the binary ladder described
-in <a href="#binary-ladder" class="auto internal xref">Section 4.2</a>.<a href="#section-7.3-4" class="pilcrow">¶</a></p>
-<p id="section-7.3-5">Each <code>ProofStep</code> structure in <code>steps</code> is one leaf that was inspected as part of
-the binary search. The first step corresponds to the "middle" leaf of the log
-tree (calculated with the <code>root</code> function in <a href="#implicit-binary-search-tree" class="auto internal xref">Section 4.1</a>).
-From there, each subsequent step moves left or right in the tree, based on
-previous results.<a href="#section-7.3-5" class="pilcrow">¶</a></p>
-<p id="section-7.3-6">The <code>successful</code> field of a <code>ProofStep</code> contains the number of steps of the
-binary ladder where the result of looking up the corresponding VRF output in the
-prefix tree yields the expected result.<a href="#section-7.3-6" class="pilcrow">¶</a></p>
-<p id="section-7.3-7">The <code>prefix_proof</code> field of a <code>ProofStep</code> is the output of searching the prefix
-tree for the first <code>successful+1</code> steps of the binary ladder, excluding:<a href="#section-7.3-7" class="pilcrow">¶</a></p>
-<ul class="normal">
-<li class="normal" id="section-7.3-8.1">
-            <p id="section-7.3-8.1.1">Any ladder entries for which a <strong>proof of inclusion</strong> is expected, and a proof
-of inclusion was already provided in a previous <code>ProofStep</code> for a log entry to
-the <strong>left</strong> of the current one.<a href="#section-7.3-8.1.1" class="pilcrow">¶</a></p>
-</li>
-          <li class="normal" id="section-7.3-8.2">
-            <p id="section-7.3-8.2.1">Any ladder entries for which a <strong>proof of non-inclusion</strong> is expected, and a
-proof of non-inclusion was already provided in a previous <code>ProofStep</code> for a
-log entry to the <strong>right</strong> of the current one.<a href="#section-7.3-8.2.1" class="pilcrow">¶</a></p>
-</li>
-        </ul>
-<p id="section-7.3-9">Whether a ladder entry is expected to produce a proof of inclusion or
-non-inclusion, for the purpose of computing this exclusion, includes the
-assumption that the ladder entry with index <code>successful+1</code> (if it exists) will
-produce the opposite result.<a href="#section-7.3-9" class="pilcrow">¶</a></p>
-<p id="section-7.3-10">The <code>commitment</code> field of a <code>ProofStep</code> contains the commitment to the update at
+different version of the search key. The versions chosen correspond either to
+the binary ladder described in <a href="#binary-ladder" class="auto internal xref">Section 4.2</a> (when searching for a specific
+version of a key), or to the full binary ladder described in
+<a href="#most-recent-version" class="auto internal xref">Section 4.3</a> (when searching for the most recent version of a key).
+The proofs are sorted from lowest version to highest version.<a href="#section-7.3-4" class="pilcrow">¶</a></p>
+<p id="section-7.3-5">Each <code>ProofStep</code> structure in <code>steps</code> is one log entry that was inspected as
+part of the binary search. The first step corresponds to the "middle" leaf of
+the log tree (calculated with the <code>root</code> function in
+<a href="#implicit-binary-search-tree" class="auto internal xref">Section 4.1</a>). From there, each subsequent step moves left or
+right in the tree, according to the procedure discussed in <a href="#binary-ladder" class="auto internal xref">Section 4.2</a> and
+<a href="#most-recent-version" class="auto internal xref">Section 4.3</a>.<a href="#section-7.3-5" class="pilcrow">¶</a></p>
+<p id="section-7.3-6">The <code>prefix_proof</code> field of a <code>ProofStep</code> is the output of executing a binary
+ladder, excluding any ladder steps for which a proof of inclusion is expected,
+and a proof of inclusion was already provided in a previous <code>ProofStep</code> for a
+log entry to the left of the current one.<a href="#section-7.3-6" class="pilcrow">¶</a></p>
+<p id="section-7.3-7">The <code>commitment</code> field of a <code>ProofStep</code> contains the commitment to the update at
 that leaf. The <code>inclusion</code> field of <code>SearchProof</code> contains a batch inclusion
-proof for all of the leaves accessed by the binary search.<a href="#section-7.3-10" class="pilcrow">¶</a></p>
-<p id="section-7.3-11">The proof can be verified by checking that:<a href="#section-7.3-11" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-7.3-12">
-<li id="section-7.3-12.1">
-            <p id="section-7.3-12.1.1">The elements of <code>steps</code> represent a monotonic series over the leaves of the
-log, and<a href="#section-7.3-12.1.1" class="pilcrow">¶</a></p>
+proof for all of the leaves accessed by the binary search.<a href="#section-7.3-7" class="pilcrow">¶</a></p>
+<p id="section-7.3-8">The proof can be verified by checking that:<a href="#section-7.3-8" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-7.3-9">
+<li id="section-7.3-9.1">
+            <p id="section-7.3-9.1.1">The elements of <code>steps</code> represent a monotonic series over the leaves of the
+log, and<a href="#section-7.3-9.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-7.3-12.2">
-            <p id="section-7.3-12.2.1">The <code>steps</code> array has the expected number of entries (no more or less than
-are necessary to execute the binary search).<a href="#section-7.3-12.2.1" class="pilcrow">¶</a></p>
+          <li id="section-7.3-9.2">
+            <p id="section-7.3-9.2.1">The <code>steps</code> array has the expected number of entries (no more or less than
+are necessary to execute the binary search).<a href="#section-7.3-9.2.1" class="pilcrow">¶</a></p>
 </li>
         </ol>
-<p id="section-7.3-13">Once the validity of the search steps has been established, the verifier can
+<p id="section-7.3-10">Once the validity of the search steps has been established, the verifier can
 compute the root of each prefix tree represented by a <code>prefix_proof</code> and combine
 it with the corresponding <code>commitment</code> to obtain the value of each leaf. These
 leaf values can then be combined with the proof in <code>inclusion</code> to check that the
-output matches the root of the log tree.<a href="#section-7.3-13" class="pilcrow">¶</a></p>
+output matches the root of the log tree.<a href="#section-7.3-10" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2364,6 +2356,25 @@ version, and <code>value</code> contains the same contents as <code>UpdateValue.
       </h2>
 <p id="section-9-1">The basic user operations are organized as a request-response protocol between a
 user and the Transparency Log operator.<a href="#section-9-1" class="pilcrow">¶</a></p>
+<p id="section-9-2">Generally, users <span class="bcp14">MUST</span> retain the most recent <code>TreeHead</code> they've successfully
+verified as part of any query response, and populate the <code>last</code> field of any
+query request with the <code>tree_size</code> from this <code>TreeHead</code>. This ensures that all
+operations performed by the user return consistent results.<a href="#section-9-2" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-9-3">
+<pre>
+struct {
+  TreeHead tree_head;
+  optional&lt;ConsistencyProof&gt; consistency;
+  select (Configuration.mode) {
+    case thirdPartyAuditing:
+      AuditorTreeHead auditor_tree_head;
+  };
+} FullTreeHead;
+</pre><a href="#section-9-3" class="pilcrow">¶</a>
+</div>
+<p id="section-9-4">If <code>last</code> is present, then the Transparency Log <span class="bcp14">MUST</span> provide a consistency proof
+between the current tree and the tree when it was this size, in the
+<code>consistency</code> field of <code>FullTreeHead</code>.<a href="#section-9-4" class="pilcrow">¶</a></p>
 <div id="search">
 <section id="section-9.1">
         <h3 id="name-search">
@@ -2376,7 +2387,7 @@ most recent one.<a href="#section-9.1-1" class="pilcrow">¶</a></p>
 <div class="lang-tls-presentation sourcecode" id="section-9.1-2">
 <pre>
 struct {
-  optional&lt;Consistency&gt; consistency;
+  optional&lt;uint32&gt; last;
 
   opaque search_key&lt;0..2^8-1&gt;;
   optional&lt;uint32&gt; version;
@@ -2426,7 +2437,7 @@ Transparency Log containing the new key and value to store.<a href="#section-9.2
 <div class="lang-tls-presentation sourcecode" id="section-9.2-2">
 <pre>
 struct {
-  optional&lt;Consistency&gt; consistency;
+  optional&lt;uint32&gt; last;
 
   opaque search_key&lt;0..2^8-1&gt;;
   opaque value&lt;0..2^32-1&gt;;
@@ -2450,6 +2461,144 @@ struct {
 recent version of <code>search_key</code>. To aid verification, the update response
 provides the <code>UpdatePrefix</code> structure necessary to reconstruct the
 <code>UpdateValue</code>.<a href="#section-9.2-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="monitor">
+<section id="section-9.3">
+        <h3 id="name-monitor">
+<a href="#section-9.3" class="section-number selfRef">9.3. </a><a href="#name-monitor" class="section-name selfRef">Monitor</a>
+        </h3>
+<p id="section-9.3-1">Users initiate a Monitor operation by submitting a MonitorRequest to the
+Transparency Log containing information about the keys they wish to monitor.<a href="#section-9.3-1" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-9.3-2">
+<pre>
+struct {
+  opaque search_key&lt;0..2^8-1&gt;;
+  uint32 highest_version;
+  uint64 entries&lt;0..2^8-1&gt;;
+} MonitorKey;
+
+struct {
+  optional&lt;uint32&gt; last;
+
+  MonitorKey owned_keys&lt;0..2^8-1&gt;;
+  MonitorKey contact_keys&lt;0..2^8-1&gt;;
+} MonitorRequest;
+</pre><a href="#section-9.3-2" class="pilcrow">¶</a>
+</div>
+<p id="section-9.3-3">Users include each of the keys that they own in <code>owned_keys</code>. If the
+Transparency Log is deployed with Contact Monitoring (or simply if the user
+wants a higher degree of confidence in the log), they also include any keys
+they've looked up in <code>contact_keys</code>.<a href="#section-9.3-3" class="pilcrow">¶</a></p>
+<p id="section-9.3-4">Each <code>MonitorKey</code> structure contains the key being monitored in <code>search_key</code>,
+the highest version of the key that the user has observed in <code>highest_version</code>,
+and a list of <code>entries</code> in the log tree corresponding to the keys of the map
+described in <a href="#monitoring" class="auto internal xref">Section 4.4</a>.<a href="#section-9.3-4" class="pilcrow">¶</a></p>
+<p id="section-9.3-5">The Transparency Log verifies the MonitorRequest by following these steps, for
+each <code>MonitorKey</code> structure:<a href="#section-9.3-5" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-9.3-6">
+<li id="section-9.3-6.1">
+            <p id="section-9.3-6.1.1">Verify that the requested keys in <code>owned_keys</code> and <code>contact_keys</code> are all
+distinct.<a href="#section-9.3-6.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-9.3-6.2">
+            <p id="section-9.3-6.2.1">Verify that the user owns every key in <code>owned_keys</code>, and is allowed (or was
+previously allowed) to lookup every key in <code>contact_keys</code>, based on the
+application's policy.<a href="#section-9.3-6.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-9.3-6.3">
+            <p id="section-9.3-6.3.1">Verify that the <code>highest_version</code> for each key is less than or equal to the
+most recent version of each key.<a href="#section-9.3-6.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-9.3-6.4">
+            <p id="section-9.3-6.4.1">Verify that each <code>entries</code> array is sorted in ascending order, and that all
+entries are within the bounds of the log.<a href="#section-9.3-6.4.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-9.3-6.5">
+            <p id="section-9.3-6.5.1">Verify each entry lies on the direct path of different versions of the key.<a href="#section-9.3-6.5.1" class="pilcrow">¶</a></p>
+</li>
+        </ol>
+<p id="section-9.3-7">If the request is valid, the Transparency Log responds with a MonitorResponse
+structure:<a href="#section-9.3-7" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-9.3-8">
+<pre>
+struct {
+  uint32 version;
+  VRFProof vrf_proofs&lt;0..2^8-1&gt;;
+  ProofStep steps&lt;0..2^8-1&gt;;
+} MonitorProof;
+
+struct {
+  FullTreeHead full_tree_head;
+  MonitorProof owned_proofs&lt;0..2^8-1&gt;;
+  MonitorProof contact_proofs&lt;0..2^8-1&gt;;
+  InclusionProof inclusion;
+} MonitorResponse;
+</pre><a href="#section-9.3-8" class="pilcrow">¶</a>
+</div>
+<p id="section-9.3-9">The elements of <code>owned_proofs</code> and <code>contact_proofs</code> correspond one-to-one with
+the elements of <code>owned_keys</code> and <code>contact_keys</code>. Each <code>MonitorProof</code> in
+<code>contact_proofs</code> is meant to convince the user that the key they looked up is
+still properly included in the log and has not been surreptitiously concealed.
+Each <code>MonitorProof</code> in <code>owned_proofs</code> conveys the same guarantee that no past
+lookups have been concealed, and also proves that <code>MonitorProof.version</code> is the
+most recent version of the key.<a href="#section-9.3-9" class="pilcrow">¶</a></p>
+<p id="section-9.3-10">The <code>version</code> field of a <code>MonitorProof</code> contains the version that was used for
+computing the binary ladder, and therefore the highest version of the key that
+will be proven to exist. The <code>vrf_proofs</code> field contains VRF proofs for
+different versions of the search key, starting at the first version that's
+different between the binary ladders for <code>MonitorKey.highest_version</code> and
+<code>MonitorProof.version</code>.<a href="#section-9.3-10" class="pilcrow">¶</a></p>
+<p id="section-9.3-11">The <code>steps</code> field of a <code>MonitorProof</code> contains the proofs required to update the
+user's monitoring data following the algorithm in <a href="#monitoring" class="auto internal xref">Section 4.4</a>. That is, each
+<code>ProofStep</code> of a <code>MonitorProof</code> contains a binary ladder for the version
+<code>MonitorProof.version</code>. The steps are provided in the order that they're
+consumed by the monitoring algorithm. If same proof is consumed by the
+monitoring algorithm multiple times, it is provided in the <code>MonitorProof</code>
+structure only the first time.<a href="#section-9.3-11" class="pilcrow">¶</a></p>
+<p id="section-9.3-12">For <code>MonitorProof</code> structures in <code>owned_keys</code>, it is also important to prove
+that <code>MonitorProof.version</code> is the highest version of the key available. This
+means that such a <code>MonitorProof</code> must contains full binary ladders for
+<code>MonitorProof.version</code> along the frontier of the log. As such, any <code>ProofStep</code>
+under the <code>owned_keys</code> field that's along the frontier of the log includes a
+full binary ladder for <code>MonitorProof.version</code> instead of a regular binary
+ladder. For additional entries on the frontier of the log that are to the right
+of the leftmost frontier entry already provided, an additional <code>ProofStep</code> is
+added to <code>MonitorProof</code>. This additional <code>ProofStep</code> contains only the proofs of
+non-inclusion from a full binary ladder.<a href="#section-9.3-12" class="pilcrow">¶</a></p>
+<p id="section-9.3-13">Users verify a MonitorResponse by following these steps:<a href="#section-9.3-13" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-9.3-14">
+<li id="section-9.3-14.1">
+            <p id="section-9.3-14.1.1">Verify that the lengths of <code>owned_proofs</code> and <code>contact_proofs</code> are the same
+as the lengths of <code>owned_keys</code> and <code>contact_keys</code>.<a href="#section-9.3-14.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-9.3-14.2">
+            <p id="section-9.3-14.2.1">For each <code>MonitorProof</code> structure, verify that <code>MonitorProof.version</code> is
+greater than or equal to the highest version of the key that's been
+previously observed.<a href="#section-9.3-14.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-9.3-14.3">
+            <p id="section-9.3-14.3.1">For each <code>MonitorProof</code> structure, evalute the monitoring algorithm in
+<a href="#monitoring" class="auto internal xref">Section 4.4</a>. Abort with an error if the monitoring algorithm detects that
+the tree is constructed incorrectly, or if there are fewer or more steps
+provided than would be expected (keeping in mind that extra steps may be
+provided along the frontier of the log, if a <code>MonitorProof</code> is a member of
+<code>owned_keys</code>).<a href="#section-9.3-14.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-9.3-14.4">
+            <p id="section-9.3-14.4.1">Construct a candidate root value for the tree by combining the
+<code>PrefixProof</code> and commitment of <code>ProofStep</code>, with the provided inclusion
+proof.<a href="#section-9.3-14.4.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-9.3-14.5">
+            <p id="section-9.3-14.5.1">With the candidate root value, verify the provided <code>FullTreeHead</code>.<a href="#section-9.3-14.5.1" class="pilcrow">¶</a></p>
+</li>
+        </ol>
+<p id="section-9.3-15">Some information is omitted from MonitorResponse in the interest of efficiency,
+due to the fact that the user would have already seen and verified it as part of
+conducting other queries. In particular, VRF proofs for different versions of
+each search key are not provided, given that these can be cached from the
+original Search or Update query.<a href="#section-9.3-15" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>

@@ -5,7 +5,7 @@
 KEYTRANS Working Group                                      B. McMillion
 Internet-Draft                                                          
 Intended status: Informational                                 F. Linker
-Expires: 9 December 2024                                     7 June 2024
+Expires: 12 December 2024                                   10 June 2024
 
 
                        Key Transparency Protocol
@@ -49,7 +49,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 9 December 2024.
+   This Internet-Draft will expire on 12 December 2024.
 
 Copyright Notice
 
@@ -93,6 +93,7 @@ Table of Contents
    9.  User Operations
      9.1.  Search
      9.2.  Update
+     9.3.  Monitor
    10. Security Considerations
    11. IANA Considerations
      11.1.  KT Ciphersuites
@@ -852,6 +853,7 @@ Table of Contents
        case nonInclusionLeaf:
          PrefixLeaf leaf;
      };
+     uint8 depth;
    } PrefixSearchResult;
 
    struct {
@@ -872,6 +874,9 @@ Table of Contents
 
    *  nonInclusionParent for a parent node that lacks the desired child.
 
+   The depth field indicates the depth of the terminal node of the
+   search, and is provided to assist proof verification.
+
    The elements array consists of the fewest node values that can be
    hashed together with the provided leaves to produce the root.  The
    contents of the elements array is kept in left-to-right order: if a
@@ -881,8 +886,8 @@ Table of Contents
    present, an all-zero byte string of length Hash.Nh is listed instead.
 
    The proof is verified by hashing together the provided elements, in
-   the left/right arrangement dictated by the search key, and checking
-   that the result equals the root value of the prefix tree.
+   the left/right arrangement dictated by the tree structure, and
+   checking that the result equals the root value of the prefix tree.
 
 7.3.  Combined Tree
 
@@ -895,7 +900,6 @@ Table of Contents
    } VRFProof;
 
    struct {
-     uint8 successful;
      PrefixProof prefix_proof;
      opaque commitment<Hash.Nh>;
    } ProofStep;
@@ -912,36 +916,25 @@ Table of Contents
    this field is omitted.
 
    Each element of vrf_proofs contains the output of evaluating the VRF
-   on a different version.  The versions chosen correspond to the binary
-   ladder described in Section 4.2.
+   on a different version of the search key.  The versions chosen
+   correspond either to the binary ladder described in Section 4.2 (when
+   searching for a specific version of a key), or to the full binary
+   ladder described in Section 4.3 (when searching for the most recent
+   version of a key).  The proofs are sorted from lowest version to
+   highest version.
 
-   Each ProofStep structure in steps is one leaf that was inspected as
-   part of the binary search.  The first step corresponds to the
+   Each ProofStep structure in steps is one log entry that was inspected
+   as part of the binary search.  The first step corresponds to the
    "middle" leaf of the log tree (calculated with the root function in
    Section 4.1).  From there, each subsequent step moves left or right
-   in the tree, based on previous results.
+   in the tree, according to the procedure discussed in Section 4.2 and
+   Section 4.3.
 
-   The successful field of a ProofStep contains the number of steps of
-   the binary ladder where the result of looking up the corresponding
-   VRF output in the prefix tree yields the expected result.
-
-   The prefix_proof field of a ProofStep is the output of searching the
-   prefix tree for the first successful+1 steps of the binary ladder,
-   excluding:
-
-   *  Any ladder entries for which a *proof of inclusion* is expected,
-      and a proof of inclusion was already provided in a previous
-      ProofStep for a log entry to the *left* of the current one.
-
-   *  Any ladder entries for which a *proof of non-inclusion* is
-      expected, and a proof of non-inclusion was already provided in a
-      previous ProofStep for a log entry to the *right* of the current
-      one.
-
-   Whether a ladder entry is expected to produce a proof of inclusion or
-   non-inclusion, for the purpose of computing this exclusion, includes
-   the assumption that the ladder entry with index successful+1 (if it
-   exists) will produce the opposite result.
+   The prefix_proof field of a ProofStep is the output of executing a
+   binary ladder, excluding any ladder steps for which a proof of
+   inclusion is expected, and a proof of inclusion was already provided
+   in a previous ProofStep for a log entry to the left of the current
+   one.
 
    The commitment field of a ProofStep contains the commitment to the
    update at that leaf.  The inclusion field of SearchProof contains a
@@ -1005,6 +998,25 @@ Table of Contents
    The basic user operations are organized as a request-response
    protocol between a user and the Transparency Log operator.
 
+   Generally, users MUST retain the most recent TreeHead they've
+   successfully verified as part of any query response, and populate the
+   last field of any query request with the tree_size from this
+   TreeHead.  This ensures that all operations performed by the user
+   return consistent results.
+
+   struct {
+     TreeHead tree_head;
+     optional<ConsistencyProof> consistency;
+     select (Configuration.mode) {
+       case thirdPartyAuditing:
+         AuditorTreeHead auditor_tree_head;
+     };
+   } FullTreeHead;
+
+   If last is present, then the Transparency Log MUST provide a
+   consistency proof between the current tree and the tree when it was
+   this size, in the consistency field of FullTreeHead.
+
 9.1.  Search
 
    Users initiate a Search operation by submitting a SearchRequest to
@@ -1013,7 +1025,7 @@ Table of Contents
    receive, if not the most recent one.
 
    struct {
-     optional<Consistency> consistency;
+     optional<uint32> last;
 
      opaque search_key<0..2^8-1>;
      optional<uint32> version;
@@ -1054,7 +1066,7 @@ Table of Contents
    the Transparency Log containing the new key and value to store.
 
    struct {
-     optional<Consistency> consistency;
+     optional<uint32> last;
 
      opaque search_key<0..2^8-1>;
      opaque value<0..2^32-1>;
@@ -1076,6 +1088,136 @@ Table of Contents
    the most recent version of search_key.  To aid verification, the
    update response provides the UpdatePrefix structure necessary to
    reconstruct the UpdateValue.
+
+9.3.  Monitor
+
+   Users initiate a Monitor operation by submitting a MonitorRequest to
+   the Transparency Log containing information about the keys they wish
+   to monitor.
+
+   struct {
+     opaque search_key<0..2^8-1>;
+     uint32 highest_version;
+     uint64 entries<0..2^8-1>;
+   } MonitorKey;
+
+   struct {
+     optional<uint32> last;
+
+     MonitorKey owned_keys<0..2^8-1>;
+     MonitorKey contact_keys<0..2^8-1>;
+   } MonitorRequest;
+
+   Users include each of the keys that they own in owned_keys.  If the
+   Transparency Log is deployed with Contact Monitoring (or simply if
+   the user wants a higher degree of confidence in the log), they also
+   include any keys they've looked up in contact_keys.
+
+   Each MonitorKey structure contains the key being monitored in
+   search_key, the highest version of the key that the user has observed
+   in highest_version, and a list of entries in the log tree
+   corresponding to the keys of the map described in Section 4.4.
+
+   The Transparency Log verifies the MonitorRequest by following these
+   steps, for each MonitorKey structure:
+
+   1.  Verify that the requested keys in owned_keys and contact_keys are
+       all distinct.
+
+   2.  Verify that the user owns every key in owned_keys, and is allowed
+       (or was previously allowed) to lookup every key in contact_keys,
+       based on the application's policy.
+
+   3.  Verify that the highest_version for each key is less than or
+       equal to the most recent version of each key.
+
+   4.  Verify that each entries array is sorted in ascending order, and
+       that all entries are within the bounds of the log.
+
+   5.  Verify each entry lies on the direct path of different versions
+       of the key.
+
+   If the request is valid, the Transparency Log responds with a
+   MonitorResponse structure:
+
+   struct {
+     uint32 version;
+     VRFProof vrf_proofs<0..2^8-1>;
+     ProofStep steps<0..2^8-1>;
+   } MonitorProof;
+
+   struct {
+     FullTreeHead full_tree_head;
+     MonitorProof owned_proofs<0..2^8-1>;
+     MonitorProof contact_proofs<0..2^8-1>;
+     InclusionProof inclusion;
+   } MonitorResponse;
+
+   The elements of owned_proofs and contact_proofs correspond one-to-one
+   with the elements of owned_keys and contact_keys.  Each MonitorProof
+   in contact_proofs is meant to convince the user that the key they
+   looked up is still properly included in the log and has not been
+   surreptitiously concealed.  Each MonitorProof in owned_proofs conveys
+   the same guarantee that no past lookups have been concealed, and also
+   proves that MonitorProof.version is the most recent version of the
+   key.
+
+   The version field of a MonitorProof contains the version that was
+   used for computing the binary ladder, and therefore the highest
+   version of the key that will be proven to exist.  The vrf_proofs
+   field contains VRF proofs for different versions of the search key,
+   starting at the first version that's different between the binary
+   ladders for MonitorKey.highest_version and MonitorProof.version.
+
+   The steps field of a MonitorProof contains the proofs required to
+   update the user's monitoring data following the algorithm in
+   Section 4.4.  That is, each ProofStep of a MonitorProof contains a
+   binary ladder for the version MonitorProof.version.  The steps are
+   provided in the order that they're consumed by the monitoring
+   algorithm.  If same proof is consumed by the monitoring algorithm
+   multiple times, it is provided in the MonitorProof structure only the
+   first time.
+
+   For MonitorProof structures in owned_keys, it is also important to
+   prove that MonitorProof.version is the highest version of the key
+   available.  This means that such a MonitorProof must contains full
+   binary ladders for MonitorProof.version along the frontier of the
+   log.  As such, any ProofStep under the owned_keys field that's along
+   the frontier of the log includes a full binary ladder for
+   MonitorProof.version instead of a regular binary ladder.  For
+   additional entries on the frontier of the log that are to the right
+   of the leftmost frontier entry already provided, an additional
+   ProofStep is added to MonitorProof.  This additional ProofStep
+   contains only the proofs of non-inclusion from a full binary ladder.
+
+   Users verify a MonitorResponse by following these steps:
+
+   1.  Verify that the lengths of owned_proofs and contact_proofs are
+       the same as the lengths of owned_keys and contact_keys.
+
+   2.  For each MonitorProof structure, verify that MonitorProof.version
+       is greater than or equal to the highest version of the key that's
+       been previously observed.
+
+   3.  For each MonitorProof structure, evalute the monitoring algorithm
+       in Section 4.4.  Abort with an error if the monitoring algorithm
+       detects that the tree is constructed incorrectly, or if there are
+       fewer or more steps provided than would be expected (keeping in
+       mind that extra steps may be provided along the frontier of the
+       log, if a MonitorProof is a member of owned_keys).
+
+   4.  Construct a candidate root value for the tree by combining the
+       PrefixProof and commitment of ProofStep, with the provided
+       inclusion proof.
+
+   5.  With the candidate root value, verify the provided FullTreeHead.
+
+   Some information is omitted from MonitorResponse in the interest of
+   efficiency, due to the fact that the user would have already seen and
+   verified it as part of conducting other queries.  In particular, VRF
+   proofs for different versions of each search key are not provided,
+   given that these can be cached from the original Search or Update
+   query.
 
 10.  Security Considerations
 
