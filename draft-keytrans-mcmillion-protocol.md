@@ -82,8 +82,10 @@ properties are maintained.
 # Tree Construction
 
 KT allows clients of a service to query the keys of other clients of the same
-service. To do so, KT maintains two structures: (i) a log of every
-key update, and (ii) a set containing all the pseudonym/key-version pairs for which key updates have been
+service. Keys are associated with *labels* and have *versions*. For example, for
+a secure messaging service, the labels could be phone numbers or pseudonyms.
+KT maintains two structures to provide this functionality: (i) a log of every
+key update, and (ii) a set containing all the label/key-version pairs for which key updates have been
 logged. When clients query a KT service, they
 require a means to authenticate the responses of the KT service. To provide for
 this, the KT service maintains a *combined hash tree structure*, which commits
@@ -289,8 +291,8 @@ added.
 
 In the combined tree structure, which is based on {{Merkle2}}, a log tree
 maintains a record of each time a key is updated, while a prefix tree
-maintains the set of pseudonym/key-version pairs corresponding to the key updates. Importantly, the root hash value of the
-prefix tree after adding a new pseudonym/key-version pair is stored in a leaf of the log
+maintains the set of label/key-version pairs corresponding to the key updates. Importantly, the root hash value of the
+prefix tree after adding a new label/key-version pair is stored in a leaf of the log
 tree alongside a privacy-preserving commitment to the update. With some caveats,
 this combined structure supports both efficient consistency proofs and can be
 efficiently searched.
@@ -307,7 +309,7 @@ entry.
 
 To search the combined tree structure described in {{combined-tree}}, users do a
 binary search for the first log entry where the prefix tree at that entry
-contains the desired pseudonym/key-version pair. The entry that a user arrives at
+contains the desired label/key-version pair. The entry that a user arrives at
 through binary search will contain the commitment to the key update that they're
 looking for, even though
 the log itself is not sorted.
@@ -414,7 +416,7 @@ When executing searches on a Transparency Log, the implicit tree described in
 {{implicit-binary-search-tree}} is navigated according to a binary search. At
 each individual log entry, the binary search needs to determine whether it
 should move left or right. That is, it needs to determine, out of the set of
-pseudonym/key-version pairs stored in the prefix tree, whether the highest key version present
+label/key-version pairs stored in the prefix tree, whether the highest key version present
 at a given log entry is greater than, equal to, or less than a target version.
 
 A **binary ladder** is a series of lookups in a single log entry's prefix tree,
@@ -438,7 +440,7 @@ the key did not exist, as of the given log entry.
 
 When executing a search in a Transparency Log for a specific version of a key, a
 binary ladder is provided for each node on the search path, verifiably guiding
-the search toward the log entry where the desired pseudonym/key-version pair was first
+the search toward the log entry where the desired label/key-version pair was first
 inserted (and therefore, the log entry with the desired update).
 
 Requiring proof that this series of versions are present in the prefix tree,
@@ -491,13 +493,13 @@ created. The goal of monitoring a key is to efficiently ensure that, when these
 new parent nodes are created, they're created correctly so that searches for the
 same versions continue converging to the same entries in the log.
 
-To monitor a given search key, users maintain a small amount of state: a map
+To monitor a given label, users maintain a small amount of state: a map
 from a position in the log to a version counter. The version counter is the
-highest version of the search key that's been proven to exist at that log
+highest key-version of the label that's been proven to exist at that log
 position. Users initially populate this map by setting the position of an entry
 they've looked up, to map to the version of the key stored in that entry. A map
-may track several different versions of a search key simultaneously, if a user
-has been shown different versions of the same search key.
+may track several different versions of a label simultaneously, if a user
+has been shown different versions of the same label.
 
 To update this map, users receive the most recent tree head from the server and
 follow these steps, for each entry in the map:
@@ -553,9 +555,9 @@ defined in {{kt-ciphersuites}}.
 
 ## Verifiable Random Function
 
-Each version of a search key that's inserted in a log will have a unique
+Each key-version associated with a label and inserted in a log will have a unique
 representation in the prefix tree. This is computed by providing the combined
-search key and version as inputs to the VRF:
+label and version as inputs to the VRF:
 
 ~~~ tls-presentation
 struct {
@@ -596,7 +598,7 @@ struct {
 
 This fixed key allows the HMAC function, and thereby the commitment scheme, to
 be modeled as a random oracle. The `search_key` field of CommitmentValue
-contains the search key being updated (the search key provided by the user, not
+contains the label being updated (the label provided by the user, not
 the VRF output) and the `update` field contains the value of the update.
 
 The output value `commitment` may be published, while `opening` should be kept
@@ -613,7 +615,7 @@ struct {
 ~~~
 
 <!-- TODO: Possible refactor key_version? People might think of this as "int only." Suggestion: `pseud_and_version` -->
-where `key_version` is the VRF output for the pseudonym/key-version pair, and `VRF.Nh` is
+where `key_version` is the VRF output for the label/key-version pair, and `VRF.Nh` is
 the output size of the ciphersuite VRF in bytes.
 
 The parent nodes of a prefix tree are serialized as:
@@ -891,7 +893,7 @@ output matches the root of the log tree.
 # Update Format
 
 The updates committed to by a combined tree structure contain the new value of a
-search key, along with additional information depending on the deployment mode
+label, along with additional information depending on the deployment mode
 of the Transparency Log. They are serialized as follows:
 
 ~~~ tls-presentation
@@ -908,7 +910,7 @@ struct {
 } UpdateValue;
 ~~~
 
-The `value` field contains the new value of the search key.
+The `value` field contains the new value of the label.
 
 In the event that third-party management is used, the `prefix` field contains a
 signature from the service operator, using the public key from
@@ -922,7 +924,7 @@ struct {
 } UpdateTBS;
 ~~~
 
-The `search_key` field contains the search key being updated (the search key
+The `search_key` field contains the label being updated (the label
 provided by the user, not the VRF output), `version` contains the new key
 version, and `value` contains the same contents as `UpdateValue.value`. Clients
 MUST successfully verify this signature before consuming `UpdateValue.value`.
