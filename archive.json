@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-06-11T00:07:58.325606+00:00",
+  "timestamp": "2024-06-13T00:08:19.397281+00:00",
   "repo": "Bren2010/draft-keytrans",
   "labels": [
     {
@@ -588,18 +588,26 @@
       "labels": [],
       "body": "",
       "createdAt": "2024-06-05T14:59:28Z",
-      "updatedAt": "2024-06-05T14:59:29Z",
+      "updatedAt": "2024-06-11T09:13:42Z",
       "baseRepository": "Bren2010/draft-keytrans",
       "baseRefName": "main",
-      "baseRefOid": "48f57350664ab9417bd4b2ffb6046c4263b2b9cc",
+      "baseRefOid": "7ed4d53c2869595022acb9fe583fb30ecec427f9",
       "headRepository": "felixlinker/draft-keytrans",
       "headRefName": "editing",
-      "headRefOid": "f23364b2fab618cf29bb7c53fbf4b16cd052eb3e",
+      "headRefOid": "0de4cb2ff2c0bd4e2141cbb1ca27e1f2e1430a7d",
       "closedAt": null,
       "mergedAt": null,
       "mergedBy": null,
       "mergeCommit": null,
-      "comments": [],
+      "comments": [
+        {
+          "author": "felixlinker",
+          "authorAssociation": "COLLABORATOR",
+          "body": "@Bren2010 I refactored \"pseudonym\" and \"search key\" into \"label\" and tried providing more intuition in the intro of the \"Searching the Tree\" section.\r\n\r\nI think we need both terms \"index\" and \"label\". For example, we counter for the leafs of the log tree also \"index\". This makes sense. I would say: \"index\" means the thing you _index_ a tree by, i.e., VRF-output or log-tree counter, and \"label\" means the thing you associate keys with, e.g., pseudonyms.\r\n\r\nCurrently, we don't define \"index\" but only use it implicitly. I don't think this is too bad right now, but could be improved.\r\n\r\nPR is ready for review and merge!",
+          "createdAt": "2024-06-11T09:13:41Z",
+          "updatedAt": "2024-06-11T09:13:41Z"
+        }
+      ],
       "reviews": []
     }
   ]
