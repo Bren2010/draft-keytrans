@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-06-13T00:08:19.397281+00:00",
+  "timestamp": "2024-06-16T00:08:42.005115+00:00",
   "repo": "Bren2010/draft-keytrans",
   "labels": [
     {
@@ -588,7 +588,7 @@
       "labels": [],
       "body": "",
       "createdAt": "2024-06-05T14:59:28Z",
-      "updatedAt": "2024-06-11T09:13:42Z",
+      "updatedAt": "2024-06-14T04:35:02Z",
       "baseRepository": "Bren2010/draft-keytrans",
       "baseRefName": "main",
       "baseRefOid": "7ed4d53c2869595022acb9fe583fb30ecec427f9",
@@ -608,7 +608,28 @@
           "updatedAt": "2024-06-11T09:13:41Z"
         }
       ],
-      "reviews": []
+      "reviews": [
+        {
+          "id": "PRR_kwDOLrnaA85-MCuN",
+          "commit": {
+            "abbreviatedOid": "0de4cb2"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "Also does unfortunately need to be rebased",
+          "createdAt": "2024-06-13T21:45:45Z",
+          "updatedAt": "2024-06-14T04:35:02Z",
+          "comments": [
+            {
+              "originalPosition": 6,
+              "body": "Here it seems you're using \"key\" as an abbreviation for \"public key\". Is that right? Public keys will not be the only things stored in a KT log. Labels may map to other labels, to arbitrary structured data, etc",
+              "createdAt": "2024-06-13T21:45:45Z",
+              "updatedAt": "2024-06-14T04:35:02Z"
+            }
+          ]
+        }
+      ]
     }
   ]
 }
