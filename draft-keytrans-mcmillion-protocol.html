@@ -20,17 +20,17 @@ timely manner.
 <meta content="draft-keytrans-mcmillion-protocol-latest" name="ietf.draft">
 <!-- Generator version information:
   xml2rfc 3.21.0
-    Python 3.11.9
+    Python 3.12.3
     ConfigArgParse 1.7
     google-i18n-address 3.1.0
     intervaltree 3.1.0
-    Jinja2 3.1.2
-    lxml 4.9.3
-    platformdirs 4.2.1
+    Jinja2 3.1.4
+    lxml 4.9.4
+    platformdirs 4.2.2
     pycountry 22.3.5
     PyYAML 6.0.1
     requests 2.31.0
-    setuptools 68.2.2
+    setuptools 69.5.1
     six 1.16.0
     wcwidth 0.2.13
 -->
@@ -1035,7 +1035,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">McMillion &amp; Linker</td>
-<td class="center">Expires 12 December 2024</td>
+<td class="center">Expires 19 December 2024</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1048,12 +1048,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-keytrans-mcmillion-protocol-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2024-06-10" class="published">10 June 2024</time>
+<time datetime="2024-06-17" class="published">17 June 2024</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Informational</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2024-12-12">12 December 2024</time></dd>
+<dd class="expires"><time datetime="2024-12-19">19 December 2024</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1106,7 +1106,7 @@ timely manner.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 12 December 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 19 December 2024.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1306,9 +1306,13 @@ properties are maintained.<a href="#section-2-2" class="pilcrow">¶</a></p>
 <a href="#section-3" class="section-number selfRef">3. </a><a href="#name-tree-construction" class="section-name selfRef">Tree Construction</a>
       </h2>
 <p id="section-3-1">KT allows clients of a service to query the keys of other clients of the same
-service. To do so, KT maintains two structures: (i) a log of each change to any
-key's value, and (ii) a set containing all of the key-version pairs that have been
-logged. When clients query a KT service, they
+service. Keys are associated with <em>labels</em> and have <em>versions</em>. For example, for
+a secure messaging service, the labels could be phone numbers or pseudonyms.
+KT maintains two structures to provide this functionality: (i) a log of every
+key update, and (ii) a set containing all the label/key-version pairs for which key updates have been
+logged. Next to the new public key, key updates can contain additional
+structured data necessary for the service in question.
+When clients query a KT service, they
 require a means to authenticate the responses of the KT service. To provide for
 this, the KT service maintains a <em>combined hash tree structure</em>, which commits
 to both these structures with a <em>root hash</em>.
@@ -1595,9 +1599,9 @@ correct. However, it's not possible to efficiently prove that a new version of a
 prefix tree contains the same data as a previous version with only new values
 added.<a href="#section-3.3-1" class="pilcrow">¶</a></p>
 <p id="section-3.3-2">In the combined tree structure, which is based on <span>[<a href="#Merkle2" class="cite xref">Merkle2</a>]</span>, a log tree
-maintains a record of each time any key's value is updated, while a prefix tree
-maintains the set of index-version pairs. Importantly, the root hash value of the
-prefix tree after adding a new index-version pair is stored in a leaf of the log
+maintains a record of each time a key is updated, while a prefix tree
+maintains the set of label/key-version pairs corresponding to the key updates. Importantly, the root hash value of the
+prefix tree after adding a new label/key-version pair is stored in a leaf of the log
 tree alongside a privacy-preserving commitment to the update. With some caveats,
 this combined structure supports both efficient consistency proofs and can be
 efficiently searched.<a href="#section-3.3-2" class="pilcrow">¶</a></p>
@@ -1618,14 +1622,16 @@ entry.<a href="#section-3.3-3" class="pilcrow">¶</a></p>
       </h2>
 <p id="section-4-1">To search the combined tree structure described in <a href="#combined-tree" class="auto internal xref">Section 3.3</a>, users do a
 binary search for the first log entry where the prefix tree at that entry
-contains the desired key-version pair. As such, the entry that a user arrives at
-through binary search contains the update that they're looking for, even though
+contains the desired label/key-version pair. The entry that a user arrives at
+through binary search will contain the commitment to the key update that they're
+looking for, even though
 the log itself is not sorted.<a href="#section-4-1" class="pilcrow">¶</a></p>
-<p id="section-4-2">Following a binary search also ensures that all users will check the same or
-similar entries when searching for the same key, which is necessary for the
-efficient auditing of a Transparency Log. To maximize this effect, users rely on
-an implicit binary tree structure constructed over the leaves of the log tree
-(distinct from the structure of the log tree itself).<a href="#section-4-2" class="pilcrow">¶</a></p>
+<p id="section-4-2">The search is designed in such a way that all users will check the same or
+similar entries when searching for the same key, allowing for the
+efficient auditing of a Transparency Log. The binary search uses
+an <em>implicit binary search tree</em> constructed over the leaves of the log tree
+(distinct from the structure of the log tree itself), which allows the search to
+have a complexity logarithmic in the number of the log's leaves.<a href="#section-4-2" class="pilcrow">¶</a></p>
 <div id="implicit-binary-search-tree">
 <section id="section-4.1">
         <h3 id="name-implicit-binary-search-tree">
@@ -1767,7 +1773,7 @@ entry 25 after even a single new entry is added to the log.<a href="#section-4.1
 <a href="#implicit-binary-search-tree" class="auto internal xref">Section 4.1</a> is navigated according to a binary search. At
 each individual log entry, the binary search needs to determine whether it
 should move left or right. That is, it needs to determine, out of the set of
-key-version pairs stored in the prefix tree, whether the highest version present
+label/key-version pairs stored in the prefix tree, whether the highest key version present
 at a given log entry is greater than, equal to, or less than a target version.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
 <p id="section-4.2-2">A <strong>binary ladder</strong> is a series of lookups in a single log entry's prefix tree,
 which is used to establish whether the target version of a key is present or
@@ -1793,7 +1799,7 @@ proof of non-inclusion was produced, this indicates that the target version of
 the key did not exist, as of the given log entry.<a href="#section-4.2-4" class="pilcrow">¶</a></p>
 <p id="section-4.2-5">When executing a search in a Transparency Log for a specific version of a key, a
 binary ladder is provided for each node on the search path, verifiably guiding
-the search toward the log entry where the desired key-version pair was first
+the search toward the log entry where the desired label/key-version pair was first
 inserted (and therefore, the log entry with the desired update).<a href="#section-4.2-5" class="pilcrow">¶</a></p>
 <p id="section-4.2-6">Requiring proof that this series of versions are present in the prefix tree,
 instead of requesting proof of just version 20, ensures that all users are able
@@ -1853,13 +1859,13 @@ established in between the search root and the leaf, or a new search root may be
 created. The goal of monitoring a key is to efficiently ensure that, when these
 new parent nodes are created, they're created correctly so that searches for the
 same versions continue converging to the same entries in the log.<a href="#section-4.4-1" class="pilcrow">¶</a></p>
-<p id="section-4.4-2">To monitor a given search key, users maintain a small amount of state: a map
+<p id="section-4.4-2">To monitor a given label, users maintain a small amount of state: a map
 from a position in the log to a version counter. The version counter is the
-highest version of the search key that's been proven to exist at that log
+highest key-version of the label that's been proven to exist at that log
 position. Users initially populate this map by setting the position of an entry
 they've looked up, to map to the version of the key stored in that entry. A map
-may track several different versions of a search key simultaneously, if a user
-has been shown different versions of the same search key.<a href="#section-4.4-2" class="pilcrow">¶</a></p>
+may track several different versions of a label simultaneously, if a user
+has been shown different versions of the same label.<a href="#section-4.4-2" class="pilcrow">¶</a></p>
 <p id="section-4.4-3">To update this map, users receive the most recent tree head from the server and
 follow these steps, for each entry in the map:<a href="#section-4.4-3" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-4.4-4">
@@ -1941,9 +1947,9 @@ defined in <a href="#kt-ciphersuites" class="auto internal xref">Section 11.1</a
         <h3 id="name-verifiable-random-function">
 <a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-verifiable-random-function" class="section-name selfRef">Verifiable Random Function</a>
         </h3>
-<p id="section-6.1-1">Each version of a search key that's inserted in a log will have a unique
+<p id="section-6.1-1">Each key-version associated with a label and inserted in a log will have a unique
 representation in the prefix tree. This is computed by providing the combined
-search key and version as inputs to the VRF:<a href="#section-6.1-1" class="pilcrow">¶</a></p>
+label and version as inputs to the VRF:<a href="#section-6.1-1" class="pilcrow">¶</a></p>
 <div class="lang-tls-presentation sourcecode" id="section-6.1-2">
 <pre>
 struct {
@@ -1960,7 +1966,7 @@ struct {
 <a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-commitment" class="section-name selfRef">Commitment</a>
         </h3>
 <p id="section-6.2-1">As discussed in <a href="#combined-tree" class="auto internal xref">Section 3.3</a>, commitments are stored in the leaves of the
-log tree and correspond to updates of a key's value. Commitments are computed
+log tree and correspond to key updates. Commitments are computed
 with HMAC <span>[<a href="#RFC2104" class="cite xref">RFC2104</a>]</span>, using the hash function specified by the ciphersuite. To
 produce a new commitment, the application generates a random 16 byte value
 called <code>opening</code> and computes:<a href="#section-6.2-1" class="pilcrow">¶</a></p>
@@ -1987,7 +1993,7 @@ struct {
 </div>
 <p id="section-6.2-7">This fixed key allows the HMAC function, and thereby the commitment scheme, to
 be modeled as a random oracle. The <code>search_key</code> field of CommitmentValue
-contains the search key being updated (the search key provided by the user, not
+contains the label being updated (the label provided by the user, not
 the VRF output) and the <code>update</code> field contains the value of the update.<a href="#section-6.2-7" class="pilcrow">¶</a></p>
 <p id="section-6.2-8">The output value <code>commitment</code> may be published, while <code>opening</code> should be kept
 private until the commitment is meant to be revealed.<a href="#section-6.2-8" class="pilcrow">¶</a></p>
@@ -2006,7 +2012,7 @@ struct {
 } PrefixLeaf;
 </pre><a href="#section-6.3-2" class="pilcrow">¶</a>
 </div>
-<p id="section-6.3-3">where <code>key_version</code> is the VRF output for the key-version pair, and <code>VRF.Nh</code> is
+<p id="section-6.3-3">where <code>key_version</code> is the VRF output for the label/key-version pair, and <code>VRF.Nh</code> is
 the output size of the ciphersuite VRF in bytes.<a href="#section-6.3-3" class="pilcrow">¶</a></p>
 <p id="section-6.3-4">The parent nodes of a prefix tree are serialized as:<a href="#section-6.3-4" class="pilcrow">¶</a></p>
 <div class="lang-tls sourcecode" id="section-6.3-5">
@@ -2313,7 +2319,7 @@ output matches the root of the log tree.<a href="#section-7.3-10" class="pilcrow
 <a href="#section-8" class="section-number selfRef">8. </a><a href="#name-update-format" class="section-name selfRef">Update Format</a>
       </h2>
 <p id="section-8-1">The updates committed to by a combined tree structure contain the new value of a
-search key, along with additional information depending on the deployment mode
+label, along with additional information depending on the deployment mode
 of the Transparency Log. They are serialized as follows:<a href="#section-8-1" class="pilcrow">¶</a></p>
 <div class="lang-tls-presentation sourcecode" id="section-8-2">
 <pre>
@@ -2330,7 +2336,7 @@ struct {
 } UpdateValue;
 </pre><a href="#section-8-2" class="pilcrow">¶</a>
 </div>
-<p id="section-8-3">The <code>value</code> field contains the new value of the search key.<a href="#section-8-3" class="pilcrow">¶</a></p>
+<p id="section-8-3">The <code>value</code> field contains the new value of the label.<a href="#section-8-3" class="pilcrow">¶</a></p>
 <p id="section-8-4">In the event that third-party management is used, the <code>prefix</code> field contains a
 signature from the service operator, using the public key from
 <code>Configuration.leaf_public_key</code>, over the following structure:<a href="#section-8-4" class="pilcrow">¶</a></p>
@@ -2343,7 +2349,7 @@ struct {
 } UpdateTBS;
 </pre><a href="#section-8-5" class="pilcrow">¶</a>
 </div>
-<p id="section-8-6">The <code>search_key</code> field contains the search key being updated (the search key
+<p id="section-8-6">The <code>search_key</code> field contains the label being updated (the label
 provided by the user, not the VRF output), <code>version</code> contains the new key
 version, and <code>value</code> contains the same contents as <code>UpdateValue.value</code>. Clients
 <span class="bcp14">MUST</span> successfully verify this signature before consuming <code>UpdateValue.value</code>.<a href="#section-8-6" class="pilcrow">¶</a></p>
