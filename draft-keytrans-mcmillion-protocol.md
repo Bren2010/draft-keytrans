@@ -86,7 +86,9 @@ service. Keys are associated with *labels* and have *versions*. For example, for
 a secure messaging service, the labels could be phone numbers or pseudonyms.
 KT maintains two structures to provide this functionality: (i) a log of every
 key update, and (ii) a set containing all the label/key-version pairs for which key updates have been
-logged. When clients query a KT service, they
+logged. Next to the new public key, key updates can contain additional
+structured data necessary for the service in question.
+When clients query a KT service, they
 require a means to authenticate the responses of the KT service. To provide for
 this, the KT service maintains a *combined hash tree structure*, which commits
 to both these structures with a *root hash*.
