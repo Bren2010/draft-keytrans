@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-06-16T00:08:42.005115+00:00",
+  "timestamp": "2024-06-18T00:08:19.948757+00:00",
   "repo": "Bren2010/draft-keytrans",
   "labels": [
     {
@@ -581,24 +581,26 @@
       "id": "PR_kwDOLrnaA85xkYLF",
       "title": "Editing",
       "url": "https://github.com/Bren2010/draft-keytrans/pull/7",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "felixlinker",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "",
       "createdAt": "2024-06-05T14:59:28Z",
-      "updatedAt": "2024-06-14T04:35:02Z",
+      "updatedAt": "2024-06-17T17:00:20Z",
       "baseRepository": "Bren2010/draft-keytrans",
       "baseRefName": "main",
       "baseRefOid": "7ed4d53c2869595022acb9fe583fb30ecec427f9",
       "headRepository": "felixlinker/draft-keytrans",
       "headRefName": "editing",
-      "headRefOid": "0de4cb2ff2c0bd4e2141cbb1ca27e1f2e1430a7d",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "headRefOid": "c3b8c7acbc34af133369a7a23d7192c8155618c6",
+      "closedAt": "2024-06-17T17:00:20Z",
+      "mergedAt": "2024-06-17T17:00:20Z",
+      "mergedBy": "Bren2010",
+      "mergeCommit": {
+        "oid": "e7661dd33f5f327cc2a9afed6d2069904580b98e"
+      },
       "comments": [
         {
           "author": "felixlinker",
@@ -606,6 +608,13 @@
           "body": "@Bren2010 I refactored \"pseudonym\" and \"search key\" into \"label\" and tried providing more intuition in the intro of the \"Searching the Tree\" section.\r\n\r\nI think we need both terms \"index\" and \"label\". For example, we counter for the leafs of the log tree also \"index\". This makes sense. I would say: \"index\" means the thing you _index_ a tree by, i.e., VRF-output or log-tree counter, and \"label\" means the thing you associate keys with, e.g., pseudonyms.\r\n\r\nCurrently, we don't define \"index\" but only use it implicitly. I don't think this is too bad right now, but could be improved.\r\n\r\nPR is ready for review and merge!",
           "createdAt": "2024-06-11T09:13:41Z",
           "updatedAt": "2024-06-11T09:13:41Z"
+        },
+        {
+          "author": "felixlinker",
+          "authorAssociation": "COLLABORATOR",
+          "body": "@Bren2010 Addressed your comment on key updates and rebased onto main!",
+          "createdAt": "2024-06-17T07:54:25Z",
+          "updatedAt": "2024-06-17T07:54:25Z"
         }
       ],
       "reviews": [
@@ -628,6 +637,39 @@
               "updatedAt": "2024-06-14T04:35:02Z"
             }
           ]
+        },
+        {
+          "id": "PRR_kwDOLrnaA85-fVNh",
+          "commit": {
+            "abbreviatedOid": "0de4cb2"
+          },
+          "author": "felixlinker",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2024-06-17T07:48:33Z",
+          "updatedAt": "2024-06-17T07:48:33Z",
+          "comments": [
+            {
+              "originalPosition": 6,
+              "body": "Correct. \"Key\" is supposed to mean \"public key.\" What you are saying is correct, but I think that my phrasing is accurate as I say that \"keys are associated with labels\" not \"labels map to keys.\"\r\n\r\nI clarified what \"key updates\" are now a bit bellow to avoid confusion! (See most recent commit.)",
+              "createdAt": "2024-06-17T07:48:33Z",
+              "updatedAt": "2024-06-17T07:48:33Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOLrnaA85-kN6K",
+          "commit": {
+            "abbreviatedOid": "c3b8c7a"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2024-06-17T17:00:14Z",
+          "updatedAt": "2024-06-17T17:00:14Z",
+          "comments": []
         }
       ]
     }
