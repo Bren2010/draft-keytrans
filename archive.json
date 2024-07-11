@@ -1,0 +1,677 @@
+{
+  "magic": "E!vIA5L86J2I",
+  "timestamp": "2024-07-11T00:08:42.680229+00:00",
+  "repo": "Bren2010/draft-keytrans",
+  "labels": [
+    {
+      "name": "bug",
+      "description": "Something isn't working",
+      "color": "d73a4a"
+    },
+    {
+      "name": "documentation",
+      "description": "Improvements or additions to documentation",
+      "color": "0075ca"
+    },
+    {
+      "name": "duplicate",
+      "description": "This issue or pull request already exists",
+      "color": "cfd3d7"
+    },
+    {
+      "name": "enhancement",
+      "description": "New feature or request",
+      "color": "a2eeef"
+    },
+    {
+      "name": "good first issue",
+      "description": "Good for newcomers",
+      "color": "7057ff"
+    },
+    {
+      "name": "help wanted",
+      "description": "Extra attention is needed",
+      "color": "008672"
+    },
+    {
+      "name": "invalid",
+      "description": "This doesn't seem right",
+      "color": "e4e669"
+    },
+    {
+      "name": "question",
+      "description": "Further information is requested",
+      "color": "d876e3"
+    },
+    {
+      "name": "wontfix",
+      "description": "This will not be worked on",
+      "color": "ffffff"
+    }
+  ],
+  "issues": [
+    {
+      "number": 1,
+      "id": "I_kwDOLrnaA86FSxiE",
+      "title": "Provide a way to bulk-initialize a log",
+      "url": "https://github.com/Bren2010/draft-keytrans/issues/1",
+      "state": "OPEN",
+      "author": "Bren2010",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "There are two aspects to this:\r\n\r\n1. We want to be able to add a certain number of fake entries to hide the actual size of the log.\r\n2. We want to be able to add pre-existing key-value pairs without having one log entry per pair (like we would for key-value pairs added after log creation).\r\n\r\nIt should be very efficient to have a large number of fake prefix tree entries. We also want to not leak the number of real entries that a log starts with",
+      "createdAt": "2024-04-10T19:33:46Z",
+      "updatedAt": "2024-04-10T19:33:46Z",
+      "closedAt": null,
+      "comments": []
+    },
+    {
+      "number": 5,
+      "id": "I_kwDOLrnaA86KWbPl",
+      "title": "Prefix tree should commit to sets of versions",
+      "url": "https://github.com/Bren2010/draft-keytrans/issues/5",
+      "state": "CLOSED",
+      "author": "felixlinker",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Currently, the prefix tree commits to one key-version pair per leaf. I would argue that the leafs should commit to lists of key-version pairs (as the Merkle^2 paper suggests). This way, users can more easily monitor that the server did not include a fake key before to the current epoch.",
+      "createdAt": "2024-05-28T13:52:53Z",
+      "updatedAt": "2024-05-29T16:31:19Z",
+      "closedAt": "2024-05-29T16:31:18Z",
+      "comments": [
+        {
+          "author": "Bren2010",
+          "authorAssociation": "OWNER",
+          "body": "I'm not sure there's any security benefit to having multiple key-version pairs per leaf. It makes things more complicated though, because you have to add an extra step where you are digging into the multiple changes that happened at that one leaf",
+          "createdAt": "2024-05-28T16:51:25Z",
+          "updatedAt": "2024-05-28T16:51:25Z"
+        },
+        {
+          "author": "felixlinker",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Brendan and I clarified this issue in a call. My understanding of which indices are used in the prefix tree was wrong.",
+          "createdAt": "2024-05-29T16:31:18Z",
+          "updatedAt": "2024-05-29T16:31:18Z"
+        }
+      ]
+    }
+  ],
+  "pulls": [
+    {
+      "number": 2,
+      "id": "PR_kwDOLrnaA85wxAUx",
+      "title": "Improvements to hash computation definitions",
+      "url": "https://github.com/Bren2010/draft-keytrans/pull/2",
+      "state": "CLOSED",
+      "author": "felixlinker",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Hi Brendan,\r\n\r\nTwo suggestions.\r\n\r\n1. I made the recursion on the hash computation more explicit and gave also leaves the value field. I think this is clearer. The only downside is that you might need to store more information on disk, but the data structures will likely not be implemented like this anyways, no?\r\n2. I dropped that cryptographic computations must be done with the TLS presentation language, because in the algorithms, you reference individual `opaque` fields only anyways. Will this change with the definition of other primitives? Could be. But so far, I thought that this sentence would only falsely lead people to believe that they must use TLS datastructures, ASN.1 parsers, etc., in the library whereas my understanding is that they need not do that.\r\n\r\nCheers!\r\n\r\nFelix",
+      "createdAt": "2024-05-28T13:27:51Z",
+      "updatedAt": "2024-05-29T16:31:59Z",
+      "baseRepository": "Bren2010/draft-keytrans",
+      "baseRefName": "main",
+      "baseRefOid": "9002fc9b5634469fb3cdc4a474532e139ff150d5",
+      "headRepository": "felixlinker/draft-keytrans",
+      "headRefName": "hashing",
+      "headRefOid": "65aba48f82c26aa71a213684475746fe999bf67c",
+      "closedAt": "2024-05-29T16:31:58Z",
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [
+        {
+          "author": "felixlinker",
+          "authorAssociation": "COLLABORATOR",
+          "body": "Brendan and I discussed this PR in a call. I missed that the TLS data-structures to which I added the `value` field are used elsewhere in cryptographic computations.",
+          "createdAt": "2024-05-29T16:31:58Z",
+          "updatedAt": "2024-05-29T16:31:58Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOLrnaA858LrU7",
+          "commit": {
+            "abbreviatedOid": "d2e8b1f"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2024-05-28T17:06:39Z",
+          "updatedAt": "2024-05-28T17:18:03Z",
+          "comments": [
+            {
+              "originalPosition": 6,
+              "body": "Crypto computations do indeed need to be done in TLS format. TLS specifies endianness, that `opaque` fields are length-prefixed byte strings, etc. Not related to ASN.1. See: https://datatracker.ietf.org/doc/html/rfc5246#section-4",
+              "createdAt": "2024-05-28T17:06:40Z",
+              "updatedAt": "2024-05-28T17:18:03Z"
+            },
+            {
+              "originalPosition": 16,
+              "body": "I don't think it makes sense to store the `value` in the leaf node, as the value can be immediately computed from `key_version`. So it is redundant when this struct is used later on.",
+              "createdAt": "2024-05-28T17:13:44Z",
+              "updatedAt": "2024-05-28T17:18:03Z"
+            },
+            {
+              "originalPosition": 33,
+              "body": "The reason to explicitly say `parent.value = ` is that `value` is an actual field of `PrefixParent` that needs to be populated, potentially stored on-disk. That connection is kind of lost when you roll it into `nodeValue`. And unlike `PrefixLeaf`, `value` can't be computed in isolation",
+              "createdAt": "2024-05-28T17:16:11Z",
+              "updatedAt": "2024-05-28T17:18:03Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOLrnaA858TBHj",
+          "commit": {
+            "abbreviatedOid": "d2e8b1f"
+          },
+          "author": "felixlinker",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2024-05-29T13:07:33Z",
+          "updatedAt": "2024-05-29T13:07:33Z",
+          "comments": [
+            {
+              "originalPosition": 16,
+              "body": "Is this the level that this spec will operate on? What is stored on disk and what not? This seems like implementation-level details we should not address. Rather, we should address the logic behind the system and have the pseudocode be as understandable as possible. So if leafs have a concept of *value* associated with them, I find it clearer to be explicit about that. Implementors can then apply all nifty tricks to get the size on disk down as much as possible.",
+              "createdAt": "2024-05-29T13:07:33Z",
+              "updatedAt": "2024-05-29T13:07:33Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOLrnaA858TBIw",
+          "commit": {
+            "abbreviatedOid": "d2e8b1f"
+          },
+          "author": "felixlinker",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2024-05-29T13:07:35Z",
+          "updatedAt": "2024-05-29T13:07:35Z",
+          "comments": [
+            {
+              "originalPosition": 33,
+              "body": "Same as above.",
+              "createdAt": "2024-05-29T13:07:35Z",
+              "updatedAt": "2024-05-29T13:07:35Z"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "number": 3,
+      "id": "PR_kwDOLrnaA85wxLKA",
+      "title": "More intuition on tree construction",
+      "url": "https://github.com/Bren2010/draft-keytrans/pull/3",
+      "state": "MERGED",
+      "author": "felixlinker",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "With this PR, I try to give a more high-level intuition of what happens in KT, but there is a discrepancy between what I write here (and the Merkle^2 paper) and what you write. I will open an issue separately for that.",
+      "createdAt": "2024-05-28T13:48:13Z",
+      "updatedAt": "2024-06-02T22:31:48Z",
+      "baseRepository": "Bren2010/draft-keytrans",
+      "baseRefName": "main",
+      "baseRefOid": "9002fc9b5634469fb3cdc4a474532e139ff150d5",
+      "headRepository": "felixlinker/draft-keytrans",
+      "headRefName": "new-intro",
+      "headRefOid": "f851f0aa3519c9e2b87fd359e5117531cb35b7b1",
+      "closedAt": "2024-06-02T22:31:48Z",
+      "mergedAt": "2024-06-02T22:31:48Z",
+      "mergedBy": "Bren2010",
+      "mergeCommit": {
+        "oid": "48f57350664ab9417bd4b2ffb6046c4263b2b9cc"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOLrnaA858Liad",
+          "commit": {
+            "abbreviatedOid": "4617696"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2024-05-28T16:48:04Z",
+          "updatedAt": "2024-05-28T16:48:04Z",
+          "comments": [
+            {
+              "originalPosition": 9,
+              "body": "Maintains two things:\r\n- A log of changes to lookup keys\r\n- A set of key-version pairs",
+              "createdAt": "2024-05-28T16:48:04Z",
+              "updatedAt": "2024-05-28T16:48:04Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOLrnaA858gb9G",
+          "commit": {
+            "abbreviatedOid": "f88f1db"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2024-05-30T17:03:48Z",
+          "updatedAt": "2024-05-30T18:05:39Z",
+          "comments": [
+            {
+              "originalPosition": 17,
+              "body": "```suggestion\r\nservice. To do so, KT maintains two structures: (i) a log of each change to any\r\nkey's value, and (ii) a set containing all of the key-version pairs that have been\r\nlogged. When clients query a KT service, they\r\n```\r\nNo maps. A log and a set",
+              "createdAt": "2024-05-30T17:03:49Z",
+              "updatedAt": "2024-05-30T18:05:39Z"
+            },
+            {
+              "originalPosition": 20,
+              "body": "```suggestion\r\nto both these structures with a *root hash*.\r\n```",
+              "createdAt": "2024-05-30T17:06:54Z",
+              "updatedAt": "2024-05-30T18:05:39Z"
+            },
+            {
+              "originalPosition": 23,
+              "body": "```suggestion\r\nTwo clients which have the same root hash are guaranteed to have the same view\r\nof the tree, and thus would always receive the same result for the same query.\r\n```",
+              "createdAt": "2024-05-30T17:07:59Z",
+              "updatedAt": "2024-05-30T18:05:39Z"
+            },
+            {
+              "originalPosition": 27,
+              "body": "```suggestion\r\nprefix trees. The log tree commits to (i) and \r\nthe prefix tree commits to (ii). This section describes the operation of\r\n```",
+              "createdAt": "2024-05-30T17:09:24Z",
+              "updatedAt": "2024-05-30T18:05:39Z"
+            },
+            {
+              "originalPosition": 34,
+              "body": "```suggestion\r\nBoth types of trees consist of\r\n*nodes* which have a byte string as their *hash value*. A node is either a\r\n*leaf* if it has no children, or a *parent*\r\n```",
+              "createdAt": "2024-05-30T17:22:04Z",
+              "updatedAt": "2024-05-30T18:05:39Z"
+            },
+            {
+              "originalPosition": 49,
+              "body": "```suggestion\r\nwas added and are constructed as *left-balanced* binary trees.\r\n```\r\nSaying what the values of the leaves are is getting ahead of yourself. Don't need to discuss leaf values until we get to Combined Tree",
+              "createdAt": "2024-05-30T17:51:54Z",
+              "updatedAt": "2024-05-30T18:05:39Z"
+            },
+            {
+              "originalPosition": 60,
+              "body": "```suggestion\r\nLog trees initially consist of a single leaf node. New leaves are\r\n```",
+              "createdAt": "2024-05-30T17:52:51Z",
+              "updatedAt": "2024-05-30T18:05:40Z"
+            },
+            {
+              "originalPosition": 70,
+              "body": "```suggestion\r\nWhile leaves contain arbitrary data, the value of a parent node is always the\r\nhash of the combined values of its left and right children.\r\n```\r\nImo the previous text is clearer",
+              "createdAt": "2024-05-30T17:54:29Z",
+              "updatedAt": "2024-05-30T18:05:40Z"
+            },
+            {
+              "originalPosition": 87,
+              "body": "When doing little changes, it keeps the diff cleaner to not rewrap text. Don't need to undo wraps in this PR, just saying for future",
+              "createdAt": "2024-05-30T17:55:12Z",
+              "updatedAt": "2024-05-30T18:05:40Z"
+            },
+            {
+              "originalPosition": 177,
+              "body": "```suggestion\r\nmaintains the set of index-version pairs. Importantly, the root hash value of the\r\nprefix tree after adding a new index-version pair is stored in a leaf of the log\r\n```\r\nNeed to use index consistently, not pseudonym",
+              "createdAt": "2024-05-30T18:02:15Z",
+              "updatedAt": "2024-05-30T18:05:40Z"
+            },
+            {
+              "originalPosition": 123,
+              "body": "```suggestion\r\nleft child if the first bit of a value is 0, or the right child if the first\r\n```\r\n\"Prefix tree is used for storing a set of values\" so sticking with value",
+              "createdAt": "2024-05-30T18:03:50Z",
+              "updatedAt": "2024-05-30T18:05:40Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOLrnaA858m21G",
+          "commit": {
+            "abbreviatedOid": "f88f1db"
+          },
+          "author": "felixlinker",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2024-05-31T11:03:36Z",
+          "updatedAt": "2024-05-31T11:03:36Z",
+          "comments": [
+            {
+              "originalPosition": 17,
+              "body": "I think it's important to point out how the leafs of each tree are addressed. For (i), it's by a global version counter (actually, we should find a name for this; is there one?). For (ii), it's the output of the VRF for pseudonym + local version counter. I find this very important! A set cannot be indexed, yet we will index the trees.",
+              "createdAt": "2024-05-31T11:03:36Z",
+              "updatedAt": "2024-05-31T11:03:36Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOLrnaA858m5NN",
+          "commit": {
+            "abbreviatedOid": "f88f1db"
+          },
+          "author": "felixlinker",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2024-05-31T11:06:27Z",
+          "updatedAt": "2024-05-31T11:06:27Z",
+          "comments": [
+            {
+              "originalPosition": 49,
+              "body": "I think it's important to provide intuitions as early as possible. Here one could say that an intuition was already provided in the introduction of the combined tree structure earlier, but readers who skip between sections might miss this.",
+              "createdAt": "2024-05-31T11:06:27Z",
+              "updatedAt": "2024-05-31T11:06:27Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOLrnaA858m5qe",
+          "commit": {
+            "abbreviatedOid": "f88f1db"
+          },
+          "author": "felixlinker",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2024-05-31T11:07:41Z",
+          "updatedAt": "2024-05-31T11:07:41Z",
+          "comments": [
+            {
+              "originalPosition": 70,
+              "body": "Some complications arise from refactoring \"value\" into \"hash value\" and this is one of them. It was clearer before, but if we want to distinguish \"hash value\" from \"value\" (which I think we should), I'd rather be explicit here.",
+              "createdAt": "2024-05-31T11:07:41Z",
+              "updatedAt": "2024-05-31T11:07:41Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOLrnaA858m6Gz",
+          "commit": {
+            "abbreviatedOid": "f88f1db"
+          },
+          "author": "felixlinker",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2024-05-31T11:08:55Z",
+          "updatedAt": "2024-05-31T11:08:55Z",
+          "comments": [
+            {
+              "originalPosition": 87,
+              "body": "Do you have any preference regarding how we handle formatting? When would you like to enforce the 80 characters limit?",
+              "createdAt": "2024-05-31T11:08:55Z",
+              "updatedAt": "2024-05-31T11:08:55Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOLrnaA858p9Ov",
+          "commit": {
+            "abbreviatedOid": "f88f1db"
+          },
+          "author": "felixlinker",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2024-05-31T17:28:28Z",
+          "updatedAt": "2024-05-31T17:28:28Z",
+          "comments": [
+            {
+              "originalPosition": 17,
+              "body": "Okay, one could make the case that the indexing of the log is implicit. The position of the leaf determines its index. But since we will use the index-terminology anyways, I think it's clearer to say that both types of trees commit to an index-value store and are optimized for different kinds of proofs.",
+              "createdAt": "2024-05-31T17:28:28Z",
+              "updatedAt": "2024-05-31T17:28:28Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOLrnaA858unmG",
+          "commit": {
+            "abbreviatedOid": "286578b"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2024-06-02T19:29:54Z",
+          "updatedAt": "2024-06-02T22:30:48Z",
+          "comments": [
+            {
+              "originalPosition": 70,
+              "body": "We should distinguish hash value from value. But in this text, we're talking about value. Talking about hash value adds an extra layer to understand",
+              "createdAt": "2024-06-02T19:29:54Z",
+              "updatedAt": "2024-06-02T22:30:48Z"
+            },
+            {
+              "originalPosition": 87,
+              "body": "When writing new text, 80 chars is good. When modifying existing text, the goal is to have a clear diff, so it's fine if lines end up uneven lengths",
+              "createdAt": "2024-06-02T19:32:39Z",
+              "updatedAt": "2024-06-02T22:30:48Z"
+            },
+            {
+              "originalPosition": 95,
+              "body": "```suggestion\r\nto efficiently produce proofs of membership and non-membership in the set.\r\n\r\nEach leaf node in a prefix tree represents a specific value, while each parent\r\nnode represents some prefix which all values in the subtree headed by that node\r\nhave in common. The subtree headed by a parent's left child contains all values\r\nthat share its prefix followed by an additional 0 bit, while the subtree headed\r\nby a parent's right child contains all values that share its prefix followed by\r\nan additional 1 bit.\r\n\r\nThe root node, in particular, represents the empty string as a prefix. The\r\nroot's left child contains all values that begin with a 0 bit, while the right\r\nchild contains all values that begin with a 1 bit.\r\n```",
+              "createdAt": "2024-06-02T22:27:12Z",
+              "updatedAt": "2024-06-02T22:30:48Z"
+            },
+            {
+              "originalPosition": 122,
+              "body": "```suggestion\r\nNew values are added to the tree by searching it according to the same process.\r\nIf the search terminates at a parent without a left or right child, a new leaf\r\nis simply added as the parent's missing child. If the search terminates at a\r\nleaf for the wrong value, one or more intermediate nodes are added until the new\r\nleaf and the existing leaf would no longer reside in the same place. That is,\r\nuntil we reach the first bit that differs between the new value and the existing\r\nvalue.\r\n```",
+              "createdAt": "2024-06-02T22:28:33Z",
+              "updatedAt": "2024-06-02T22:30:48Z"
+            },
+            {
+              "originalPosition": 105,
+              "body": "```suggestion\r\nleft child if the first bit of a value is 0, or the right child if the first bit\r\nis 1. This is then repeated for the second bit, third bit, and so on until the\r\nsearch either terminates at a leaf node (which may or may not be for the desired\r\nvalue), or a parent node that lacks the desired child.\r\n```",
+              "createdAt": "2024-06-02T22:28:51Z",
+              "updatedAt": "2024-06-02T22:30:48Z"
+            },
+            {
+              "originalPosition": 131,
+              "body": "```suggestion\r\nThe value of a leaf node is the encoded set member, while the value of a\r\nparent node is the hash of the combined values of its left and right children\r\n(or a stand-in value when one of the children doesn't exist).\r\n```",
+              "createdAt": "2024-06-02T22:30:21Z",
+              "updatedAt": "2024-06-02T22:30:48Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOLrnaA858usld",
+          "commit": {
+            "abbreviatedOid": "f851f0a"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2024-06-02T22:31:38Z",
+          "updatedAt": "2024-06-02T22:31:38Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 4,
+      "id": "PR_kwDOLrnaA85wxL1V",
+      "title": "Add Felix Linker as author",
+      "url": "https://github.com/Bren2010/draft-keytrans/pull/4",
+      "state": "MERGED",
+      "author": "felixlinker",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2024-05-28T13:49:24Z",
+      "updatedAt": "2024-05-28T16:43:37Z",
+      "baseRepository": "Bren2010/draft-keytrans",
+      "baseRefName": "main",
+      "baseRefOid": "9002fc9b5634469fb3cdc4a474532e139ff150d5",
+      "headRepository": "felixlinker/draft-keytrans",
+      "headRefName": "authorship",
+      "headRefOid": "8ad7441a4043593e8bec351c3c8762d5ec4634c5",
+      "closedAt": "2024-05-28T16:43:37Z",
+      "mergedAt": "2024-05-28T16:43:37Z",
+      "mergedBy": "Bren2010",
+      "mergeCommit": {
+        "oid": "610128224a781e017d916a5ed19b4b5be57ac5a3"
+      },
+      "comments": [
+        {
+          "author": "Bren2010",
+          "authorAssociation": "OWNER",
+          "body": "Feel free to add an organization as well if you'd like",
+          "createdAt": "2024-05-28T16:43:32Z",
+          "updatedAt": "2024-05-28T16:43:32Z"
+        }
+      ],
+      "reviews": []
+    },
+    {
+      "number": 6,
+      "id": "PR_kwDOLrnaA85xhltE",
+      "title": "Figures",
+      "url": "https://github.com/Bren2010/draft-keytrans/pull/6",
+      "state": "MERGED",
+      "author": "felixlinker",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2024-06-05T09:21:57Z",
+      "updatedAt": "2024-06-06T03:46:29Z",
+      "baseRepository": "Bren2010/draft-keytrans",
+      "baseRefName": "main",
+      "baseRefOid": "48f57350664ab9417bd4b2ffb6046c4263b2b9cc",
+      "headRepository": "felixlinker/draft-keytrans",
+      "headRefName": "diagrams",
+      "headRefOid": "729b821e90cabf8340da1916266e47b79e6e53e1",
+      "closedAt": "2024-06-06T03:46:29Z",
+      "mergedAt": "2024-06-06T03:46:29Z",
+      "mergedBy": "Bren2010",
+      "mergeCommit": {
+        "oid": "6e3f4698a915eca9f97575b524bb2e50e4f4b87a"
+      },
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOLrnaA859Ns2r",
+          "commit": {
+            "abbreviatedOid": "729b821"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "Thank you!!",
+          "createdAt": "2024-06-06T03:46:15Z",
+          "updatedAt": "2024-06-06T03:46:15Z",
+          "comments": []
+        }
+      ]
+    },
+    {
+      "number": 7,
+      "id": "PR_kwDOLrnaA85xkYLF",
+      "title": "Editing",
+      "url": "https://github.com/Bren2010/draft-keytrans/pull/7",
+      "state": "MERGED",
+      "author": "felixlinker",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2024-06-05T14:59:28Z",
+      "updatedAt": "2024-06-17T17:00:20Z",
+      "baseRepository": "Bren2010/draft-keytrans",
+      "baseRefName": "main",
+      "baseRefOid": "7ed4d53c2869595022acb9fe583fb30ecec427f9",
+      "headRepository": "felixlinker/draft-keytrans",
+      "headRefName": "editing",
+      "headRefOid": "c3b8c7acbc34af133369a7a23d7192c8155618c6",
+      "closedAt": "2024-06-17T17:00:20Z",
+      "mergedAt": "2024-06-17T17:00:20Z",
+      "mergedBy": "Bren2010",
+      "mergeCommit": {
+        "oid": "e7661dd33f5f327cc2a9afed6d2069904580b98e"
+      },
+      "comments": [
+        {
+          "author": "felixlinker",
+          "authorAssociation": "COLLABORATOR",
+          "body": "@Bren2010 I refactored \"pseudonym\" and \"search key\" into \"label\" and tried providing more intuition in the intro of the \"Searching the Tree\" section.\r\n\r\nI think we need both terms \"index\" and \"label\". For example, we counter for the leafs of the log tree also \"index\". This makes sense. I would say: \"index\" means the thing you _index_ a tree by, i.e., VRF-output or log-tree counter, and \"label\" means the thing you associate keys with, e.g., pseudonyms.\r\n\r\nCurrently, we don't define \"index\" but only use it implicitly. I don't think this is too bad right now, but could be improved.\r\n\r\nPR is ready for review and merge!",
+          "createdAt": "2024-06-11T09:13:41Z",
+          "updatedAt": "2024-06-11T09:13:41Z"
+        },
+        {
+          "author": "felixlinker",
+          "authorAssociation": "COLLABORATOR",
+          "body": "@Bren2010 Addressed your comment on key updates and rebased onto main!",
+          "createdAt": "2024-06-17T07:54:25Z",
+          "updatedAt": "2024-06-17T07:54:25Z"
+        }
+      ],
+      "reviews": [
+        {
+          "id": "PRR_kwDOLrnaA85-MCuN",
+          "commit": {
+            "abbreviatedOid": "0de4cb2"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "OWNER",
+          "state": "COMMENTED",
+          "body": "Also does unfortunately need to be rebased",
+          "createdAt": "2024-06-13T21:45:45Z",
+          "updatedAt": "2024-06-14T04:35:02Z",
+          "comments": [
+            {
+              "originalPosition": 6,
+              "body": "Here it seems you're using \"key\" as an abbreviation for \"public key\". Is that right? Public keys will not be the only things stored in a KT log. Labels may map to other labels, to arbitrary structured data, etc",
+              "createdAt": "2024-06-13T21:45:45Z",
+              "updatedAt": "2024-06-14T04:35:02Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOLrnaA85-fVNh",
+          "commit": {
+            "abbreviatedOid": "0de4cb2"
+          },
+          "author": "felixlinker",
+          "authorAssociation": "COLLABORATOR",
+          "state": "COMMENTED",
+          "body": "",
+          "createdAt": "2024-06-17T07:48:33Z",
+          "updatedAt": "2024-06-17T07:48:33Z",
+          "comments": [
+            {
+              "originalPosition": 6,
+              "body": "Correct. \"Key\" is supposed to mean \"public key.\" What you are saying is correct, but I think that my phrasing is accurate as I say that \"keys are associated with labels\" not \"labels map to keys.\"\r\n\r\nI clarified what \"key updates\" are now a bit bellow to avoid confusion! (See most recent commit.)",
+              "createdAt": "2024-06-17T07:48:33Z",
+              "updatedAt": "2024-06-17T07:48:33Z"
+            }
+          ]
+        },
+        {
+          "id": "PRR_kwDOLrnaA85-kN6K",
+          "commit": {
+            "abbreviatedOid": "c3b8c7a"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2024-06-17T17:00:14Z",
+          "updatedAt": "2024-06-17T17:00:14Z",
+          "comments": []
+        }
+      ]
+    }
+  ]
+}
