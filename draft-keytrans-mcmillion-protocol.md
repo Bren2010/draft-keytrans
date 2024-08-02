@@ -256,7 +256,21 @@ is 1. This is then repeated for the second bit, third bit, and so on until the
 search either terminates at a leaf node (which may or may not be for the desired
 value), or a parent node that lacks the desired child.
 
-<!-- TODO diagram -->
+~~~ aasvg
+                     X
+                     |
+             .-------+-----.
+            /               \
+            0                1
+            |                |
+            |             .--+-.
+            |            /      \
+            0           0        |
+           / \         / \       |
+          /   \       /   \      |
+Index: 00101 00010 10001 10111 11011
+~~~
+{: title="A prefix tree containing five leaves."}
 
 New values are added to the tree by searching it according to the same process.
 If the search terminates at a parent without a left or right child, a new leaf
@@ -266,7 +280,21 @@ leaf and the existing leaf would no longer reside in the same place. That is,
 until we reach the first bit that differs between the new value and the existing
 value.
 
-<!-- TODO diagram of adding new value -->
+~~~ aasvg
+                          X
+                          |
+                   .------+------.
+                  /               \
+                 0                 1
+                 |                 |
+              .--+-.            .--+-.
+             /      \          /      \
+            0        |        0        |
+           / \       |       / \       |
+          /   \      |      /   \      |
+Index: 00101 00010 01101 10001 10111 11011
+~~~
+{: title="The previous prefix tree after adding the leave with index 01101."}
 
 The value of a leaf node is the encoded set member, while the value of a
 parent node is the hash of the combined values of its left and right children
