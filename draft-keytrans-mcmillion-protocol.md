@@ -81,28 +81,41 @@ properties are maintained.
 
 # Tree Construction
 
-KT allows clients of a service to query the keys of other clients of the same
-service. Keys are associated with *labels* and have *versions*. For example, for
-a secure messaging service, the labels could be phone numbers or pseudonyms.
-KT maintains two structures to provide this functionality: (i) a log of every
-key update, and (ii) a set containing all the label/key-version pairs for which key updates have been
-logged. Next to the new public key, key updates can contain additional
-structured data necessary for the service in question.
-When clients query a KT service, they
-require a means to authenticate the responses of the KT service. To provide for
-this, the KT service maintains a *combined hash tree structure*, which commits
-to both these structures with a *root hash*.
-Two clients which have the same root hash are guaranteed to have the same view
-of the tree, and thus would always receive the same result for the same query.
+A KT log is a verifiable data structure that maps *label-version pairs* to
+cryptographic keys and (optionally) additional structured data. Labels identify
+users, and versions identify the key updates of a respective label. A KT log has
+an *epoch* counter which is incremented with each key update. Each epoch is
+associated with exactly one key update and a set of label-version pairs for
+which key updates have been submitted so far.
 
-The combined hash tree structure consists of two types of trees: log trees and
-prefix trees. The log tree commits to (i) and
-the prefix tree commits to (ii). This section describes the operation of
-both at a high level and the way that they're combined. More precise algorithms
+~~~ aasvg
+  Epoch   Update      Set of logged Label-Version Pairs
+* n       X:0 -> k    { ..., X:0 }
+* n+1     Y:3 -> l    { ..., X:0, Y:3 }
+* n+2     Z:2 -> m    { ..., X:0, Y:3, Z:2 }
+* n+3     X:1 -> n    { ..., X:0, Y:3, Z:2, X:1 }
+~~~
+{: title="An example log history. At epoch n the user with label X submits their
+first key k. As it is their first key, it is associated with version 0. At epoch
+n+1, user Y updates their key to l."}
+
+KT uses a *prefix tree* to commit to a set of logged label-version pairs and a
+*log tree* to commit to the history of key updates and sets of logged
+label-version pairs. The benefit of the prefix tree is that it is easily
+searchable, and the benefit of the log tree is that it can easily be verified to
+be append-only. Both the prefix and log tree have a *root hash*. Two clients
+which have the same root hash are guaranteed to have the same view of the tree,
+and thus would always receive the same result for the same query. The data
+structure powering KT is called the *combined tree structure*.
+
+This section describes the operation of
+both prefix and log trees at a high level and the way that they're combined. More precise algorithms
 for computing the intermediate and root values of the trees are given in
 {{cryptographic-computations}}.
 
-Both types of trees consist of
+## Terminology
+
+Trees consist of
 *nodes* which have a byte string as their *hash value*. A node is either a
 *leaf* if it has no children, or a *parent*
 if it has either a *left child* or a *right child*. A node is the *root* of a
@@ -334,6 +347,21 @@ prefix tree at a given log entry," this actually means searching in the specific
 version of the prefix tree that corresponds to the root hash stored at that log
 entry.
 
+~~~ aasvg
+Epoch        n-1         n                      n+1
+
+Root hash     o -------- o ---------------------- o
+             / \         |                        |
+            /___\     .--+--.              .------+------.
+                     / \    |             / \            |
+                    /___\   |            /___\   .-------+-------.
+                            |                   /                 \
+                    [X:0->k; h(PT_n)]  [X:0->k; h(PT_n)]  [Y:3->l; h(PT_n+1)]
+~~~
+{: title="An example evolution of the combined tree structure, following the
+example from the beginning of the section. At every epoch, a new leaf is added
+to the combined tree structure that commits to a key update and the updated
+prefix tree."}
 
 # Searching the Tree
 
