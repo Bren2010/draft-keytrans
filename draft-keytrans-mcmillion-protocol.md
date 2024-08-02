@@ -231,7 +231,7 @@ Index:  0     1     2     3     4     5
 {: title="Illustration of a consistency proof. The server proves to the client
 that it correctly extended the tree by giving it the hashes of marked nodes
 ([X] / (X)). The client can verify that it can construct the old root hash
-form the hashes of nodes marked by (X), and that it can construct the new root
+from the hashes of nodes marked by (X), and that it can construct the new root
 hash when also considering the hash of the node [X]."}
 
 ## Prefix Tree
