@@ -348,7 +348,7 @@ version of the prefix tree that corresponds to the root hash stored at that log
 entry.
 
 ~~~ aasvg
-Epoch        n-1         n                      n+1
+Epoch        n-1         n                       n+1
 
 Root hash     o -------- o ---------------------- o
              / \         |                        |
