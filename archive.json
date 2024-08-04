@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-08-01T00:09:27.978012+00:00",
+  "timestamp": "2024-08-04T00:09:00.756553+00:00",
   "repo": "Bren2010/draft-keytrans",
   "labels": [
     {
@@ -672,6 +672,34 @@
           "comments": []
         }
       ]
+    },
+    {
+      "number": 8,
+      "id": "PR_kwDOLrnaA853Rzu0",
+      "title": "Editing",
+      "url": "https://github.com/Bren2010/draft-keytrans/pull/8",
+      "state": "MERGED",
+      "author": "felixlinker",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "I hope text is self-explanatory! :) Some of the changes are more straight-forward than others. If you want, we can split the PR up.",
+      "createdAt": "2024-08-02T16:29:26Z",
+      "updatedAt": "2024-08-02T16:30:53Z",
+      "baseRepository": "Bren2010/draft-keytrans",
+      "baseRefName": "main",
+      "baseRefOid": "e7661dd33f5f327cc2a9afed6d2069904580b98e",
+      "headRepository": "Bren2010/draft-keytrans",
+      "headRefName": "editing",
+      "headRefOid": "8d214c801ea825cc3bbf9d3822d0eaa05768dfc3",
+      "closedAt": "2024-08-02T16:30:53Z",
+      "mergedAt": "2024-08-02T16:30:53Z",
+      "mergedBy": "felixlinker",
+      "mergeCommit": {
+        "oid": "8d214c801ea825cc3bbf9d3822d0eaa05768dfc3"
+      },
+      "comments": [],
+      "reviews": []
     }
   ]
 }
