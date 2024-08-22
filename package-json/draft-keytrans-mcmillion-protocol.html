@@ -1314,66 +1314,14 @@ an <em>epoch</em> counter which is incremented with each key update. Each epoch 
 associated with exactly one key update and a set of label-version pairs for
 which key updates have been submitted so far.<a href="#section-3-1" class="pilcrow">¶</a></p>
 <span id="name-an-example-log-history-at-e"></span><figure id="figure-1">
-        <div id="section-3-2.1">
-          <div class="alignLeft art-svg artwork" id="section-3-2.1.1">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="112" width="448" viewBox="0 0 448 112" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
-              <path d="M 32,64 L 32,96" fill="none" stroke="black"></path>
-              <circle cx="8" cy="48" r="6" class="closeddot" fill="black"></circle>
-              <circle cx="8" cy="64" r="6" class="closeddot" fill="black"></circle>
-              <circle cx="8" cy="80" r="6" class="closeddot" fill="black"></circle>
-              <circle cx="8" cy="96" r="6" class="closeddot" fill="black"></circle>
-              <g class="text">
-                <text x="40" y="36">Epoch</text>
-                <text x="108" y="36">Update</text>
-                <text x="192" y="36">Set</text>
-                <text x="220" y="36">of</text>
-                <text x="260" y="36">logged</text>
-                <text x="344" y="36">Label-Version</text>
-                <text x="424" y="36">Pairs</text>
-                <text x="24" y="52">n</text>
-                <text x="96" y="52">X:0</text>
-                <text x="124" y="52">-&gt;</text>
-                <text x="144" y="52">k</text>
-                <text x="184" y="52">{</text>
-                <text x="212" y="52">...,</text>
-                <text x="248" y="52">X:0</text>
-                <text x="272" y="52">}</text>
-                <text x="24" y="68">n</text>
-                <text x="40" y="68">1</text>
-                <text x="96" y="68">Y:3</text>
-                <text x="124" y="68">-&gt;</text>
-                <text x="144" y="68">l</text>
-                <text x="184" y="68">{</text>
-                <text x="212" y="68">...,</text>
-                <text x="252" y="68">X:0,</text>
-                <text x="288" y="68">Y:3</text>
-                <text x="312" y="68">}</text>
-                <text x="24" y="84">n</text>
-                <text x="40" y="84">2</text>
-                <text x="96" y="84">Z:2</text>
-                <text x="124" y="84">-&gt;</text>
-                <text x="144" y="84">m</text>
-                <text x="184" y="84">{</text>
-                <text x="212" y="84">...,</text>
-                <text x="252" y="84">X:0,</text>
-                <text x="292" y="84">Y:3,</text>
-                <text x="328" y="84">Z:2</text>
-                <text x="352" y="84">}</text>
-                <text x="24" y="100">n</text>
-                <text x="40" y="100">3</text>
-                <text x="96" y="100">X:1</text>
-                <text x="124" y="100">-&gt;</text>
-                <text x="144" y="100">n</text>
-                <text x="184" y="100">{</text>
-                <text x="212" y="100">...,</text>
-                <text x="252" y="100">X:0,</text>
-                <text x="292" y="100">Y:3,</text>
-                <text x="332" y="100">Z:2,</text>
-                <text x="368" y="100">X:1</text>
-                <text x="392" y="100">}</text>
-              </g>
-            </svg><a href="#section-3-2.1.1" class="pilcrow">¶</a>
-</div>
+        <div class="alignLeft art-text artwork" id="section-3-2.1">
+<pre>
+  Epoch   Update      Set of logged Label-Version Pairs
+* n       X:0 -&gt; k    { ..., X:0 }
+* n+1     Y:3 -&gt; l    { ..., X:0, Y:3 }
+* n+2     Z:2 -&gt; m    { ..., X:0, Y:3, Z:2 }
+* n+3     X:1 -&gt; n    { ..., X:0, Y:3, Z:2, X:1 }
+</pre>
 </div>
 <figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
 <a href="#name-an-example-log-history-at-e" class="selfRef">An example log history. At epoch n the user with label X submits their first key k. As it is their first key, it is associated with version 0. At epoch n+1, user Y updates their key to l.</a>
