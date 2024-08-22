@@ -88,7 +88,7 @@ an *epoch* counter which is incremented with each key update. Each epoch is
 associated with exactly one key update and a set of label-version pairs for
 which key updates have been submitted so far.
 
-~~~ aasvg
+~~~
   Epoch   Update      Set of logged Label-Version Pairs
 * n       X:0 -> k    { ..., X:0 }
 * n+1     Y:3 -> l    { ..., X:0, Y:3 }
