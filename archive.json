@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-08-22T00:08:29.880599+00:00",
+  "timestamp": "2024-08-25T00:09:16.744542+00:00",
   "repo": "Bren2010/draft-keytrans",
   "labels": [
     {
@@ -685,7 +685,7 @@
       "labels": [],
       "body": "I hope text is self-explanatory! :) Some of the changes are more straight-forward than others. If you want, we can split the PR up.",
       "createdAt": "2024-08-02T16:29:26Z",
-      "updatedAt": "2024-08-02T16:30:53Z",
+      "updatedAt": "2024-08-22T07:35:23Z",
       "baseRepository": "Bren2010/draft-keytrans",
       "baseRefName": "main",
       "baseRefOid": "e7661dd33f5f327cc2a9afed6d2069904580b98e",
@@ -700,6 +700,46 @@
       },
       "comments": [],
       "reviews": []
+    },
+    {
+      "number": 9,
+      "id": "PR_kwDOLrnaA855FzDL",
+      "title": "Add aasvg dependency",
+      "url": "https://github.com/Bren2010/draft-keytrans/pull/9",
+      "state": "OPEN",
+      "author": "felixlinker",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "Commit does the same as suggested here: https://github.com/ietf-wg-scitt/draft-ietf-scitt-architecture/pull/142\r\n\r\nWith the change, I can run `make` locally to preview changes, see warnings, etc.",
+      "createdAt": "2024-08-22T08:13:52Z",
+      "updatedAt": "2024-08-22T15:15:14Z",
+      "baseRepository": "Bren2010/draft-keytrans",
+      "baseRefName": "main",
+      "baseRefOid": "6daf33c8233a81fa57093289fb2a08a176a13ac6",
+      "headRepository": "Bren2010/draft-keytrans",
+      "headRefName": "package-json",
+      "headRefOid": "741acb77637651d7088bededd4288a5044875d80",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
+      "comments": [],
+      "reviews": [
+        {
+          "id": "PRR_kwDOLrnaA86GZrfs",
+          "commit": {
+            "abbreviatedOid": "741acb7"
+          },
+          "author": "Bren2010",
+          "authorAssociation": "OWNER",
+          "state": "APPROVED",
+          "body": "",
+          "createdAt": "2024-08-22T15:15:14Z",
+          "updatedAt": "2024-08-22T15:15:14Z",
+          "comments": []
+        }
+      ]
     }
   ]
 }
