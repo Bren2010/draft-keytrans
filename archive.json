@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-09-12T00:08:59.031977+00:00",
+  "timestamp": "2024-09-15T00:10:03.579535+00:00",
   "repo": "Bren2010/draft-keytrans",
   "labels": [
     {
@@ -706,24 +706,26 @@
       "id": "PR_kwDOLrnaA855FzDL",
       "title": "Add aasvg dependency",
       "url": "https://github.com/Bren2010/draft-keytrans/pull/9",
-      "state": "OPEN",
+      "state": "MERGED",
       "author": "felixlinker",
       "authorAssociation": "COLLABORATOR",
       "assignees": [],
       "labels": [],
       "body": "Commit does the same as suggested here: https://github.com/ietf-wg-scitt/draft-ietf-scitt-architecture/pull/142\r\n\r\nWith the change, I can run `make` locally to preview changes, see warnings, etc.",
       "createdAt": "2024-08-22T08:13:52Z",
-      "updatedAt": "2024-08-22T15:15:14Z",
+      "updatedAt": "2024-09-13T04:07:23Z",
       "baseRepository": "Bren2010/draft-keytrans",
       "baseRefName": "main",
       "baseRefOid": "6daf33c8233a81fa57093289fb2a08a176a13ac6",
       "headRepository": "Bren2010/draft-keytrans",
       "headRefName": "package-json",
       "headRefOid": "741acb77637651d7088bededd4288a5044875d80",
-      "closedAt": null,
-      "mergedAt": null,
-      "mergedBy": null,
-      "mergeCommit": null,
+      "closedAt": "2024-09-13T04:07:23Z",
+      "mergedAt": "2024-09-13T04:07:23Z",
+      "mergedBy": "Bren2010",
+      "mergeCommit": {
+        "oid": "12f569da33954320c48045bfb5f629e54774a55e"
+      },
       "comments": [],
       "reviews": [
         {
