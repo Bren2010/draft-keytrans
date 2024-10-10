@@ -331,8 +331,13 @@ prefix tree contains the same data as a previous version with only new values
 added.
 
 In the combined tree structure, which is based on {{Merkle2}}, a log tree
-contains a record of each time a label is updated, while a prefix tree
-contains the set of label-version pairs corresponding to the updates. Importantly, the root hash value of the
+contains a record of each time a label is updated. A prefix tree stores the
+set of label-version pairs corresponding to the updates as well as the tree size
+corresponding to each update. The prefix tree is indexed by the hashes of the
+label-version pairs. Each of the prefix tree's leafs additionally commits to the
+index of the log tree leaf that commit to the corresponding label-version pair.
+This allows for shorter proofs in the third-party auditing mode. Importantly,
+the root hash value of the
 prefix tree after adding a new label-version pair is stored in a leaf of the log
 tree alongside a privacy-preserving commitment to the update. With some caveats,
 this combined structure supports both efficient consistency proofs and can be
@@ -376,6 +381,13 @@ efficient auditing of a Transparency Log. The binary search uses
 an *implicit binary search tree* constructed over the leaves of the log tree
 (distinct from the structure of the log tree itself), which allows the search to
 have a complexity logarithmic in the number of the log's leaves.
+
+The search is designed to ensure that the server cannot trick clients into
+accepting different keys as the most recent by removing leafs from the prefix
+tree. This is necessary because monitoring the prefix tree to be append-only is
+too costly for clients. However, when third-party auditors can ensure that the
+prefix tree is append-only, search can be simplified. We will explain how at the
+end of this section.
 
 ## Implicit Binary Search Tree
 
@@ -541,7 +553,30 @@ Once the user has verified that the frontier lookups are monotonic and
 determined the highest version, the user then continues a binary search for this
 specific version.
 
+## Simplified Search for Third-Party Auditing
+
+When third-party auditors are present that monitor the log to provide an
+append-only prefix tree, the server can provide more compact proofs. Recall that
+each leaf in the prefix tree also commits to the index of the log tree's leaf
+committing to the respective value.
+
+When a client requests a label's most recent version, it is sufficient for the
+server to provide a full binary ladder in the most recent prefix tree proving to
+the client which version is the most recent version of the requested label. When
+a client requests a specific version, the server can simply provide a proof of
+inclusion of the respective label-version pair in the most recent prefix tree.
+
+In both cases, the client will learn the index of the log tree's leaf that
+commits to the desired value from the proofs about the prefix tree. To complete
+the search, the server only needs to provide the client with proof of inclusion
+for the log tree's latest leaf (to prove to the client that it used the correct
+prefix tree root hash) and a proof of inclusion for the leaf that commits to the
+value of the requested label-version pair (which will be identified by
+aforementioned index).
+
 ## Monitoring
+
+### Contact Monitoring
 
 As new entries are added to the log tree, the search path that's traversed to
 find a specific version of a label may change. New intermediate nodes may become
@@ -587,6 +622,9 @@ different versions will often intersect. Intersections reduce the total number
 of entries in the map and therefore the amount of work that will be needed to
 monitor the label from then on.
 
+### Third-Party Auditing
+
+<!-- TODO: -->
 
 # Ciphersuites
 
@@ -671,11 +709,14 @@ The leaf nodes of a prefix tree are serialized as:
 ~~~ tls
 struct {
     opaque vrf_output<VRF.Nh>;
+    uint64 update_index;
 } PrefixLeaf;
 ~~~
 
-where `vrf_output` is the VRF output for the label-version pair, and `VRF.Nh` is
-the output size of the ciphersuite VRF in bytes.
+where `vrf_output` is the VRF output for the label-version pair, `VRF.Nh` is the
+output size of the ciphersuite VRF in bytes, and `update_index` is the index of
+the log tree's leaf committing to the respective value, i.e., the log tree's
+`tree_size` just after the respective label-version pair was inserted minus one.
 
 The parent nodes of a prefix tree are serialized as:
 
@@ -698,7 +739,7 @@ nodeValue(node):
   if node.type == emptyNode:
     return 0 // all-zero vector of length Hash.Nh
   else if node.type == leafNode:
-    return Hash(0x00 || node.vrf_output)
+    return Hash(0x00 || node.vrf_output || node.update_index)
   else if node.type == parentNode:
     return node.value
 ~~~
@@ -850,6 +891,8 @@ enum {
 struct {
   PrefixSearchResultType result_type;
   select (PrefixSearchResult.result_type) {
+    case inclusion:
+      uint64 update_index;
     case nonInclusionLeaf:
       PrefixLeaf leaf;
   };
@@ -888,6 +931,8 @@ left/right arrangement dictated by the tree structure, and checking that the
 result equals the root value of the prefix tree.
 
 ## Combined Tree {#proof-combined-tree}
+
+### Proofs for Contact Monitoring
 
 A proof from a combined log and prefix tree follows the execution of a binary
 search through the leaves of the log tree, as described in {{combined-tree}}. It
@@ -953,6 +998,39 @@ it with the corresponding `commitment` to obtain the value of each leaf. These
 leaf values can then be combined with the proof in `inclusion` to check that the
 output matches the root of the log tree.
 
+### Proofs for Third-Party Auditing
+
+In third-party auditing, clients can rely on the assumption that the prefix tree
+is monitored to be append-only. Therefore, they need not execute the binary
+ladder but the proof can directly jump to the index identified by the prefix
+tree leaf.
+
+~~~ tls-presentation
+struct {
+  optional<uint32> version;
+  VRFProof vrf_proofs<0..2^8-1>;
+  PrefixProof prefix_proof;
+  InclusionProof inclusion;
+} SearchProofCompact;
+~~~
+
+The semantics of the `version` field do not change.
+
+Similarly to `SearchProof`, `vrf_proofs` contains the output of evaluating the
+VRF on a different version of the label. Either one version will be included
+(when requesting a specific version) or the versions to verify the full binary
+ladder (when requesting the latest version).
+
+`prefix_proof` contains the proof to either verify the inclusion of the
+label-version pair (when requesting a specific version) or to verify the full
+binary ladder (when requesting the latest version). Both types of proofs are for
+the most recent prefix tree.
+
+`inclusion` contains a batch inclusion of the most recent leaf and the leaf that
+commits to respective value for the request label-version pair. The most recent
+leaf is needed to obtain the prefix tree's root hash, and the leaf committing to
+the requested value will be at the index identified in the most recent prefix
+tree.
 
 # Update Format
 
@@ -1019,6 +1097,8 @@ between the current tree and the tree when it was this size, in the
 `consistency` field of `FullTreeHead`.
 
 ## Search
+
+<!-- TODO: Update to cover different deployment modes -->
 
 Users initiate a Search operation by submitting a SearchRequest to the
 Transparency Log containing the label that they're interested in. Users can
@@ -1095,6 +1175,8 @@ provides the `UpdatePrefix` structure necessary to reconstruct the
 `UpdateValue`.
 
 ## Monitor
+
+<!-- TODO: Update to cover different deployment modes -->
 
 Users initiate a Monitor operation by submitting a MonitorRequest to the
 Transparency Log containing information about the labels they wish to monitor.
