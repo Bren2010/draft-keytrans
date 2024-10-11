@@ -98,13 +98,13 @@ incremented every time a new label-version pair is added.
 first key k. As it is their first key, it is associated with version 0. At epoch
 n+1, user Y updates their key to l."}
 
-KT uses a *prefix tree* to commit to a set of logged label-version pairs and a
+KT uses a *prefix tree* to commit to the set of logged label-version pairs, and a
 *log tree* to commit to the history of changes. The benefit of the prefix tree
 is that it is easily searchable, and the benefit of the log tree is that it can
 easily be verified to be append-only. Both the prefix and log tree have a *root
-hash*. Two clients which have the same root hash are guaranteed to have the same
-view of the tree, and thus would always receive the same result for the same
-query. The data structure powering KT is called the *combined tree structure*.
+hash*, which succinctly represent the entire tree. The data structure powering
+KT combines a log tree and a prefix tree, and is called the *combined tree
+structure*.
 
 This section describes the operation of
 both prefix and log trees at a high level and the way that they're combined. More precise algorithms
@@ -122,7 +122,7 @@ parents. Nodes are *siblings* if they share the same parent.
 
 The *descendants* of a node are that node, its children, and the descendants of
 its children. A *subtree* of a tree is the tree given by the descendants of a
-node, called the *head* of the subtree.
+particular node, called the *head* of the subtree.
 
 The *direct path* of a root node is the empty list, and of any other node is the
 concatenation of that node's parent along with the parent's direct path. The
@@ -331,17 +331,12 @@ prefix tree contains the same data as a previous version with only new values
 added.
 
 In the combined tree structure, which is based on {{Merkle2}}, a log tree
-contains a record of each time a label is updated. A prefix tree stores the
-set of label-version pairs corresponding to the updates as well as the tree size
-corresponding to each update. The prefix tree is indexed by the hashes of the
-label-version pairs. Each of the prefix tree's leafs additionally commits to the
-index of the log tree leaf that commit to the corresponding label-version pair.
-This allows for shorter proofs in the third-party auditing mode. Importantly,
-the root hash value of the
-prefix tree after adding a new label-version pair is stored in a leaf of the log
-tree alongside a privacy-preserving commitment to the update. With some caveats,
-this combined structure supports both efficient consistency proofs and can be
-efficiently searched.
+contains a record of each time a label is updated, while a prefix tree contains
+the set of label-version pairs corresponding to the updates. Importantly, the
+root hash value of the prefix tree after adding a new label-version pair is
+stored in a leaf of the log tree alongside a privacy-preserving commitment to
+the update. With some caveats, this combined structure supports both efficient
+consistency proofs and can be efficiently searched.
 
 Note that, although the Transparency Log maintains a single logical prefix tree,
 each modification of this tree results in a new root hash, which is then stored
@@ -368,26 +363,30 @@ prefix tree (PT)."}
 
 # Searching the Tree
 
-To search the combined tree structure described in {{combined-tree}}, users do a
-binary search for the first log entry where the prefix tree at that entry
-contains the desired label-version pair. The entry that a user arrives at
-through binary search will contain the commitment to the update that they're
-looking for, even though
-the log itself is not sorted.
+When searching the combined tree structure described in {{combined-tree}}, the
+proof provided by the Transparency Log may either be **full** or **abridged**. A
+full proof must be provided if the deployment mode of the Transparency Log is
+Contact Monitoring, or if the user has specifically requested it. Otherwise,
+proofs are provided abridged.
+
+A full proof follows the path of a binary search for the first log entry where
+the prefix tree contains the desired label-version pair. The entry that a user
+arrives at through binary search will contain the commitment to the update that
+they're looking for, even though the log itself is not sorted.
 
 The search is designed in such a way that all users will check the same or
-similar entries when searching for the same label, allowing for the
-efficient auditing of a Transparency Log. The binary search uses
+similar entries when searching for the same label, allowing for
+efficient client-side auditing of the Transparency Log. The binary search uses
 an *implicit binary search tree* constructed over the leaves of the log tree
 (distinct from the structure of the log tree itself), which allows the search to
 have a complexity logarithmic in the number of the log's leaves.
 
-The search is designed to ensure that the server cannot trick clients into
-accepting different keys as the most recent by removing leafs from the prefix
-tree. This is necessary because monitoring the prefix tree to be append-only is
-too costly for clients. However, when third-party auditors can ensure that the
-prefix tree is append-only, search can be simplified. We will explain how at the
-end of this section.
+An abridged proof skips this binary search, and simply looks at the most recent
+version of the prefix tree to determine which log entry has the commitment to
+the update that the user is looking for. Abridged proofs rely on a third-party
+auditor or manager that can be trusted not to collude with the Transparency Log,
+and who checks that every version of the prefix tree is constructed correctly.
+This is described in more detail in {{putting-it-together}}.
 
 ## Implicit Binary Search Tree
 
@@ -553,30 +552,38 @@ Once the user has verified that the frontier lookups are monotonic and
 determined the highest version, the user then continues a binary search for this
 specific version.
 
-## Simplified Search for Third-Party Auditing
+## Putting it Together
 
-When third-party auditors are present that monitor the log to provide an
-append-only prefix tree, the server can provide more compact proofs. Recall that
-each leaf in the prefix tree also commits to the index of the log tree's leaf
-committing to the respective value.
+As noted at the beginning of the section, a search in the tree will either
+require producing a full proof, or an abridged proof may be accepted if the user
+can trust a third-party to audit and not collude with the Transparency Log.
 
-When a client requests a label's most recent version, it is sufficient for the
-server to provide a full binary ladder in the most recent prefix tree proving to
-the client which version is the most recent version of the requested label. When
-a client requests a specific version, the server can simply provide a proof of
-inclusion of the respective label-version pair in the most recent prefix tree.
+The steps for producing a full or abridged search proof are summarized as
+follows:
 
-In both cases, the client will learn the index of the log tree's leaf that
-commits to the desired value from the proofs about the prefix tree. To complete
-the search, the server only needs to provide the client with proof of inclusion
-for the log tree's latest leaf (to prove to the client that it used the correct
-prefix tree root hash) and a proof of inclusion for the leaf that commits to the
-value of the requested label-version pair (which will be identified by
-aforementioned index).
+- Full proof:
+  - If searching for the most recent version of a label, a full binary ladder
+    is obtained for each node on the frontier of the log. This determines the
+    highest version of the label available, which allows the search to proceed
+    for this specific version.
+  - If searching for a specific version, the proof follows a binary search for
+    the first entry in the log where this version of the label exists. For
+    each step in the binary search, the proof contains a (non-full) binary
+    ladder for the targeted version, which proves whether the targeted version
+    of the label existed yet or not by this point in the log. This indicates
+    whether the binary search should move forwards or backwards in the log.
+- Abridged proof:
+  - If searching for the most recent version of a label, a full binary ladder is
+    obtained only from the last (most recent) entry of the log. The prefix tree
+    entry for the most recent version of the label will directly commit to the
+    index in the log that contains the update, ending the search.
+  - If searching for a specific version, a (non-full) binary ladder for this
+    version is obtained only from the last entry of the log. Similar to the
+    previous case, the prefix tree entry for the targeted version will directly
+    commit to the index in the log tree that contains the update.
 
-## Monitoring
 
-### Contact Monitoring
+# Monitoring the Tree
 
 As new entries are added to the log tree, the search path that's traversed to
 find a specific version of a label may change. New intermediate nodes may become
@@ -622,9 +629,8 @@ different versions will often intersect. Intersections reduce the total number
 of entries in the map and therefore the amount of work that will be needed to
 monitor the label from then on.
 
-### Third-Party Auditing
+Finally, unlike searching, there is no abridged version of monitoring.
 
-<!-- TODO: -->
 
 # Ciphersuites
 
@@ -1204,7 +1210,7 @@ they've looked up in `contact_labels`.
 Each `MonitorLabel` structure contains the label being monitored in `label`,
 the highest version of the label that the user has observed in `highest_version`,
 and a list of `entries` in the log tree corresponding to the keys of the map
-described in {{monitoring}}.
+described in {{monitoring-the-tree}}.
 
 The Transparency Log verifies the MonitorRequest by following these steps, for
 each `MonitorLabel` structure:
@@ -1254,7 +1260,7 @@ different between the binary ladders for `MonitorLabel.highest_version` and
 `MonitorProof.version`.
 
 The `steps` field of a `MonitorProof` contains the proofs required to update the
-user's monitoring data following the algorithm in {{monitoring}}. That is, each
+user's monitoring data following the algorithm in {{monitoring-the-tree}}. That is, each
 `ProofStep` of a `MonitorProof` contains a binary ladder for the version
 `MonitorProof.version`. The steps are provided in the order that they're
 consumed by the monitoring algorithm. If same proof is consumed by the
@@ -1280,7 +1286,7 @@ Users verify a MonitorResponse by following these steps:
    greater than or equal to the highest version of the label that's been
    previously observed.
 3. For each `MonitorProof` structure, evalute the monitoring algorithm in
-   {{monitoring}}. Abort with an error if the monitoring algorithm detects that
+   {{monitoring-the-tree}}. Abort with an error if the monitoring algorithm detects that
    the tree is constructed incorrectly, or if there are fewer or more steps
    provided than would be expected (keeping in mind that extra steps may be
    provided along the frontier of the log, if a `MonitorProof` is a member of
