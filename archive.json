@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-10-10T00:09:18.756427+00:00",
+  "timestamp": "2024-10-13T00:10:06.513310+00:00",
   "repo": "Bren2010/draft-keytrans",
   "labels": [
     {
@@ -713,7 +713,7 @@
       "labels": [],
       "body": "Commit does the same as suggested here: https://github.com/ietf-wg-scitt/draft-ietf-scitt-architecture/pull/142\r\n\r\nWith the change, I can run `make` locally to preview changes, see warnings, etc.",
       "createdAt": "2024-08-22T08:13:52Z",
-      "updatedAt": "2024-09-13T04:07:23Z",
+      "updatedAt": "2024-10-10T13:43:26Z",
       "baseRepository": "Bren2010/draft-keytrans",
       "baseRefName": "main",
       "baseRefOid": "6daf33c8233a81fa57093289fb2a08a176a13ac6",
@@ -742,6 +742,62 @@
           "comments": []
         }
       ]
+    },
+    {
+      "number": 10,
+      "id": "PR_kwDOLrnaA85-PNV6",
+      "title": "First step towards third-party auditing",
+      "url": "https://github.com/Bren2010/draft-keytrans/pull/10",
+      "state": "MERGED",
+      "author": "felixlinker",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "I started writing about third-party auditing. The PR is not complete yet, but I wanted to iterate early on! Especially curious to hear what you think about the TLS encoding.\r\n\r\nWould be great to hear whether you think this goes in the right direction!",
+      "createdAt": "2024-10-10T15:05:25Z",
+      "updatedAt": "2024-10-11T02:44:45Z",
+      "baseRepository": "Bren2010/draft-keytrans",
+      "baseRefName": "main",
+      "baseRefOid": "12f569da33954320c48045bfb5f629e54774a55e",
+      "headRepository": "Bren2010/draft-keytrans",
+      "headRefName": "tp-auditing",
+      "headRefOid": "ce7ad760b27ddb560101df394a7affdcbce99073",
+      "closedAt": "2024-10-11T02:44:45Z",
+      "mergedAt": "2024-10-11T02:44:45Z",
+      "mergedBy": "Bren2010",
+      "mergeCommit": {
+        "oid": "d71426e84c54e5c44455323c95b1f3b732ce1ccd"
+      },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 11,
+      "id": "PR_kwDOLrnaA85-Stzw",
+      "title": "Introduce idea of full vs abridged search proofs",
+      "url": "https://github.com/Bren2010/draft-keytrans/pull/11",
+      "state": "MERGED",
+      "author": "Bren2010",
+      "authorAssociation": "OWNER",
+      "assignees": [],
+      "labels": [],
+      "body": "",
+      "createdAt": "2024-10-11T02:43:23Z",
+      "updatedAt": "2024-10-11T02:44:27Z",
+      "baseRepository": "Bren2010/draft-keytrans",
+      "baseRefName": "tp-auditing",
+      "baseRefOid": "35270e19711da2e3b2839da67c1cda25cc3ccda0",
+      "headRepository": "Bren2010/draft-keytrans",
+      "headRefName": "brendan/tp-editorial",
+      "headRefOid": "ea42541b18205e0325ef714303005a0f80afba26",
+      "closedAt": "2024-10-11T02:44:27Z",
+      "mergedAt": "2024-10-11T02:44:27Z",
+      "mergedBy": "Bren2010",
+      "mergeCommit": {
+        "oid": "ce7ad760b27ddb560101df394a7affdcbce99073"
+      },
+      "comments": [],
+      "reviews": []
     }
   ]
 }
