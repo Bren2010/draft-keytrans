@@ -85,7 +85,7 @@ A Transparency Log is a verifiable data structure that maps *label-version
 pairs* to cryptographic keys or other structured data. Labels correspond to user
 identifiers, and a new version of a label is created each time the label's
 associated value changes. Transparency Logs have an *epoch* counter which is
-incremented every time a new label-version pair is added.
+incremented every time a new set of label-version pairs are added.
 
 ~~~
   Epoch   Update      Set of logged Label-Version Pairs
@@ -98,12 +98,12 @@ incremented every time a new label-version pair is added.
 first key k. As it is their first key, it is associated with version 0. At epoch
 n+1, user Y updates their key to l."}
 
-KT uses a *prefix tree* to commit to the set of logged label-version pairs, and a
-*log tree* to commit to the history of changes. The benefit of the prefix tree
-is that it is easily searchable, and the benefit of the log tree is that it can
-easily be verified to be append-only. Both the prefix and log tree have a *root
-hash*, which succinctly represent the entire tree. The data structure powering
-KT combines a log tree and a prefix tree, and is called the *combined tree
+KT uses a *prefix tree* to commit to a mapping between each label-version pair
+and a commitment to the label's value at that version. Every time the prefix
+tree changes, its new root hash is stored in a *log tree*. The benefit of the
+prefix tree is that it is easily searchable, and the benefit of the log tree is
+that it can easily be verified to be append-only. The data structure powering KT
+combines a log tree and a prefix tree, and is called the *combined tree
 structure*.
 
 This section describes the operation of
@@ -247,22 +247,22 @@ hash when also considering the hash of the node [X]."}
 
 ## Prefix Tree
 
-Prefix trees are used for storing a set of values while preserving the ability
-to efficiently produce proofs of membership and non-membership in the set.
+Prefix trees are used for storing key-value pairs, in a way that provides the
+ability to efficiently prove that a search key's value was looked up correctly.
 
-Each leaf node in a prefix tree represents a specific value, while each parent
-node represents some prefix which all values in the subtree headed by that node
-have in common. The subtree headed by a parent's left child contains all values
+Each leaf node in a prefix tree represents a specific key-value pair, while each parent
+node represents some prefix which all search keys in the subtree headed by that node
+have in common. The subtree headed by a parent's left child contains all search keys
 that share its prefix followed by an additional 0 bit, while the subtree headed
-by a parent's right child contains all values that share its prefix followed by
+by a parent's right child contains all search keys that share its prefix followed by
 an additional 1 bit.
 
 The root node, in particular, represents the empty string as a prefix. The
-root's left child contains all values that begin with a 0 bit, while the right
-child contains all values that begin with a 1 bit.
+root's left child contains all search keys that begin with a 0 bit, while the right
+child contains all search keys that begin with a 1 bit.
 
 A prefix tree can be searched by starting at the root node, and moving to the
-left child if the first bit of a value is 0, or the right child if the first bit
+left child if the first bit of a search key is 0, or the right child if the first bit
 is 1. This is then repeated for the second bit, third bit, and so on until the
 search either terminates at a leaf node (which may or may not be for the desired
 value), or a parent node that lacks the desired child.
@@ -279,17 +279,18 @@ value), or a parent node that lacks the desired child.
             0           0        |
            / \         / \       |
           /   \       /   \      |
-Index: 00010 00101 10001 10111 11011
+Key:   00010 00101 10001 10111 11011
+Value:     A     B     C     D     E
 ~~~
-{: title="A prefix tree containing five leaves."}
+{: title="A prefix tree containing five entries."}
 
-New values are added to the tree by searching it according to the same process.
+New key-value pairs are added to the tree by searching it according to the same process.
 If the search terminates at a parent without a left or right child, a new leaf
 is simply added as the parent's missing child. If the search terminates at a
-leaf for the wrong value, one or more intermediate nodes are added until the new
+leaf for the wrong search key, one or more intermediate nodes are added until the new
 leaf and the existing leaf would no longer reside in the same place. That is,
-until we reach the first bit that differs between the new value and the existing
-value.
+until we reach the first bit that differs between the new search key and the existing
+search key.
 
 ~~~ aasvg
                           X
@@ -304,18 +305,19 @@ value.
            / \       |       / \       |
           /   \      |      /   \      |
 Index: 00010 00101 01101 10001 10111 11011
+Value:     A     B     F     C     D     E
 ~~~
-{: title="The previous prefix tree after adding the leave with index 01101."}
+{: title="The previous prefix tree after adding the key-value pair: 01101 -> F."}
 
-The value of a leaf node is the encoded set member, while the value of a
+The value of a leaf node is the encoded key-value pair, while the value of a
 parent node is the hash of the combined values of its left and right children
 (or a stand-in value when one of the children doesn't exist).
 
 A proof of membership is given by providing the leaf hash value, along with the
 hash value of each copath entry along the search path. A proof of non-membership
-is given by providing an abridged proof of membership that follows the search
-path for the intended value, but ends either at a stand-in value or a leaf for a
-different value. In either case, the proof is verified by hashing together the
+is given by providing an abridged proof of membership that follows the
+path for the intended search key, but ends either at a stand-in node or a leaf for a
+different search key. In either case, the proof is verified by hashing together the
 leaf with the copath hash values and checking that the result equals the root
 hash value of the tree.
 
@@ -330,13 +332,12 @@ correct. However, it's not possible to efficiently prove that a new version of a
 prefix tree contains the same data as a previous version with only new values
 added.
 
-In the combined tree structure, which is based on {{Merkle2}}, a log tree
-contains a record of each time a label is updated, while a prefix tree contains
-the set of label-version pairs corresponding to the updates. Importantly, the
-root hash value of the prefix tree after adding a new label-version pair is
-stored in a leaf of the log tree alongside a privacy-preserving commitment to
-the update. With some caveats, this combined structure supports both efficient
-consistency proofs and can be efficiently searched.
+In the combined tree structure, which is based on {{Merkle2}}, a prefix tree
+contains a mapping where each label-version pair is a search key, and its
+associated value is a cryptographic commitment to the label's new contents. A
+log tree contains a record of each version of the prefix tree that's created.
+With some caveats, this combined structure supports both efficient consistency
+proofs and can be efficiently searched.
 
 Note that, although the Transparency Log maintains a single logical prefix tree,
 each modification of this tree results in a new root hash, which is then stored
@@ -370,11 +371,8 @@ Contact Monitoring, or if the user has specifically requested it. Otherwise,
 proofs are provided abridged.
 
 A full proof follows the path of a binary search for the first log entry where
-the prefix tree contains the desired label-version pair. The entry that a user
-arrives at through binary search will contain the commitment to the update that
-they're looking for, even though the log itself is not sorted.
-
-The search is designed in such a way that all users will check the same or
+the prefix tree contains the desired label-version pair.
+This ensures that all users will check the same or
 similar entries when searching for the same label, allowing for
 efficient client-side auditing of the Transparency Log. The binary search uses
 an *implicit binary search tree* constructed over the leaves of the log tree
@@ -382,7 +380,7 @@ an *implicit binary search tree* constructed over the leaves of the log tree
 have a complexity logarithmic in the number of the log's leaves.
 
 An abridged proof skips this binary search, and simply looks at the most recent
-version of the prefix tree to determine which log entry has the commitment to
+version of the prefix tree to determine the commitment to
 the update that the user is looking for. Abridged proofs rely on a third-party
 auditor or manager that can be trusted not to collude with the Transparency Log,
 and who checks that every version of the prefix tree is constructed correctly.
@@ -575,12 +573,12 @@ follows:
 - Abridged proof:
   - If searching for the most recent version of a label, a full binary ladder is
     obtained only from the last (most recent) entry of the log. The prefix tree
-    entry for the most recent version of the label will directly commit to the
-    index in the log that contains the update, ending the search.
+    entry for the most recent version of the label will contain the commitment to the
+    update, ending the search.
   - If searching for a specific version, a (non-full) binary ladder for this
     version is obtained only from the last entry of the log. Similar to the
-    previous case, the prefix tree entry for the targeted version will directly
-    commit to the index in the log tree that contains the update.
+    previous case, the prefix tree entry for the targeted version will contain
+    the commitment to the update.
 
 
 # Monitoring the Tree
