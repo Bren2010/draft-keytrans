@@ -5,7 +5,7 @@
 KEYTRANS Working Group                                      B. McMillion
 Internet-Draft                                                          
 Intended status: Informational                                 F. Linker
-Expires: 17 April 2025                                   14 October 2024
+Expires: 3 May 2025                                      30 October 2024
 
 
                        Key Transparency Protocol
@@ -49,7 +49,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 17 April 2025.
+   This Internet-Draft will expire on 3 May 2025.
 
 Copyright Notice
 
@@ -155,25 +155,14 @@ Table of Contents
    Transparency Logs have an _epoch_ counter which is incremented every
    time a new set of label-version pairs are added.
 
-     Epoch   Update      Set of logged Label-Version Pairs
-   * n       X:0 -> k    { ..., X:0 }
-   * n+1     Y:3 -> l    { ..., X:0, Y:3 }
-   * n+2     Z:2 -> m    { ..., X:0, Y:3, Z:2 }
-   * n+3     X:1 -> n    { ..., X:0, Y:3, Z:2, X:1 }
-
-     Figure 1: An example log history.  At epoch n the user with label
-       X submits their first key k.  As it is their first key, it is
-       associated with version 0.  At epoch n+1, user Y updates their
-                                 key to l.
-
    KT uses a _prefix tree_ to commit to a mapping between each label-
    version pair and a commitment to the label's value at that version.
-   Every time the prefix tree changes, its new root hash is stored in a
-   _log tree_. The benefit of the prefix tree is that it is easily
-   searchable, and the benefit of the log tree is that it can easily be
-   verified to be append-only.  The data structure powering KT combines
-   a log tree and a prefix tree, and is called the _combined tree
-   structure_.
+   Every time the prefix tree changes, its new root hash and the current
+   timestamp are stored in a _log tree_. The benefit of the prefix tree
+   is that it is easily searchable, and the benefit of the log tree is
+   that it can easily be verified to be append-only.  The data
+   structure, which combines a log tree and a prefix tree, is called the
+   _combined tree_.
 
    This section describes the operation of both prefix and log trees at
    a high level and the way that they're combined.  More precise
@@ -231,7 +220,7 @@ Table of Contents
 
    Index:  0     1     2     3     4
 
-                Figure 2: A log tree containing five leaves.
+                Figure 1: A log tree containing five leaves.
 
    Log trees initially consist of a single leaf node.  New leaves are
    added to the right-most edge of the tree along with a single parent
@@ -252,7 +241,7 @@ Table of Contents
 
    Index:  0     1     2     3     4     5
 
-      Figure 3: Example of inserting a new leaf with index 5 into the
+      Figure 2: Example of inserting a new leaf with index 5 into the
      previously depicted log tree.  Observe that only the nodes on the
                path from the new root to the new leaf change.
 
@@ -289,7 +278,7 @@ Table of Contents
 
    Index:  0     1     2     3     4     5
 
-      Figure 4: Illustration of a proof of inclusion.  To verify that
+      Figure 3: Illustration of a proof of inclusion.  To verify that
        leaf 2 is included in the tree, the server provides the client
      with the hashes of the nodes on its copath, i.e., all hashes that
       are required for the client to compute the root hash itself.  In
@@ -310,7 +299,7 @@ Table of Contents
 
    Index:  0     1     2     3     4     5
 
-     Figure 5: Illustration of a consistency proof.  The server proves
+     Figure 4: Illustration of a consistency proof.  The server proves
        to the client that it correctly extended the tree by giving it
        the hashes of marked nodes ([X] / (X)).  The client can verify
       that it can construct the old root hash from the hashes of nodes
@@ -319,7 +308,7 @@ Table of Contents
 
 3.3.  Prefix Tree
 
-   Prefix trees are used for storing key-value pairs, in a way that
+   Prefix trees are used for storing key-value pairs in a way that
    provides the ability to efficiently prove that a search key's value
    was looked up correctly.
 
@@ -357,7 +346,7 @@ Table of Contents
    Key:   00010 00101 10001 10111 11011
    Value:     A     B     C     D     E
 
-              Figure 6: A prefix tree containing five entries.
+              Figure 5: A prefix tree containing five entries.
 
    New key-value pairs are added to the tree by searching it according
    to the same process.  If the search terminates at a parent without a
@@ -382,7 +371,7 @@ Table of Contents
    Index: 00010 00101 01101 10001 10111 11011
    Value:     A     B     F     C     D     E
 
-       Figure 7: The previous prefix tree after adding the key-value
+       Figure 6: The previous prefix tree after adding the key-value
                              pair: 01101 -> F.
 
    The value of a leaf node is the encoded key-value pair, while the
@@ -412,36 +401,34 @@ Table of Contents
    with only new values added.
 
    In the combined tree structure, which is based on [Merkle2], a prefix
-   tree contains a mapping where each label-version pair is a search
-   key, and its associated value is a cryptographic commitment to the
+   tree contains a mapping where each label-version pair has a search
+   key, and the search key's value is a cryptographic commitment to the
    label's new contents.  A log tree contains a record of each version
-   of the prefix tree that's created.  With some caveats, this combined
-   structure supports both efficient consistency proofs and can be
-   efficiently searched.
+   of the prefix tree that's created and the timestamp that it was
+   created.  With some caveats, this combined structure supports both
+   efficient consistency proofs and can be efficiently searched.
 
    Note that, although the Transparency Log maintains a single logical
    prefix tree, each modification of this tree results in a new root
-   hash, which is then stored in the log tree.  Therefore, when
+   hash which is then stored in the log tree.  And, as part of the
+   protocol, the Transparency Log is often required to perform lookups
+   in different versions of the prefix tree.  Therefore, when
    instructions refer to "looking up a label-version pair in the prefix
-   tree at a given log entry," this actually means searching in the
-   specific version of the prefix tree that corresponds to the root hash
-   stored at that log entry (where a "log entry" refers to a leaf of the
-   log tree).
+   tree at a given log entry," this means performing the search in the
+   specific version of the prefix tree whose root hash is stored at that
+   log entry (where a "log entry" refers to a leaf of the log tree).
 
-Epoch        n-1         n                       n+1
+Epoch:       n                                  n+1
+                                ==>
+Log tree:       o                                o
+           o----+----.                o----------+----------o
+          / \         \              / \            .-------+-----.
+         /   \         |            /   \          /               \
+        /_____\   [T_n; h(PT_n)]   /_____\   [T_n; h(PT_n)]   [T_n+1; h(PT_n+1)]
 
-Root hash     o -------- o ---------------------- o
-             / \         |                        |
-            /___\     .--+--.              .------+------.
-                     / \    |             / \            |
-                    /___\   |            /___\   .-------+-------.
-                            |                   /                 \
-                    [X:0->k; h(PT_n)]  [X:0->k; h(PT_n)]  [Y:3->l; h(PT_n+1)]
-
-    Figure 8: An example evolution of the combined tree structure,
-     following the example from the beginning of the section.  At
-     every epoch, a new leaf is added to a log tree, containing a
-     change to a label's value and the updated prefix tree (PT).
+    Figure 7: An example evolution of the combined tree structure.
+   At every epoch, a new leaf is added to a log tree containing the
+      timestamp (T_n) and the new prefix tree root hash (PT_n).
 
 4.  Searching the Tree
 
@@ -493,7 +480,7 @@ Root hash     o -------- o ---------------------- o
 
    Index:  0  1  2  3  4  5  6  7  8  9 10 11 12 13
 
-        Figure 9: A binary tree constructed from 14 entries in a log
+        Figure 8: A binary tree constructed from 14 entries in a log
 
    Following the structure of this binary tree when executing searches
    makes auditing the Transparency Log much more efficient because users
