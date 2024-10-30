@@ -122,28 +122,17 @@ identifiers, and a new version of a label is created each time the label's
 associated value changes. Transparency Logs have an *epoch* counter which is
 incremented every time a new set of label-version pairs are added.
 
-~~~
-  Epoch   Update      Set of logged Label-Version Pairs
-* n       X:0 -> k    { ..., X:0 }
-* n+1     Y:3 -> l    { ..., X:0, Y:3 }
-* n+2     Z:2 -> m    { ..., X:0, Y:3, Z:2 }
-* n+3     X:1 -> n    { ..., X:0, Y:3, Z:2, X:1 }
-~~~
-{: title="An example log history. At epoch n the user with label X submits their
-first key k. As it is their first key, it is associated with version 0. At epoch
-n+1, user Y updates their key to l."}
-
 KT uses a *prefix tree* to commit to a mapping between each label-version pair
 and a commitment to the label's value at that version. Every time the prefix
-tree changes, its new root hash is stored in a *log tree*. The benefit of the
-prefix tree is that it is easily searchable, and the benefit of the log tree is
-that it can easily be verified to be append-only. The data structure powering KT
-combines a log tree and a prefix tree, and is called the *combined tree
-structure*.
+tree changes, its new root hash and the current timestamp are stored in a *log
+tree*. The benefit of the prefix tree is that it is easily searchable, and the
+benefit of the log tree is that it can easily be verified to be append-only. The
+data structure, which combines a log tree and a prefix tree, is called the
+*combined tree*.
 
-This section describes the operation of
-both prefix and log trees at a high level and the way that they're combined. More precise algorithms
-for computing the intermediate and root values of the trees are given in
+This section describes the operation of both prefix and log trees at a high
+level and the way that they're combined. More precise algorithms for computing
+the intermediate and root values of the trees are given in
 {{cryptographic-computations}}.
 
 ## Terminology
@@ -282,7 +271,7 @@ hash when also considering the hash of the node [X]."}
 
 ## Prefix Tree
 
-Prefix trees are used for storing key-value pairs, in a way that provides the
+Prefix trees are used for storing key-value pairs in a way that provides the
 ability to efficiently prove that a search key's value was looked up correctly.
 
 Each leaf node in a prefix tree represents a specific key-value pair, while each parent
@@ -368,34 +357,33 @@ prefix tree contains the same data as a previous version with only new values
 added.
 
 In the combined tree structure, which is based on {{Merkle2}}, a prefix tree
-contains a mapping where each label-version pair is a search key, and its
-associated value is a cryptographic commitment to the label's new contents. A
-log tree contains a record of each version of the prefix tree that's created.
-With some caveats, this combined structure supports both efficient consistency
-proofs and can be efficiently searched.
+contains a mapping where each label-version pair has a search key, and the
+search key's value is a cryptographic commitment to the label's new contents. A
+log tree contains a record of each version of the prefix tree that's created and
+the timestamp that it was created. With some caveats, this combined structure
+supports both efficient consistency proofs and can be efficiently searched.
 
 Note that, although the Transparency Log maintains a single logical prefix tree,
-each modification of this tree results in a new root hash, which is then stored
-in the log tree. Therefore, when instructions refer to "looking up a label-version pair in the
-prefix tree at a given log entry," this actually means searching in the specific
-version of the prefix tree that corresponds to the root hash stored at that log
-entry (where a "log entry" refers to a leaf of the log tree).
+each modification of this tree results in a new root hash which is then stored
+in the log tree. And, as part of the protocol, the Transparency Log is often
+required to perform lookups in different versions of the prefix tree. Therefore,
+when instructions refer to "looking up a label-version pair in the prefix tree
+at a given log entry," this means performing the search in the specific version
+of the prefix tree whose root hash is stored at that log entry (where a "log
+entry" refers to a leaf of the log tree).
 
 ~~~ aasvg
-Epoch        n-1         n                       n+1
-
-Root hash     o -------- o ---------------------- o
-             / \         |                        |
-            /___\     .--+--.              .------+------.
-                     / \    |             / \            |
-                    /___\   |            /___\   .-------+-------.
-                            |                   /                 \
-                    [X:0->k; h(PT_n)]  [X:0->k; h(PT_n)]  [Y:3->l; h(PT_n+1)]
+Epoch:       n                                  n+1
+                                ==>
+Log tree:       o                                o
+           o----+----.                o----------+----------o
+          / \         \              / \            .-------+-----.
+         /   \         |            /   \          /               \
+        /_____\   [T_n; h(PT_n)]   /_____\   [T_n; h(PT_n)]   [T_n+1; h(PT_n+1)]
 ~~~
-{: title="An example evolution of the combined tree structure, following the
-example from the beginning of the section. At every epoch, a new leaf is added
-to a log tree, containing a change to a label's value and the updated
-prefix tree (PT)."}
+{: title="An example evolution of the combined tree structure. At every epoch, a
+new leaf is added to a log tree containing the timestamp (T_n) and the new
+prefix tree root hash (PT_n)."}
 
 # Searching the Tree
 
