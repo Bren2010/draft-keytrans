@@ -373,7 +373,7 @@ of the prefix tree whose root hash is stored at that log entry (where a "log
 entry" refers to a leaf of the log tree).
 
 ~~~ aasvg
-Epoch:       n                                  n+1
+Epoch:          n                               n+1
                                 ==>
 Log tree:       o                                o
            o----+----.                o----------+----------o
@@ -382,32 +382,21 @@ Log tree:       o                                o
         /_____\   [T_n; h(PT_n)]   /_____\   [T_n; h(PT_n)]   [T_n+1; h(PT_n+1)]
 ~~~
 {: title="An example evolution of the combined tree structure. At every epoch, a
-new leaf is added to a log tree containing the timestamp (T_n) and the new
-prefix tree root hash (PT_n)."}
+new leaf is added to a log tree containing the timestamp T_n, and the new
+prefix tree root hash PT_n."}
 
 # Searching the Tree
 
-When searching the combined tree structure described in {{combined-tree}}, the
-proof provided by the Transparency Log may either be **full** or **abridged**. A
-full proof must be provided if the deployment mode of the Transparency Log is
-Contact Monitoring, or if the user has specifically requested it. Otherwise,
-proofs are provided abridged.
-
-A full proof follows the path of a binary search for the first log entry where
-the prefix tree contains the desired label-version pair.
-This ensures that all users will check the same or
-similar entries when searching for the same label, allowing for
+When searching the combined tree structure described in {{combined-tree}}, users
+do a binary search for the first log entry where the prefix tree at that entry
+contains the desired label-version pair. This ensures that all users will check
+the same or similar entries when searching for the same label, allowing for
 efficient client-side auditing of the Transparency Log. The binary search uses
 an *implicit binary search tree* constructed over the leaves of the log tree
 (distinct from the structure of the log tree itself), which allows the search to
 have a complexity logarithmic in the number of the log's leaves.
 
-An abridged proof skips this binary search, and simply looks at the most recent
-version of the prefix tree to determine the commitment to
-the update that the user is looking for. Abridged proofs rely on a third-party
-auditor or manager that can be trusted not to collude with the Transparency Log,
-and who checks that every version of the prefix tree is constructed correctly.
-This is described in more detail in {{putting-it-together}}.
+An abridged process for searching the tree is described in TODO.
 
 ## Implicit Binary Search Tree
 
@@ -528,14 +517,14 @@ proof of non-inclusion was produced, this indicates that the target version of
 the label did not exist, as of the given log entry.
 
 When executing a search in a Transparency Log for a specific version of a label, a
-binary ladder is provided for each node on the search path, verifiably guiding
+binary ladder is provided for each log entry on the search path, verifiably guiding
 the search toward the log entry where the desired label-version pair was first
-inserted (and therefore, the log entry with the desired update).
+inserted.
 
 Requiring proof that this series of versions are present in the prefix tree,
 instead of requesting proof of just version 20, ensures that all users are able
 to agree on which version of the label is *most recent*, which is discussed
-further in the next section.
+further in the next subsection.
 
 ## Most Recent Version
 
@@ -573,35 +562,79 @@ Once the user has verified that the frontier lookups are monotonic and
 determined the highest version, the user then continues a binary search for this
 specific version.
 
-## Putting it Together
+## Maximum Lifetime
 
-As noted at the beginning of the section, a search in the tree will either
-require producing a full proof, or an abridged proof may be accepted if the user
-can trust a third-party to audit and not collude with the Transparency Log.
+A Transparency Log operator MAY define a maximum lifetime for log entries. This
+maximum lifetime MUST be greater than zero. Log entries which have exceeded
+their maximum lifetime will simply be skipped in searches, instead of needing to
+produce a binary ladder. This allows the Transparency Log to prune data which is
+sufficiently old, and is explained in more detail in TODO.
 
-The steps for producing a full or abridged search proof are summarized as
-follows:
+Whether a log entry has surpassed its maximum lifetime is determined by
+subtracting the timestamp of the most recent log entry from the timestamp of the
+log entry in question. If this is the case, the binary search immediately
+proceeds to the log entry's right child in the implicit binary search tree.
 
-- Full proof:
-  - If searching for the most recent version of a label, a full binary ladder
-    is obtained for each node on the frontier of the log. This determines the
-    highest version of the label available, which allows the search to proceed
-    for this specific version.
-  - If searching for a specific version, the proof follows a binary search for
-    the first entry in the log where this version of the label exists. For
-    each step in the binary search, the proof contains a (non-full) binary
-    ladder for the targeted version, which proves whether the targeted version
-    of the label existed yet or not by this point in the log. This indicates
-    whether the binary search should move forwards or backwards in the log.
-- Abridged proof:
-  - If searching for the most recent version of a label, a full binary ladder is
-    obtained only from the last (most recent) entry of the log. The prefix tree
-    entry for the most recent version of the label will contain the commitment to the
-    update, ending the search.
-  - If searching for a specific version, a (non-full) binary ladder for this
-    version is obtained only from the last entry of the log. Similar to the
-    previous case, the prefix tree entry for the targeted version will contain
-    the commitment to the update.
+## Full Algorithm
+
+The full process for performing a search is described below as a recursive
+algorithm. It starts with the root log entry, as defined by the implicit binary
+search tree, and then recurses to left or right children, each time starting
+back at step 1.
+
+1. If the log entry has a parent, verify that the log entry's timestamp is
+   greater than that of its parent if it is the right child, or less than that
+   of its parent if it is the left child.
+2. If the log entry has surpassed its maximum lifetime, recurse to its right
+   child in the implicit binary search tree. Note that a right child always
+   exists, as the rightmost log entry cannot exceed its maximum lifetime by
+   definition.
+3. If searching for the most recent version of a label, obtain a full binary
+   ladder from the current log entry. Verify that the full binary ladder proves
+   that the greatest version of the label at this log entry is greater than or
+   equal to that of its parent. If this check is successful, recurse to the log
+   entry's right child. If there is no right child, then restart the search
+   algorithm from the root log entry, searching for the specific version of the
+   label that was identified as most recent.
+4. If searching for a specific version of a label, obtain a binary ladder from
+   the current log entry for the target version. (It's assumed that a non-full
+   binary ladder is provided. However, if this is a continuation of a
+   most-recent-version search, the full binary ladders provided along the
+   frontier are re-used for this step.) If the binary ladder stops short of
+   proving the target version is present, recurse to the log entry's right
+   child; else, recurse to its left child. If the child doesn't exist, terminate
+   the search successfully.
+
+To allow users to execute this algorithm, the concrete data provided by the
+Transparency Log consists of:
+
+- For each version of the label looked up in a binary ladder: the commitment
+  corresponding to the label's value at that version.
+- For each log entry inspected:
+  - The log entry's timestamp
+  - If a binary ladder is required: a batch search proof in the log entry's
+    prefix tree, for all of the different label-version pairs that constitute
+    the binary ladder.
+  - If a binary ladder is not required: the log entry's prefix tree root hash.
+- A batch inclusion proof for all inspected log entries.
+
+In addition to the verification steps described in the algorithm above, the user
+verifies the data provided by the Transparency Log by following these steps:
+
+1. Compute the prefix tree root hash of each log entry (when it is not provided
+   explicitly) by hashing together the binary ladder with the provided
+   commitments.
+2. Compute the set of log tree leaf hashes by hashing together each log
+   entry's timestamp and prefix tree root hash.
+3. Compute the log tree root hash by hashing together the leaf hashes with the
+   provided batch inclusion proof.
+4. Verify the Transparency Log's signature over the computed log tree root hash.
+
+While the same label-version pair may be looked up in several different versions
+of the prefix tree, note that the corresponding commitment is only provided
+once. This ensures that the commitments are the same in each version of the
+prefix tree; if they weren't, the proof will fail to reconstruct the correct log
+tree root.
 
 
 # Monitoring the Tree
