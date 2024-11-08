@@ -224,6 +224,7 @@ more general version of the same idea. With a consistency proof, the prover
 provides the minimum set of intermediate node values from the current tree that
 allows the verifier to compute both the old root value and the current root
 value. An algorithm for this is given in section 2.1.2 of {{!RFC6962}}.
+<!-- TODO: Rework this section to reflect more flexible proofs that are actually used -->
 
 ~~~ aasvg
                              X
@@ -664,11 +665,21 @@ functionally a fork, and it introduces the same security issues. This is because
 users rely on such timing information to decide how long to monitor certain
 labels, or which portions of the tree to skip when searching.
 
-To address this, when users make queries to the Transparency Log they advertise
-the "size" (the total number of log entries) of the last tree head they
-observed. If the Transparency Log responds with an updated tree head, it
-provides additional information in its query response to prove that the
-advertised tree head and the more recent one are consistent.
+To address this, users retain select information about the last tree head they
+have observed:
+
+1. The "size" of the log tree (the number of log entries it contains).
+2. The root hashes of the "full subtrees" of the log tree (those that are the
+   largest powers of two possible). This allows the Transparency Log to provide
+   more space-efficient consistency and inclusion proofs than if just the root
+   hash was retained.
+3. The timestamp of the rightmost log entry. As will be described below, this
+   will be used to ensure that subsequent log entry timestamps are correct.
+
+When users make queries to the Transparency Log, they advertise the size of the
+last tree head they observed. If the Transparency Log responds with an updated
+tree head, it provides additional information in its query response to prove
+that the advertised tree head and the more recent one are consistent.
 
 Proving the latter two properties, that newly added log entries have
 monotonically increasing timestamps, is done as follows:
@@ -691,15 +702,13 @@ Proving the first property, that the tree is append-only, is done by providing a
 consistency proof combined with an inclusion proof for the log entries that were
 provided to prove the latter two properties. That is, the minimum set of
 intermediate hashes from the log tree are provided that are necessary to compute
-both the old root hash (when the log entry that was advertised by the user was
-the rightmost one), and the new root hash of the tree.
+the new root hash from the given log entries and the full subtrees retained by
+the user.
 
-Users that have never interacted with the Transparency Log before will not be
-able to advertise a tree head they've previously observed. For these users, the
-Transparency Log simply provides the timestamps and prefix tree root hashes of
-the log entries on the frontier, along with an inclusion proof. The user
-verifies that the timestamps are monotonic and retains the rightmost timestamp
-and root hash for future queries.
+For users which have never interacted with the Transparency Log before and don't
+have a previous tree head to advertise, the Transparency Log simply provides the
+log tree's full subtree hashes and the rightmost log entry's timestamp directly.
+These are then retained for later queries.
 
 
 # Monitoring the Tree
