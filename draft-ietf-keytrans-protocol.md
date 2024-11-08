@@ -565,10 +565,10 @@ specific version.
 ## Maximum Lifetime
 
 A Transparency Log operator MAY define a maximum lifetime for log entries. This
-maximum lifetime MUST be greater than zero. Log entries which have exceeded
-their maximum lifetime will simply be skipped in searches, instead of needing to
-produce a binary ladder. This allows the Transparency Log to prune data which is
-sufficiently old, and is explained in more detail in TODO.
+maximum lifetime MUST be greater than zero seconds. Log entries which have
+exceeded their maximum lifetime will simply be skipped in searches, instead of
+needing to produce a binary ladder. This allows the Transparency Log to prune
+data which is sufficiently old, and is explained in more detail in TODO.
 
 Whether a log entry has surpassed its maximum lifetime is determined by
 subtracting the timestamp of the most recent log entry from the timestamp of the
@@ -582,9 +582,11 @@ algorithm. It starts with the root log entry, as defined by the implicit binary
 search tree, and then recurses to left or right children, each time starting
 back at step 1.
 
-1. If the log entry has a parent, verify that the log entry's timestamp is
-   greater than that of its parent if it is the right child, or less than that
-   of its parent if it is the left child.
+1. Verify that the log entry's timestamp is consistent with the timestamps of
+   all ancestor log entries. That is, if the log entry is in the ancestor's left
+   subtree, then its timestamp is less than the ancestor's. If the log entry is
+   in the ancestor's right subtree, then its timestamp is greater than the
+   ancestor's.
 2. If the log entry has surpassed its maximum lifetime, recurse to its right
    child in the implicit binary search tree. Note that a right child always
    exists, as the rightmost log entry cannot exceed its maximum lifetime by
@@ -635,6 +637,69 @@ of the prefix tree, note that the corresponding commitment is only provided
 once. This ensures that the commitments are the same in each version of the
 prefix tree; if they weren't, the proof will fail to reconstruct the correct log
 tree root.
+
+
+# Updating Views of the Tree
+
+The previous section on performing searches in the combined tree assumes that we
+have a fixed root hash. However, as users interact with the tree over time, they
+will see many different root hashes as the contents of the tree changes. It is
+necessary for users to guarantee that the root hashes they observe are
+consistent with respect to a few important properties:
+
+- If root hash A is shown after root hash B, then root hash A contains all the
+  same log entries as B (with some new ones potentially added).
+- If the rightmost log entry of the tree with root hash A has timestamp
+  T_a, and the rightmost log entry of the tree with root hash B has timestamp
+  T_b, then T_a is greater than T_b.
+  - Furthermore, all log entries between the rightmost log entry of A and the
+    rightmost log entry of B have monotonically increasing timestamps.
+
+The first property is necessary to ensure that the Transparency Log never
+removes a log entry after showing it to a user, as this would allow the
+Transparency Log to remove evidence of its own misbehavior. The second two
+properties ensure that all users have a consistent view of when each portion of
+the tree was created. Disagreement of when portions of the tree were created is
+functionally a fork, and it introduces the same security issues. This is because
+users rely on such timing information to decide how long to monitor certain
+labels, or which portions of the tree to skip when searching.
+
+To address this, when users make queries to the Transparency Log they advertise
+the "size" (the total number of log entries) of the last tree head they
+observed. If the Transparency Log responds with an updated tree head, it
+provides additional information in its query response to prove that the
+advertised tree head and the more recent one are consistent.
+
+Proving the latter two properties, that newly added log entries have
+monotonically increasing timestamps, is done as follows:
+
+- Starting with the log entry that was advertised by the user, compute its
+  direct path (in terms of the implicit binary search tree) in the new tree.
+  Provide the log entry timestamp and prefix tree root hash for each element
+  of the direct path that's to the right of the advertised log entry.
+- Exactly one of these log entries will lie on the new tree's frontier. From
+  this log entry, compute the remainder of the frontier. That is, compute the
+  log entry's right child, and the right child's right child, and so on. Provide
+  the timestamps and prefix tree root hashes for these log entries as well.
+
+Users verify that the presented timestamps represent a monotonic series. While
+this only requires users to verify a logarithmic number of the newly added log
+entries' timestamps, it guarantees that two users with overlapping views of
+the tree will detect any violations.
+
+Proving the first property, that the tree is append-only, is done by providing a
+consistency proof combined with an inclusion proof for the log entries that were
+provided to prove the latter two properties. That is, the minimum set of
+intermediate hashes from the log tree are provided that are necessary to compute
+both the old root hash (when the log entry that was advertised by the user was
+the rightmost one), and the new root hash of the tree.
+
+Users that have never interacted with the Transparency Log before will not be
+able to advertise a tree head they've previously observed. For these users, the
+Transparency Log simply provides the timestamps and prefix tree root hashes of
+the log entries on the frontier, along with an inclusion proof. The user
+verifies that the timestamps are monotonic and retains the rightmost timestamp
+and root hash for future queries.
 
 
 # Monitoring the Tree
