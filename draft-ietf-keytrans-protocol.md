@@ -653,26 +653,26 @@ The first property is necessary to ensure that the Transparency Log never
 removes a log entry after showing it to a user, as this would allow the
 Transparency Log to remove evidence of its own misbehavior. The second two
 properties ensure that all users have a consistent view of when each portion of
-the tree was created. Disagreement of when portions of the tree were created is
+the tree was created. Disagreement on when portions of the tree were created is
 functionally a fork, and it introduces the same security issues. This is because
-users rely on such timing information to decide how long to monitor certain
-labels, or which portions of the tree to skip when searching.
+users rely on log entry timestamps to decide whether to continue monitoring
+certain labels, or which portions of the tree to skip when searching.
 
-To address this, users retain select information about the last tree head they
-have observed:
+To address this, users retain select information about the last tree head
+they've observed:
 
 1. The "size" of the log tree (the number of log entries it contains).
-2. The root hashes of the "full subtrees" of the log tree (those that are the
-   largest powers of two possible). This allows the Transparency Log to provide
-   more space-efficient consistency and inclusion proofs than if just the root
-   hash was retained.
+2. The root hashes of the "full subtrees" of the log tree (those subtrees which
+   are the largest powers of two possible). This allows the Transparency Log to
+   provide more space-efficient consistency and inclusion proofs than if just
+   the root hash was retained.
 3. The timestamp of the rightmost log entry. As will be described below, this
    will be used to ensure that subsequent log entry timestamps are correct.
 
 When users make queries to the Transparency Log, they advertise the size of the
-last tree head they observed. If the Transparency Log responds with an updated
-tree head, it provides additional information in its query response to prove
-that the advertised tree head and the more recent one are consistent.
+last tree head observed. If the Transparency Log responds with an updated tree
+head, it provides additional information in its query response to prove that the
+advertised tree head and the more recent one are consistent.
 
 Proving the latter two properties, that newly added log entries have
 monotonically increasing timestamps, is done as follows:
@@ -697,6 +697,10 @@ provided to prove the latter two properties. That is, the minimum set of
 intermediate hashes from the log tree are provided that are necessary to compute
 the new root hash from the given log entries and the full subtrees retained by
 the user.
+
+Only once the user successfully verifies that the log entries' timestamps are
+monotonic and that it correctly computed the new root hash, can they update
+their stored state to replace the previous tree head with the new one.
 
 For users which have never interacted with the Transparency Log before and don't
 have a previous tree head to advertise, the Transparency Log simply provides the
