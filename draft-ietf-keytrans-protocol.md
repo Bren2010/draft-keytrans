@@ -223,8 +223,17 @@ that the result equals the root hash value of the log. Consistency proofs are a
 more general version of the same idea. With a consistency proof, the prover
 provides the minimum set of intermediate node values from the current tree that
 allows the verifier to compute both the old root value and the current root
-value. An algorithm for this is given in section 2.1.2 of {{!RFC6962}}.
-<!-- TODO: Rework this section to reflect more flexible proofs that are actually used -->
+value.
+
+However, the protocol described in this document generally doesn't provide pure
+inclusion or consistency proofs to verifiers. Instead, it relies on the more
+general idea of providing the minimum set of intermediate node values that are
+necessary to allow a verifier to compute one or more root values from
+intermediate/leaf values that they already have. The verifier may already have
+intermediate/leaf values because they were provided by the Transparency Log as
+part of its response to the current query, or because they were retained from
+responses to previous queries. This pattern of providing proofs ensures that
+there is minimal on-the-wire redundancy.
 
 ~~~ aasvg
                              X
@@ -517,14 +526,14 @@ by a proof of non-inclusion for version 7. Then, proofs of inclusion for
 versions 5 and 6 would conclude the proof that 6 is the highest version
 available.
 
-However, while being able to determine the exact highest version of a label is
-sometimes useful (as the next section discusses), this is not always the case.
-If a user is searching for a specific version of a label, they only need to know
-whether the highest version at a given log entry is greater than or less than
-their target version, not its exact value. A **truncated binary ladder** is one
-which stops after the first proof of inclusion for a version greater than or
-equal to the target version or the first proof of non-inclusion for a version
-less than the target version.
+While being able to determine the exact highest version of a label is sometimes
+useful (as the next section discusses), this is not always the case. If a user
+is searching for a specific version of a label, they only need to know whether
+the highest version at a given log entry is greater than or less than their
+target version, not its exact value. A **truncated binary ladder** is one which
+stops after the first proof of inclusion for a version greater than or equal to
+the target version, or the first proof of non-inclusion for a version less than
+the target version.
 
 ## Most Recent Version
 
@@ -585,7 +594,7 @@ back at step 1.
    was identified as most recent.
 4. If searching for a specific version of a label, obtain a truncated binary
    ladder from the current log entry for the target version. (If this is a
-   continuation of a most-recent-version search, the non-truncated binary
+   continuation of a "most recent version" search, the non-truncated binary
    ladders provided along the frontier are re-used for this step.) If the binary
    ladder stops short of proving the target version is present, recurse to the
    log entry's right child; else, recurse to its left child. If the child
@@ -599,10 +608,18 @@ Transparency Log consists of:
 - For each log entry inspected:
   - The log entry's timestamp
   - If a binary ladder is required: a batch search proof in the log entry's
-    prefix tree, for all of the different label-version pairs that constitute
+    prefix tree for all of the different label-version pairs that constitute
     the binary ladder.
   - If a binary ladder is not required: the log entry's prefix tree root hash.
 - A batch inclusion proof for all inspected log entries.
+
+While the same label-version pair may be looked up in several different versions
+of the prefix tree, note that the corresponding commitment is only provided
+once. This ensures that the commitments are the same in each version of the
+prefix tree; if they weren't, verification of the proof would fail.
+
+<!--
+TODO: Move to protocol section
 
 In addition to the verification steps described in the algorithm above, the user
 verifies the data provided by the Transparency Log by following these steps:
@@ -614,14 +631,7 @@ verifies the data provided by the Transparency Log by following these steps:
    entry's timestamp and prefix tree root hash.
 3. Compute the log tree root hash by hashing together the leaf hashes with the
    provided batch inclusion proof.
-4. Verify the Transparency Log's signature over the computed log tree root hash.
-
-While the same label-version pair may be looked up in several different versions
-of the prefix tree, note that the corresponding commitment is only provided
-once. This ensures that the commitments are the same in each version of the
-prefix tree; if they weren't, the proof will fail to reconstruct the correct log
-tree root.
-
+4. Verify the Transparency Log's signature over the computed log tree root hash. -->
 
 # Updating Views of the Tree
 
@@ -1051,7 +1061,7 @@ struct {
 
 Again, each `NodeValue` is computed by passing the relevant `LogLeaf` or
 `LogParent` structure through the `nodeValue` function. The nodes chosen
-correspond to those output by the algorithm in Section 2.1.2 of {{RFC6962}}.
+correspond to those output by the algorithm in Section 2.1.2 of {{!RFC6962}}.
 
 ## Prefix Tree
 
