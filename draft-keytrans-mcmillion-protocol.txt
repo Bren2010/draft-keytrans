@@ -5,7 +5,7 @@
 KEYTRANS Working Group                                      B. McMillion
 Internet-Draft                                                          
 Intended status: Informational                                 F. Linker
-Expires: 12 May 2025                                     8 November 2024
+Expires: 13 May 2025                                     9 November 2024
 
 
                        Key Transparency Protocol
@@ -49,7 +49,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 12 May 2025.
+   This Internet-Draft will expire on 13 May 2025.
 
 Copyright Notice
 
@@ -82,6 +82,8 @@ Table of Contents
      4.5.  Full Algorithm
    5.  Updating Views of the Tree
    6.  Monitoring the Tree
+     6.1.  Binary Ladder
+     6.2.  Reasonable Monitoring Window
    7.  Ciphersuites
    8.  Cryptographic Computations
      8.1.  Verifiable Random Function
@@ -549,55 +551,8 @@ Log tree:       o                                o
    version.
 
    A *binary ladder* is a series of lookups in a single log entry's
-   prefix tree, which is used to establish whether the target version of
-   a label is present or not.  It consists of the following lookups,
-   stopping after the first lookup that produces a proof of non-
-   inclusion:
-
-   1.  First, version x of the label is looked up, where x is
-       consecutively higher powers of two minus one (0, 1, 3, 7, ...).
-       This is repeated until x is the largest such value less than or
-       equal to the target version.
-
-   2.  Second, the largest x that was looked up is retained, and
-       consecutively smaller powers of two are added to it until it
-       equals the target version.  Each time a power of two is added,
-       this version of the label is looked up.
-
-   As an example, if the target version of a label to lookup is 20, a
-   binary ladder would consist of the following versions: 0, 1, 3, 7,
-   15, 19, 20.  If all of the lookups succeed (i.e., result in proofs of
-   inclusion), this indicates that the target version of the label
-   exists in the log.  If the ladder stops early because a proof of non-
-   inclusion was produced, this indicates that the target version of the
-   label did not exist, as of the given log entry.
-
-   When executing a search in a Transparency Log for a specific version
-   of a label, a binary ladder is provided for each log entry on the
-   search path, verifiably guiding the search toward the log entry where
-   the desired label-version pair was first inserted.
-
-   Requiring proof that this series of versions are present in the
-   prefix tree, instead of requesting proof of just version 20, ensures
-   that all users are able to agree on which version of the label is
-   _most recent_, which is discussed further in the next subsection.
-
-4.3.  Most Recent Version
-
-   Often, users wish to search for the "most recent" version of a label.
-   That is, the label with the highest version possible.
-
-   To determine this, users request a *full binary ladder* for each node
-   on the *frontier* of the log.  The frontier consists of the root node
-   of a search, followed by the entries produced by repeatedly calling
-   right until reaching the last entry of the log.  Using the same
-   example of a search where the log has 50 entries, the frontier would
-   be entries: 31, 47, 49.
-
-   A full binary ladder is similar to the binary ladder discussed in the
-   previous section, except that it identifies the exact highest version
-   of a label that exists, as of a particular log entry, rather than
-   stopping at a target version.  It consists of the following lookups:
+   prefix tree that determines the highest version of a label that
+   exists, and proceeds as follows:
 
    1.  First, version x of the label is looked up, where x is a
        consecutively higher power of two minus one (0, 1, 3, 7, ...).
@@ -611,9 +566,36 @@ Log tree:       o                                o
        of inclusion or non-inclusion, which guides the search left or
        right, until it terminates.
 
+   As an example, if the highest version of a label is 6, a binary
+   ladder would consist of the following: proofs of inclusion for
+   versions 0, 1, 3, terminated by a proof of non-inclusion for version
+   7.  Then, proofs of inclusion for versions 5 and 6 would conclude the
+   proof that 6 is the highest version available.
+
+   However, while being able to determine the exact highest version of a
+   label is sometimes useful (as the next section discusses), this is
+   not always the case.  If a user is searching for a specific version
+   of a label, they only need to know whether the highest version at a
+   given log entry is greater than or less than their target version,
+   not its exact value.  A *truncated binary ladder* is one which stops
+   after the first proof of inclusion for a version greater than or
+   equal to the target version or the first proof of non-inclusion for a
+   version less than the target version.
+
+4.3.  Most Recent Version
+
+   When users wish to search for the "most recent" version of a label,
+   they must determine the highest version of the label that exists in
+   the log overall -- not just a single log entry.  To do this, users
+   request a binary ladder for each node on the *frontier* of the log.
+   The frontier consists of the root node of a search, followed by the
+   entries produced by repeatedly calling right until reaching the last
+   entry of the log.  Using the same example of a search where the log
+   has 50 entries, the frontier would be entries: 31, 47, 49.
+
    For the purpose of finding the highest version possible, requesting a
-   full binary ladder for each entry along the frontier is functionally
-   the same as doing so for only the last log entry.  However,
+   binary ladder for each entry along the frontier is functionally the
+   same as doing so for only the rightmost log entry.  However,
    inspecting the entire frontier allows the user to verify that the
    search path leading to the last log entry represents a monotonic
    series of version increases, which minimizes opportunities for log
@@ -657,23 +639,22 @@ Log tree:       o                                o
        exceed its maximum lifetime by definition.
 
    3.  If searching for the most recent version of a label, obtain a
-       full binary ladder from the current log entry.  Verify that the
-       full binary ladder proves that the greatest version of the label
-       at this log entry is greater than or equal to that of its parent.
-       If this check is successful, recurse to the log entry's right
-       child.  If there is no right child, then restart the search
-       algorithm from the root log entry, searching for the specific
-       version of the label that was identified as most recent.
+       binary ladder from the current log entry.  Verify that the binary
+       ladder proves that the greatest version of the label at this log
+       entry is greater than or equal to that of its parent.  If this
+       check is successful, recurse to the log entry's right child.  If
+       there is no right child, then restart the search algorithm from
+       the root log entry, searching for the specific version of the
+       label that was identified as most recent.
 
-   4.  If searching for a specific version of a label, obtain a binary
-       ladder from the current log entry for the target version.  (It's
-       assumed that a non-full binary ladder is provided.  However, if
-       this is a continuation of a most-recent-version search, the full
-       binary ladders provided along the frontier are re-used for this
-       step.)  If the binary ladder stops short of proving the target
-       version is present, recurse to the log entry's right child; else,
-       recurse to its left child.  If the child doesn't exist, terminate
-       the search successfully.
+   4.  If searching for a specific version of a label, obtain a
+       truncated binary ladder from the current log entry for the target
+       version.  (If this is a continuation of a most-recent-version
+       search, the non-truncated binary ladders provided along the
+       frontier are re-used for this step.)  If the binary ladder stops
+       short of proving the target version is present, recurse to the
+       log entry's right child; else, recurse to its left child.  If the
+       child doesn't exist, terminate the search successfully.
 
    To allow users to execute this algorithm, the concrete data provided
    by the Transparency Log consists of:
@@ -800,9 +781,11 @@ Log tree:       o                                o
 
    For users which have never interacted with the Transparency Log
    before and don't have a previous tree head to advertise, the
-   Transparency Log simply provides the log tree's full subtree hashes
-   and the rightmost log entry's timestamp directly.  These are then
-   retained for later queries.
+   Transparency Log simply provides the timestamps and prefix tree root
+   hashes of the log entries on the frontier, along with an inclusion
+   proof.  The user verifies that the timestamps are monotonic.  If this
+   is successful, the user retains the log tree's full subtrees and the
+   rightmost log entry's timestamp for future queries.
 
 6.  Monitoring the Tree
 
@@ -811,15 +794,23 @@ Log tree:       o                                o
    intermediate nodes may become established in between the search root
    and the leaf, or a new search root may be created.  The goal of
    monitoring a label is to efficiently ensure that, when these new
-   parent nodes are created, they're created correctly so that searches
-   for the same versions continue converging to the same entries in the
-   log.
+   parent nodes are created, they're created correctly such that
+   searches for the same versions continue converging to the same
+   entries in the log.
+
+   Monitoring is performed both by the users that own a label and the
+   users that lookup a label.  Owners monitor their labels to ensure
+   that past (expected) versions of a label are still correctly stored
+   in the log, and that no new (unexpected) versions have been added.
+   Users that looked up a label may need to monitor those labels
+   afterwards to ensure that the version of the label they observed was
+   not later concealed by the Transparency Log.
 
    To monitor a given label, users maintain a small amount of state: a
    map from a position in the log to a version counter.  The version
    counter is the highest version of the label that's been proven to
    exist at that log position.  Users initially populate this map by
-   setting the position of an entry they've looked up, to map to the
+   setting the position of an entry they've looked up to map to the
    version of the label stored in that entry.  A map may track several
    different versions of a label simultaneously, if a user has been
    shown different versions of the same label.
@@ -860,8 +851,67 @@ Log tree:       o                                o
    therefore the amount of work that will be needed to monitor the label
    from then on.
 
-   Finally, unlike searching, there is no abridged version of
-   monitoring.
+6.1.  Binary Ladder
+
+   1.  First, version x of the label is looked up, where x is
+       consecutively higher powers of two minus one (0, 1, 3, 7, ...).
+       This is repeated until x is the largest such value less than or
+       equal to the target version.
+
+   2.  Second, the largest x that was looked up is retained, and
+       consecutively smaller powers of two are added to it until it
+       equals the target version.  Each time a power of two is added,
+       this version of the label is looked up.
+
+   As an example, if the target version of a label to lookup is 20, a
+   binary ladder would consist of the following versions: 0, 1, 3, 7,
+   15, 19, 20.  If all of the lookups succeed (i.e., result in proofs of
+   inclusion), this indicates that the target version of the label
+   exists in the log.  If the ladder stops early because a proof of non-
+   inclusion was produced, this indicates that the target version of the
+   label did not exist, as of the given log entry.
+
+   When executing a search in a Transparency Log for a specific version
+   of a label, a binary ladder is provided for each log entry on the
+   search path, verifiably guiding the search toward the log entry where
+   the desired label-version pair was first inserted.
+
+   Requiring proof that this series of versions are present in the
+   prefix tree, instead of requesting proof of just version 20, ensures
+   that all users are able to agree on which version of the label is
+   _most recent_, which is discussed further in the next subsection.
+
+6.2.  Reasonable Monitoring Window
+
+   Users that own a label, meaning that they are the authoritative
+   source for the label's value, MUST regularly monitor the label for
+   the entirety of the time that they own it.  This includes both
+   ensuring that past versions of the label are still correctly
+   represented in the log and verifying that new versions of the label
+   are permissible (alerting the user if not).
+
+   Service Providers define a duration in seconds, referred to as the
+   *Reasonable Monitoring Window*, which is the frequency with which the
+   Transparency Log generally expects label owners to perform
+   monitoring.  The maximum log entry lifetime MUST be substantially
+   greater than the Reasonable Monitoring Window.
+
+   Users that lookup a label, and find that the first log entry
+   containing the version of the label they're interested in has a
+   timestamp outside of the Reasonable Monitoring Window, are not
+   required to monitor the label afterwards.  Specifically, the
+   timestamp of the rightmost log entry in the tree, minus the timestamp
+   of the first log entry to contain the label-version pair, must be
+   greater than the Reasonable Monitoring Window.  This is because the
+   label is assumed to have been in the tree long enough for the label
+   owner to verify its correctness.  When this is not the case, the user
+   that looked up the label MUST regularly monitor it until the
+   rightmost log entry's timestamp is great enough to satisfy this
+   condition.
+
+   Users that do not monitor labels they own within this amount of time
+   will be required to do multiple monitoring passes: one pass for each
+   interval of the duration that was missed.
 
 7.  Ciphersuites
 
