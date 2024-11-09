@@ -2184,21 +2184,21 @@ rightmost log entry of B have monotonically increasing timestamps.<a href="#sect
 removes a log entry after showing it to a user, as this would allow the
 Transparency Log to remove evidence of its own misbehavior. The second two
 properties ensure that all users have a consistent view of when each portion of
-the tree was created. Disagreement of when portions of the tree were created is
+the tree was created. Disagreement on when portions of the tree were created is
 functionally a fork, and it introduces the same security issues. This is because
-users rely on such timing information to decide how long to monitor certain
-labels, or which portions of the tree to skip when searching.<a href="#section-5-3" class="pilcrow">¶</a></p>
-<p id="section-5-4">To address this, users retain select information about the last tree head they
-have observed:<a href="#section-5-4" class="pilcrow">¶</a></p>
+users rely on log entry timestamps to decide whether to continue monitoring
+certain labels, or which portions of the tree to skip when searching.<a href="#section-5-3" class="pilcrow">¶</a></p>
+<p id="section-5-4">To address this, users retain select information about the last tree head
+they've observed:<a href="#section-5-4" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-5-5">
 <li id="section-5-5.1">
           <p id="section-5-5.1.1">The "size" of the log tree (the number of log entries it contains).<a href="#section-5-5.1.1" class="pilcrow">¶</a></p>
 </li>
         <li id="section-5-5.2">
-          <p id="section-5-5.2.1">The root hashes of the "full subtrees" of the log tree (those that are the
-largest powers of two possible). This allows the Transparency Log to provide
-more space-efficient consistency and inclusion proofs than if just the root
-hash was retained.<a href="#section-5-5.2.1" class="pilcrow">¶</a></p>
+          <p id="section-5-5.2.1">The root hashes of the "full subtrees" of the log tree (those subtrees which
+are the largest powers of two possible). This allows the Transparency Log to
+provide more space-efficient consistency and inclusion proofs than if just
+the root hash was retained.<a href="#section-5-5.2.1" class="pilcrow">¶</a></p>
 </li>
         <li id="section-5-5.3">
           <p id="section-5-5.3.1">The timestamp of the rightmost log entry. As will be described below, this
@@ -2206,9 +2206,9 @@ will be used to ensure that subsequent log entry timestamps are correct.<a href=
 </li>
       </ol>
 <p id="section-5-6">When users make queries to the Transparency Log, they advertise the size of the
-last tree head they observed. If the Transparency Log responds with an updated
-tree head, it provides additional information in its query response to prove
-that the advertised tree head and the more recent one are consistent.<a href="#section-5-6" class="pilcrow">¶</a></p>
+last tree head observed. If the Transparency Log responds with an updated tree
+head, it provides additional information in its query response to prove that the
+advertised tree head and the more recent one are consistent.<a href="#section-5-6" class="pilcrow">¶</a></p>
 <p id="section-5-7">Proving the latter two properties, that newly added log entries have
 monotonically increasing timestamps, is done as follows:<a href="#section-5-7" class="pilcrow">¶</a></p>
 <ul class="normal">
@@ -2235,12 +2235,15 @@ provided to prove the latter two properties. That is, the minimum set of
 intermediate hashes from the log tree are provided that are necessary to compute
 the new root hash from the given log entries and the full subtrees retained by
 the user.<a href="#section-5-10" class="pilcrow">¶</a></p>
-<p id="section-5-11">For users which have never interacted with the Transparency Log before and don't
+<p id="section-5-11">Only once the user successfully verifies that the log entries' timestamps are
+monotonic and that it correctly computed the new root hash, can they update
+their stored state to replace the previous tree head with the new one.<a href="#section-5-11" class="pilcrow">¶</a></p>
+<p id="section-5-12">For users which have never interacted with the Transparency Log before and don't
 have a previous tree head to advertise, the Transparency Log simply provides the
 timestamps and prefix tree root hashes of the log entries on the frontier, along
 with an inclusion proof. The user verifies that the timestamps are monotonic. If
 this is successful, the user retains the log tree's full subtrees and the
-rightmost log entry's timestamp for future queries.<a href="#section-5-11" class="pilcrow">¶</a></p>
+rightmost log entry's timestamp for future queries.<a href="#section-5-12" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="monitoring-the-tree">
