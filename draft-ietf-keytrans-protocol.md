@@ -666,8 +666,9 @@ they've observed:
    are the largest powers of two possible). This allows the Transparency Log to
    provide more space-efficient consistency and inclusion proofs than if just
    the root hash was retained.
-3. The timestamp of the rightmost log entry. As will be described below, this
-   will be used to ensure that subsequent log entry timestamps are correct.
+3. The timestamps of the log entries along the frontier. As will be described
+   below, this will be used to ensure that subsequent log entry timestamps are
+   correct.
 
 When users make queries to the Transparency Log, they advertise the size of the
 last tree head observed. If the Transparency Log responds with an updated tree
@@ -688,8 +689,12 @@ monotonically increasing timestamps, is done as follows:
 
 Users verify that the presented timestamps represent a monotonic series. While
 this only requires users to verify a logarithmic number of the newly added log
-entries' timestamps, it guarantees that two users with overlapping views of
-the tree will detect any violations.
+entries' timestamps, it guarantees that two users with overlapping views of the
+tree will detect any violations. Note that retaining only the rightmost log
+entry's timestamp would be sufficient for this purpose, but users retain the
+timestamps of all log entries along the frontier. The additional timestamps are
+retained so that the Transparency Log doesn't have to provide them again in
+future queries if they've exceeded their maximum lifetime.
 
 Proving the first property, that the tree is append-only, is done by providing a
 consistency proof combined with an inclusion proof for the log entries that were
