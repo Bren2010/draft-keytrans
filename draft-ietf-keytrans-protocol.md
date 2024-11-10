@@ -731,13 +731,66 @@ versions of a label are still correctly stored in the log, and that no new
 monitor those labels afterwards to ensure that the version of the label they
 observed was not later concealed by the Transparency Log.
 
-To monitor a given label, users maintain a small amount of state: a map
-from a position in the log to a version counter. The version counter is the
-highest version of the label that's been proven to exist at that log
-position. Users initially populate this map by setting the position of an entry
-they've looked up to map to the version of the label stored in that entry. A map
-may track several different versions of a label simultaneously, if a user
-has been shown different versions of the same label.
+## Reasonable Monitoring Window
+
+Users that own a label, meaning that they are the authoritative source for the
+label's value, MUST regularly monitor the label for the entirety of the time
+that they own it. This includes both ensuring that past versions of the label
+are still correctly represented in the log, and verifying that new versions of
+the label are permissible (alerting the user if not).
+
+Service Providers define a duration in seconds, referred to as the **Reasonable
+Monitoring Window**, which is the frequency with which the Transparency Log
+generally expects label owners to perform monitoring. The log entry maximum
+lifetime MUST be substantially greater than the Reasonable Monitoring Window.
+
+If a user looks up a label, and finds that the first log entry containing the
+label-version pair has a timestamp within the Reasonable Monitoring Window, they
+MUST regularly monitor the label until this timestamp is outside of the window.
+Whether a timestamp is within the window or not is determined by subtracting it
+from the timestamp of the rightmost log entry. The purpose of this is to ensure
+that the label-version pair is not removed or obscured by the Transparency Log
+before the label owner is able to detect it.
+
+However, if a user looks up a label and finds that the first log entry
+containing the label-version pair has a timestamp outside of the Reasonable
+Monitoring Window, they are not required to monitor it afterwards or otherwise
+retain any state from the query. This is because it is assumed that the
+label-version pair has been in the tree long enough for the label owner to have
+verified it already.
+
+Users that own a label and are offline for longer than the Reasonable Monitoring
+Window will be required to do multiple monitoring passes when they come back
+online: one pass for each interval of the duration that was missed.
+
+## Binary Ladder
+
+Similar to the algorithm for searching the tree, the algorithm for monitoring
+the tree requires a way to prove that the highest version of a label stored in a
+particular log entry is greater than or equal to a target version. Since we
+already know that the target version exists, we only need to prove that there
+has not been an unexpected downgrade. As such, the steps of the binary ladder
+for monitoring are slightly different than for search:
+
+1. First, version `x` of the label is looked up, where `x` is consecutively higher
+   powers of two minus one (0, 1, 3, 7, ...). This is repeated until `x` is the
+   largest such value less than or equal to the target version.
+2. Second, the largest `x` that was looked up is retained, and consecutively
+   smaller powers of two are added to it until it equals the target version.
+   Each time a power of two is added, this version of the label is looked up.
+
+This could be equivalently computed as a search binary ladder, excluding lookups
+for any versions greater than the target.
+
+## Algorithm
+
+To monitor a given label, users maintain a small amount of state: a map from a
+position in the log to a version counter. The version counter is the highest
+version of the label that's been proven to exist at that log position. Users
+initially populate this map by setting the position of the first log entry to
+contain the label-version pair they've looked up to map to that version. A map
+may track several different versions of a label simultaneously, if a user has
+been shown different versions of the same label.
 
 To update this map, users receive the most recent tree head from the server and
 follow these steps, for each entry in the map:
@@ -760,7 +813,7 @@ follow these steps, for each entry in the map:
 This algorithm progressively moves up the tree as new intermediate/root nodes
 are established and verifies that they're constructed correctly. Note that users
 can often execute this process with the output of Search or Update operations
-for a label, without waiting to make explicit Monitor queries.
+for a label without waiting to make explicit Monitor queries.
 
 It is also worth noting that the work required to monitor several versions of
 the same label scales sublinearly, due to the fact that the direct paths of the
@@ -768,60 +821,8 @@ different versions will often intersect. Intersections reduce the total number
 of entries in the map and therefore the amount of work that will be needed to
 monitor the label from then on.
 
-## Binary Ladder
-
-1. First, version `x` of the label is looked up, where `x` is consecutively higher
-   powers of two minus one (0, 1, 3, 7, ...). This is repeated until `x` is the
-   largest such value less than or equal to the target version.
-2. Second, the largest `x` that was looked up is retained, and consecutively
-   smaller powers of two are added to it until it equals the target version.
-   Each time a power of two is added, this version of the label is looked up.
-
-As an example, if the target version of a label to lookup is 20, a binary ladder
-would consist of the following versions: 0, 1, 3, 7, 15, 19, 20. If all of the
-lookups succeed (i.e., result in proofs of inclusion), this indicates that the
-target version of the label exists in the log. If the ladder stops early because a
-proof of non-inclusion was produced, this indicates that the target version of
-the label did not exist, as of the given log entry.
-
-When executing a search in a Transparency Log for a specific version of a label, a
-binary ladder is provided for each log entry on the search path, verifiably guiding
-the search toward the log entry where the desired label-version pair was first
-inserted.
-
-Requiring proof that this series of versions are present in the prefix tree,
-instead of requesting proof of just version 20, ensures that all users are able
-to agree on which version of the label is *most recent*, which is discussed
-further in the next subsection.
-
-## Reasonable Monitoring Window
-
-Users that own a label, meaning that they are the authoritative source for the
-label's value, MUST regularly monitor the label for the entirety of the time
-that they own it. This includes both ensuring that past versions of the label
-are still correctly represented in the log and verifying that new versions of
-the label are permissible (alerting the user if not).
-
-Service Providers define a duration in seconds, referred to as the **Reasonable
-Monitoring Window**, which is the frequency with which the Transparency Log
-generally expects label owners to perform monitoring. The maximum log entry
-lifetime MUST be substantially greater than the Reasonable Monitoring Window.
-
-Users that lookup a label, and find that the first log entry containing the
-version of the label they're interested in has a timestamp outside of the
-Reasonable Monitoring Window, are not required to monitor the label afterwards.
-Specifically, the timestamp of the rightmost log entry in the tree, minus the
-timestamp of the first log entry to contain the label-version pair, must be
-greater than the Reasonable Monitoring Window. This is because the label is
-assumed to have been in the tree long enough for the label owner to verify its
-correctness. When this is not the case, the user that looked up the label MUST
-regularly monitor it until the rightmost log entry's timestamp is great enough
-to satisfy this condition.
-
-
-Users that do not monitor
-labels they own within this amount of time will be required to do multiple
-monitoring passes: one pass for each interval of the duration that was missed.
+TODO mention frontier checks when monitoring owned labels
+TODO multiple monitoring passes
 
 
 # Ciphersuites
