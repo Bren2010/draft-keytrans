@@ -1237,10 +1237,13 @@ timely manner.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
             <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-monitoring-the-tree" class="internal xref">Monitoring the Tree</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
-                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-binary-ladder-2" class="internal xref">Binary Ladder</a></p>
+                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-reasonable-monitoring-windo" class="internal xref">Reasonable Monitoring Window</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
-                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-reasonable-monitoring-windo" class="internal xref">Reasonable Monitoring Window</a></p>
+                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-binary-ladder-2" class="internal xref">Binary Ladder</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3">
+                <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="auto internal xref">6.3</a>.  <a href="#name-algorithm" class="internal xref">Algorithm</a></p>
 </li>
             </ul>
 </li>
@@ -2268,112 +2271,118 @@ versions of a label are still correctly stored in the log, and that no new
 (unexpected) versions have been added. Users that looked up a label may need to
 monitor those labels afterwards to ensure that the version of the label they
 observed was not later concealed by the Transparency Log.<a href="#section-6-2" class="pilcrow">¶</a></p>
-<p id="section-6-3">To monitor a given label, users maintain a small amount of state: a map
-from a position in the log to a version counter. The version counter is the
-highest version of the label that's been proven to exist at that log
-position. Users initially populate this map by setting the position of an entry
-they've looked up to map to the version of the label stored in that entry. A map
-may track several different versions of a label simultaneously, if a user
-has been shown different versions of the same label.<a href="#section-6-3" class="pilcrow">¶</a></p>
-<p id="section-6-4">To update this map, users receive the most recent tree head from the server and
-follow these steps, for each entry in the map:<a href="#section-6-4" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-6-5">
-<li id="section-6-5.1">
-          <p id="section-6-5.1.1">Compute the entry's direct path (in terms of the Implicit Binary Search Tree)
-based on the current tree size.<a href="#section-6-5.1.1" class="pilcrow">¶</a></p>
+<div id="reasonable-monitoring-window">
+<section id="section-6.1">
+        <h3 id="name-reasonable-monitoring-windo">
+<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-reasonable-monitoring-windo" class="section-name selfRef">Reasonable Monitoring Window</a>
+        </h3>
+<p id="section-6.1-1">Users that own a label, meaning that they are the authoritative source for the
+label's value, <span class="bcp14">MUST</span> regularly monitor the label for the entirety of the time
+that they own it. This includes both ensuring that past versions of the label
+are still correctly represented in the log, and verifying that new versions of
+the label are permissible (alerting the user if not).<a href="#section-6.1-1" class="pilcrow">¶</a></p>
+<p id="section-6.1-2">Service Providers define a duration in seconds, referred to as the <strong>Reasonable
+Monitoring Window</strong>, which is the frequency with which the Transparency Log
+generally expects label owners to perform monitoring. The log entry maximum
+lifetime <span class="bcp14">MUST</span> be substantially greater than the Reasonable Monitoring Window.<a href="#section-6.1-2" class="pilcrow">¶</a></p>
+<p id="section-6.1-3">If a user looks up a label, and finds that the first log entry containing the
+label-version pair has a timestamp within the Reasonable Monitoring Window, they
+<span class="bcp14">MUST</span> regularly monitor the label until this timestamp is outside of the window.
+Whether a timestamp is within the window or not is determined by subtracting it
+from the timestamp of the rightmost log entry. The purpose of this is to ensure
+that the label-version pair is not removed or obscured by the Transparency Log
+before the label owner is able to detect it.<a href="#section-6.1-3" class="pilcrow">¶</a></p>
+<p id="section-6.1-4">However, if a user looks up a label and finds that the first log entry
+containing the label-version pair has a timestamp outside of the Reasonable
+Monitoring Window, they are not required to monitor it afterwards or otherwise
+retain any state from the query. This is because it is assumed that the
+label-version pair has been in the tree long enough for the label owner to have
+verified it already.<a href="#section-6.1-4" class="pilcrow">¶</a></p>
+<p id="section-6.1-5">Users that own a label and are offline for longer than the Reasonable Monitoring
+Window will be required to do multiple monitoring passes when they come back
+online: one pass for each interval of the duration that was missed.<a href="#section-6.1-5" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="binary-ladder-1">
+<section id="section-6.2">
+        <h3 id="name-binary-ladder-2">
+<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-binary-ladder-2" class="section-name selfRef">Binary Ladder</a>
+        </h3>
+<p id="section-6.2-1">Similar to the algorithm for searching the tree, the algorithm for monitoring
+the tree requires a way to prove that the highest version of a label stored in a
+particular log entry is greater than or equal to a target version. Since we
+already know that the target version exists, we only need to prove that there
+has not been an unexpected downgrade. As such, the steps of the binary ladder
+for monitoring are slightly different than for search:<a href="#section-6.2-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-6.2-2">
+<li id="section-6.2-2.1">
+            <p id="section-6.2-2.1.1">First, version <code>x</code> of the label is looked up, where <code>x</code> is consecutively higher
+powers of two minus one (0, 1, 3, 7, ...). This is repeated until <code>x</code> is the
+largest such value less than or equal to the target version.<a href="#section-6.2-2.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-6-5.2">
-          <p id="section-6-5.2.1">If there are no entries in the direct path that are to the right of the
+          <li id="section-6.2-2.2">
+            <p id="section-6.2-2.2.1">Second, the largest <code>x</code> that was looked up is retained, and consecutively
+smaller powers of two are added to it until it equals the target version.
+Each time a power of two is added, this version of the label is looked up.<a href="#section-6.2-2.2.1" class="pilcrow">¶</a></p>
+</li>
+        </ol>
+<p id="section-6.2-3">This could be equivalently computed as a search binary ladder, excluding lookups
+for any versions greater than the target.<a href="#section-6.2-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="algorithm">
+<section id="section-6.3">
+        <h3 id="name-algorithm">
+<a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-algorithm" class="section-name selfRef">Algorithm</a>
+        </h3>
+<p id="section-6.3-1">To monitor a given label, users maintain a small amount of state: a map from a
+position in the log to a version counter. The version counter is the highest
+version of the label that's been proven to exist at that log position. Users
+initially populate this map by setting the position of the first log entry to
+contain the label-version pair they've looked up to map to that version. A map
+may track several different versions of a label simultaneously, if a user has
+been shown different versions of the same label.<a href="#section-6.3-1" class="pilcrow">¶</a></p>
+<p id="section-6.3-2">To update this map, users receive the most recent tree head from the server and
+follow these steps, for each entry in the map:<a href="#section-6.3-2" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-6.3-3">
+<li id="section-6.3-3.1">
+            <p id="section-6.3-3.1.1">Compute the entry's direct path (in terms of the Implicit Binary Search Tree)
+based on the current tree size.<a href="#section-6.3-3.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.3-3.2">
+            <p id="section-6.3-3.2.1">If there are no entries in the direct path that are to the right of the
 current entry, then skip updating this entry (there's no new information to
-update it with).<a href="#section-6-5.2.1" class="pilcrow">¶</a></p>
+update it with).<a href="#section-6.3-3.2.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-6-5.3">
-          <p id="section-6-5.3.1">For each entry in the direct path that's to the right of the current entry,
-from low to high:<a href="#section-6-5.3.1" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-6-5.3.2">
-<li id="section-6-5.3.2.1">
-              <p id="section-6-5.3.2.1.1">Receive and verify a binary ladder from that log entry, for the version
+          <li id="section-6.3-3.3">
+            <p id="section-6.3-3.3.1">For each entry in the direct path that's to the right of the current entry,
+from low to high:<a href="#section-6.3-3.3.1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-6.3-3.3.2">
+<li id="section-6.3-3.3.2.1">
+                <p id="section-6.3-3.3.2.1.1">Receive and verify a binary ladder from that log entry, for the version
 currently in the map. This proves that, at the indicated log entry, the
 highest version present is greater than or equal to the
-previously-observed version.<a href="#section-6-5.3.2.1.1" class="pilcrow">¶</a></p>
+previously-observed version.<a href="#section-6.3-3.3.2.1.1" class="pilcrow">¶</a></p>
 </li>
-            <li id="section-6-5.3.2.2">
-              <p id="section-6-5.3.2.2.1">If the above check was successful, remove the current position-version
+              <li id="section-6.3-3.3.2.2">
+                <p id="section-6.3-3.3.2.2.1">If the above check was successful, remove the current position-version
 pair from the map and replace it with a position-version pair
-corresponding to the entry in the log that was just checked.<a href="#section-6-5.3.2.2.1" class="pilcrow">¶</a></p>
+corresponding to the entry in the log that was just checked.<a href="#section-6.3-3.3.2.2.1" class="pilcrow">¶</a></p>
 </li>
-          </ol>
+            </ol>
 </li>
-      </ol>
-<p id="section-6-6">This algorithm progressively moves up the tree as new intermediate/root nodes
+        </ol>
+<p id="section-6.3-4">This algorithm progressively moves up the tree as new intermediate/root nodes
 are established and verifies that they're constructed correctly. Note that users
 can often execute this process with the output of Search or Update operations
-for a label, without waiting to make explicit Monitor queries.<a href="#section-6-6" class="pilcrow">¶</a></p>
-<p id="section-6-7">It is also worth noting that the work required to monitor several versions of
+for a label without waiting to make explicit Monitor queries.<a href="#section-6.3-4" class="pilcrow">¶</a></p>
+<p id="section-6.3-5">It is also worth noting that the work required to monitor several versions of
 the same label scales sublinearly, due to the fact that the direct paths of the
 different versions will often intersect. Intersections reduce the total number
 of entries in the map and therefore the amount of work that will be needed to
-monitor the label from then on.<a href="#section-6-7" class="pilcrow">¶</a></p>
-<div id="binary-ladder-1">
-<section id="section-6.1">
-        <h3 id="name-binary-ladder-2">
-<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-binary-ladder-2" class="section-name selfRef">Binary Ladder</a>
-        </h3>
-<ol start="1" type="1" class="normal type-1" id="section-6.1-1">
-<li id="section-6.1-1.1">
-            <p id="section-6.1-1.1.1">First, version <code>x</code> of the label is looked up, where <code>x</code> is consecutively higher
-powers of two minus one (0, 1, 3, 7, ...). This is repeated until <code>x</code> is the
-largest such value less than or equal to the target version.<a href="#section-6.1-1.1.1" class="pilcrow">¶</a></p>
-</li>
-          <li id="section-6.1-1.2">
-            <p id="section-6.1-1.2.1">Second, the largest <code>x</code> that was looked up is retained, and consecutively
-smaller powers of two are added to it until it equals the target version.
-Each time a power of two is added, this version of the label is looked up.<a href="#section-6.1-1.2.1" class="pilcrow">¶</a></p>
-</li>
-        </ol>
-<p id="section-6.1-2">As an example, if the target version of a label to lookup is 20, a binary ladder
-would consist of the following versions: 0, 1, 3, 7, 15, 19, 20. If all of the
-lookups succeed (i.e., result in proofs of inclusion), this indicates that the
-target version of the label exists in the log. If the ladder stops early because a
-proof of non-inclusion was produced, this indicates that the target version of
-the label did not exist, as of the given log entry.<a href="#section-6.1-2" class="pilcrow">¶</a></p>
-<p id="section-6.1-3">When executing a search in a Transparency Log for a specific version of a label, a
-binary ladder is provided for each log entry on the search path, verifiably guiding
-the search toward the log entry where the desired label-version pair was first
-inserted.<a href="#section-6.1-3" class="pilcrow">¶</a></p>
-<p id="section-6.1-4">Requiring proof that this series of versions are present in the prefix tree,
-instead of requesting proof of just version 20, ensures that all users are able
-to agree on which version of the label is <em>most recent</em>, which is discussed
-further in the next subsection.<a href="#section-6.1-4" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="reasonable-monitoring-window">
-<section id="section-6.2">
-        <h3 id="name-reasonable-monitoring-windo">
-<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-reasonable-monitoring-windo" class="section-name selfRef">Reasonable Monitoring Window</a>
-        </h3>
-<p id="section-6.2-1">Users that own a label, meaning that they are the authoritative source for the
-label's value, <span class="bcp14">MUST</span> regularly monitor the label for the entirety of the time
-that they own it. This includes both ensuring that past versions of the label
-are still correctly represented in the log and verifying that new versions of
-the label are permissible (alerting the user if not).<a href="#section-6.2-1" class="pilcrow">¶</a></p>
-<p id="section-6.2-2">Service Providers define a duration in seconds, referred to as the <strong>Reasonable
-Monitoring Window</strong>, which is the frequency with which the Transparency Log
-generally expects label owners to perform monitoring. The maximum log entry
-lifetime <span class="bcp14">MUST</span> be substantially greater than the Reasonable Monitoring Window.<a href="#section-6.2-2" class="pilcrow">¶</a></p>
-<p id="section-6.2-3">Users that lookup a label, and find that the first log entry containing the
-version of the label they're interested in has a timestamp outside of the
-Reasonable Monitoring Window, are not required to monitor the label afterwards.
-Specifically, the timestamp of the rightmost log entry in the tree, minus the
-timestamp of the first log entry to contain the label-version pair, must be
-greater than the Reasonable Monitoring Window. This is because the label is
-assumed to have been in the tree long enough for the label owner to verify its
-correctness. When this is not the case, the user that looked up the label <span class="bcp14">MUST</span>
-regularly monitor it until the rightmost log entry's timestamp is great enough
-to satisfy this condition.<a href="#section-6.2-3" class="pilcrow">¶</a></p>
-<p id="section-6.2-4">Users that do not monitor
-labels they own within this amount of time will be required to do multiple
-monitoring passes: one pass for each interval of the duration that was missed.<a href="#section-6.2-4" class="pilcrow">¶</a></p>
+monitor the label from then on.<a href="#section-6.3-5" class="pilcrow">¶</a></p>
+<p id="section-6.3-6">TODO mention frontier checks when monitoring owned labels
+TODO multiple monitoring passes<a href="#section-6.3-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
