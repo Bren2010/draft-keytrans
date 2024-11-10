@@ -5,7 +5,7 @@
 KEYTRANS Working Group                                      B. McMillion
 Internet-Draft                                                          
 Intended status: Informational                                 F. Linker
-Expires: 13 May 2025                                     9 November 2024
+Expires: 14 May 2025                                    10 November 2024
 
 
                        Key Transparency Protocol
@@ -49,7 +49,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 13 May 2025.
+   This Internet-Draft will expire on 14 May 2025.
 
 Copyright Notice
 
@@ -735,9 +735,9 @@ Log tree:       o                                o
        consistency and inclusion proofs than if just the root hash was
        retained.
 
-   3.  The timestamp of the rightmost log entry.  As will be described
-       below, this will be used to ensure that subsequent log entry
-       timestamps are correct.
+   3.  The timestamps of the log entries along the frontier.  As will be
+       described below, this will be used to ensure that subsequent log
+       entry timestamps are correct.
 
    When users make queries to the Transparency Log, they advertise the
    size of the last tree head observed.  If the Transparency Log
@@ -764,7 +764,12 @@ Log tree:       o                                o
    series.  While this only requires users to verify a logarithmic
    number of the newly added log entries' timestamps, it guarantees that
    two users with overlapping views of the tree will detect any
-   violations.
+   violations.  Note that retaining only the rightmost log entry's
+   timestamp would be sufficient for this purpose, but users retain the
+   timestamps of all log entries along the frontier.  The additional
+   timestamps are retained so that the Transparency Log doesn't have to
+   provide them again in future queries if they've exceeded their
+   maximum lifetime.
 
    Proving the first property, that the tree is append-only, is done by
    providing a consistency proof combined with an inclusion proof for
