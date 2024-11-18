@@ -1,6 +1,6 @@
 ---
 title: "Key Transparency Protocol"
-category: info
+category: std
 
 docname: draft-keytrans-mcmillion-protocol-latest
 submissiontype: IETF
@@ -22,6 +22,35 @@ author:
 normative:
 
 informative:
+  CONIKS:
+    target: https://eprint.iacr.org/2014/1004
+    title: "CONIKS: Bringing Key Transparency to End Users"
+    date: 2014-04-27
+    author:
+      - name: Marcela S. Melara
+      - name: Aaron Blankstein
+      - name: Joseph Bonneau
+      - name: Edward W. Felten
+      - name: Michael J. Freedman
+  SEEMLess:
+    target: https://eprint.iacr.org/2018/607
+    title: "SEEMless: Secure End-to-End Encrypted Messaging with less trust"
+    date: 2018-06-18
+    author:
+      - name: Melissa Chase
+      - name: Apoorvaa Deshpande
+      - name: Esha Ghosh
+      - name: Harjasleen Malvai
+  OPTIKS:
+    target: https://eprint.iacr.org/2023/1515
+    title: "OPTIKS: An Optimized Key Transparency System"
+    date: 2023-10-04
+    author:
+      - name: Julia Len
+      - name: Melissa Chase
+      - name: Esha Ghosh
+      - name: Kim Laine
+      - name: Radames Cruz Moreno
   Merkle2:
     target: https://eprint.iacr.org/2021/453
     title: "Merkle^2: A Low-Latency Transparency Log System"
