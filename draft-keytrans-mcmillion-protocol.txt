@@ -4,8 +4,8 @@
 
 KEYTRANS Working Group                                      B. McMillion
 Internet-Draft                                                          
-Intended status: Informational                                 F. Linker
-Expires: 14 May 2025                                    10 November 2024
+Intended status: Standards Track                               F. Linker
+Expires: 22 May 2025                                    18 November 2024
 
 
                        Key Transparency Protocol
@@ -49,7 +49,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 14 May 2025.
+   This Internet-Draft will expire on 22 May 2025.
 
 Copyright Notice
 
@@ -78,38 +78,33 @@ Table of Contents
      4.1.  Implicit Binary Search Tree
      4.2.  Binary Ladder
      4.3.  Most Recent Version
-     4.4.  Maximum Lifetime
-     4.5.  Full Algorithm
-   5.  Updating Views of the Tree
-   6.  Monitoring the Tree
-     6.1.  Reasonable Monitoring Window
-     6.2.  Binary Ladder
-     6.3.  Algorithm
-   7.  Ciphersuites
-   8.  Cryptographic Computations
-     8.1.  Verifiable Random Function
-     8.2.  Commitment
-     8.3.  Prefix Tree
-     8.4.  Log Tree
-     8.5.  Tree Head Signature
-   9.  Tree Proofs
-     9.1.  Log Tree
-     9.2.  Prefix Tree
-     9.3.  Combined Tree
-       9.3.1.  Proofs for Contact Monitoring
-       9.3.2.  Proofs for Third-Party Auditing
-   10. Update Format
-   11. User Operations
-     11.1.  Search
-     11.2.  Update
-     11.3.  Monitor
-   12. Security Considerations
-   13. IANA Considerations
-     13.1.  KT Ciphersuites
-     13.2.  KT Designated Expert Pool
-   14. References
-     14.1.  Normative References
-     14.2.  Informative References
+     4.4.  Putting it Together
+   5.  Monitoring the Tree
+   6.  Ciphersuites
+   7.  Cryptographic Computations
+     7.1.  Verifiable Random Function
+     7.2.  Commitment
+     7.3.  Prefix Tree
+     7.4.  Log Tree
+     7.5.  Tree Head Signature
+   8.  Tree Proofs
+     8.1.  Log Tree
+     8.2.  Prefix Tree
+     8.3.  Combined Tree
+       8.3.1.  Proofs for Contact Monitoring
+       8.3.2.  Proofs for Third-Party Auditing
+   9.  Update Format
+   10. User Operations
+     10.1.  Search
+     10.2.  Update
+     10.3.  Monitor
+   11. Security Considerations
+   12. IANA Considerations
+     12.1.  KT Ciphersuites
+     12.2.  KT Designated Expert Pool
+   13. References
+     13.1.  Normative References
+     13.2.  Informative References
    Acknowledgments
    Authors' Addresses
 
@@ -160,19 +155,30 @@ Table of Contents
    Transparency Logs have an _epoch_ counter which is incremented every
    time a new set of label-version pairs are added.
 
+     Epoch   Update      Set of logged Label-Version Pairs
+   * n       X:0 -> k    { ..., X:0 }
+   * n+1     Y:3 -> l    { ..., X:0, Y:3 }
+   * n+2     Z:2 -> m    { ..., X:0, Y:3, Z:2 }
+   * n+3     X:1 -> n    { ..., X:0, Y:3, Z:2, X:1 }
+
+     Figure 1: An example log history.  At epoch n the user with label
+       X submits their first key k.  As it is their first key, it is
+       associated with version 0.  At epoch n+1, user Y updates their
+                                 key to l.
+
    KT uses a _prefix tree_ to commit to a mapping between each label-
    version pair and a commitment to the label's value at that version.
-   Every time the prefix tree changes, its new root hash and the current
-   timestamp are stored in a _log tree_. The benefit of the prefix tree
-   is that it is easily searchable, and the benefit of the log tree is
-   that it can easily be verified to be append-only.  The data
-   structure, which combines a log tree and a prefix tree, is called the
-   _combined tree_.
+   Every time the prefix tree changes, its new root hash is stored in a
+   _log tree_. The benefit of the prefix tree is that it is easily
+   searchable, and the benefit of the log tree is that it can easily be
+   verified to be append-only.  The data structure powering KT combines
+   a log tree and a prefix tree, and is called the _combined tree
+   structure_.
 
    This section describes the operation of both prefix and log trees at
    a high level and the way that they're combined.  More precise
    algorithms for computing the intermediate and root values of the
-   trees are given in Section 8.
+   trees are given in Section 7.
 
 3.1.  Terminology
 
@@ -225,7 +231,7 @@ Table of Contents
 
    Index:  0     1     2     3     4
 
-                Figure 1: A log tree containing five leaves.
+                Figure 2: A log tree containing five leaves.
 
    Log trees initially consist of a single leaf node.  New leaves are
    added to the right-most edge of the tree along with a single parent
@@ -246,7 +252,7 @@ Table of Contents
 
    Index:  0     1     2     3     4     5
 
-      Figure 2: Example of inserting a new leaf with index 5 into the
+      Figure 3: Example of inserting a new leaf with index 5 into the
      previously depicted log tree.  Observe that only the nodes on the
                path from the new root to the new leaf change.
 
@@ -266,18 +272,7 @@ Table of Contents
    With a consistency proof, the prover provides the minimum set of
    intermediate node values from the current tree that allows the
    verifier to compute both the old root value and the current root
-   value.
-
-   However, the protocol described in this document generally doesn't
-   provide pure inclusion or consistency proofs to verifiers.  Instead,
-   it relies on the more general idea of providing the minimum set of
-   intermediate node values that are necessary to allow a verifier to
-   compute one or more root values from intermediate/leaf values that
-   they already have.  The verifier may already have intermediate/leaf
-   values because they were provided by the Transparency Log as part of
-   its response to the current query, or because they were retained from
-   responses to previous queries.  This pattern of providing proofs
-   ensures that there is minimal on-the-wire redundancy.
+   value.  An algorithm for this is given in section 2.1.2 of [RFC6962].
 
                                 X
                                 |
@@ -294,7 +289,7 @@ Table of Contents
 
    Index:  0     1     2     3     4     5
 
-      Figure 3: Illustration of a proof of inclusion.  To verify that
+      Figure 4: Illustration of a proof of inclusion.  To verify that
        leaf 2 is included in the tree, the server provides the client
      with the hashes of the nodes on its copath, i.e., all hashes that
       are required for the client to compute the root hash itself.  In
@@ -315,7 +310,7 @@ Table of Contents
 
    Index:  0     1     2     3     4     5
 
-     Figure 4: Illustration of a consistency proof.  The server proves
+     Figure 5: Illustration of a consistency proof.  The server proves
        to the client that it correctly extended the tree by giving it
        the hashes of marked nodes ([X] / (X)).  The client can verify
       that it can construct the old root hash from the hashes of nodes
@@ -324,7 +319,7 @@ Table of Contents
 
 3.3.  Prefix Tree
 
-   Prefix trees are used for storing key-value pairs in a way that
+   Prefix trees are used for storing key-value pairs, in a way that
    provides the ability to efficiently prove that a search key's value
    was looked up correctly.
 
@@ -362,7 +357,7 @@ Table of Contents
    Key:   00010 00101 10001 10111 11011
    Value:     A     B     C     D     E
 
-              Figure 5: A prefix tree containing five entries.
+              Figure 6: A prefix tree containing five entries.
 
    New key-value pairs are added to the tree by searching it according
    to the same process.  If the search terminates at a parent without a
@@ -387,7 +382,7 @@ Table of Contents
    Index: 00010 00101 01101 10001 10111 11011
    Value:     A     B     F     C     D     E
 
-       Figure 6: The previous prefix tree after adding the key-value
+       Figure 7: The previous prefix tree after adding the key-value
                              pair: 01101 -> F.
 
    The value of a leaf node is the encoded key-value pair, while the
@@ -417,49 +412,62 @@ Table of Contents
    with only new values added.
 
    In the combined tree structure, which is based on [Merkle2], a prefix
-   tree contains a mapping where each label-version pair has a search
-   key, and the search key's value is a cryptographic commitment to the
+   tree contains a mapping where each label-version pair is a search
+   key, and its associated value is a cryptographic commitment to the
    label's new contents.  A log tree contains a record of each version
-   of the prefix tree that's created and the timestamp that it was
-   created.  With some caveats, this combined structure supports both
-   efficient consistency proofs and can be efficiently searched.
+   of the prefix tree that's created.  With some caveats, this combined
+   structure supports both efficient consistency proofs and can be
+   efficiently searched.
 
    Note that, although the Transparency Log maintains a single logical
    prefix tree, each modification of this tree results in a new root
-   hash which is then stored in the log tree.  And, as part of the
-   protocol, the Transparency Log is often required to perform lookups
-   in different versions of the prefix tree.  Therefore, when
+   hash, which is then stored in the log tree.  Therefore, when
    instructions refer to "looking up a label-version pair in the prefix
-   tree at a given log entry," this means performing the search in the
-   specific version of the prefix tree whose root hash is stored at that
-   log entry (where a "log entry" refers to a leaf of the log tree).
+   tree at a given log entry," this actually means searching in the
+   specific version of the prefix tree that corresponds to the root hash
+   stored at that log entry (where a "log entry" refers to a leaf of the
+   log tree).
 
-Epoch:          n                               n+1
-                                ==>
-Log tree:       o                                o
-           o----+----.                o----------+----------o
-          / \         \              / \            .-------+-----.
-         /   \         |            /   \          /               \
-        /_____\   [T_n; h(PT_n)]   /_____\   [T_n; h(PT_n)]   [T_n+1; h(PT_n+1)]
+Epoch        n-1         n                       n+1
 
-    Figure 7: An example evolution of the combined tree structure.
-   At every epoch, a new leaf is added to a log tree containing the
-        timestamp T_n, and the new prefix tree root hash PT_n.
+Root hash     o -------- o ---------------------- o
+             / \         |                        |
+            /___\     .--+--.              .------+------.
+                     / \    |             / \            |
+                    /___\   |            /___\   .-------+-------.
+                            |                   /                 \
+                    [X:0->k; h(PT_n)]  [X:0->k; h(PT_n)]  [Y:3->l; h(PT_n+1)]
+
+    Figure 8: An example evolution of the combined tree structure,
+     following the example from the beginning of the section.  At
+     every epoch, a new leaf is added to a log tree, containing a
+     change to a label's value and the updated prefix tree (PT).
 
 4.  Searching the Tree
 
    When searching the combined tree structure described in Section 3.4,
-   users do a binary search for the first log entry where the prefix
-   tree at that entry contains the desired label-version pair.  This
-   ensures that all users will check the same or similar entries when
-   searching for the same label, allowing for efficient client-side
+   the proof provided by the Transparency Log may either be *full* or
+   *abridged*. A full proof must be provided if the deployment mode of
+   the Transparency Log is Contact Monitoring, or if the user has
+   specifically requested it.  Otherwise, proofs are provided abridged.
+
+   A full proof follows the path of a binary search for the first log
+   entry where the prefix tree contains the desired label-version pair.
+   This ensures that all users will check the same or similar entries
+   when searching for the same label, allowing for efficient client-side
    auditing of the Transparency Log. The binary search uses an _implicit
    binary search tree_ constructed over the leaves of the log tree
    (distinct from the structure of the log tree itself), which allows
    the search to have a complexity logarithmic in the number of the
    log's leaves.
 
-   An abridged process for searching the tree is described in TODO.
+   An abridged proof skips this binary search, and simply looks at the
+   most recent version of the prefix tree to determine the commitment to
+   the update that the user is looking for.  Abridged proofs rely on a
+   third-party auditor or manager that can be trusted not to collude
+   with the Transparency Log, and who checks that every version of the
+   prefix tree is constructed correctly.  This is described in more
+   detail in Section 4.4.
 
 4.1.  Implicit Binary Search Tree
 
@@ -485,7 +493,7 @@ Log tree:       o                                o
 
    Index:  0  1  2  3  4  5  6  7  8  9 10 11 12 13
 
-        Figure 8: A binary tree constructed from 14 entries in a log
+        Figure 9: A binary tree constructed from 14 entries in a log
 
    Following the structure of this binary tree when executing searches
    makes auditing the Transparency Log much more efficient because users
@@ -563,8 +571,56 @@ Log tree:       o                                o
    version.
 
    A *binary ladder* is a series of lookups in a single log entry's
-   prefix tree that determines the highest version of a label that
-   exists, and proceeds as follows:
+   prefix tree, which is used to establish whether the target version of
+   a label is present or not.  It consists of the following lookups,
+   stopping after the first lookup that produces a proof of non-
+   inclusion:
+
+   1.  First, version x of the label is looked up, where x is
+       consecutively higher powers of two minus one (0, 1, 3, 7, ...).
+       This is repeated until x is the largest such value less than or
+       equal to the target version.
+
+   2.  Second, the largest x that was looked up is retained, and
+       consecutively smaller powers of two are added to it until it
+       equals the target version.  Each time a power of two is added,
+       this version of the label is looked up.
+
+   As an example, if the target version of a label to lookup is 20, a
+   binary ladder would consist of the following versions: 0, 1, 3, 7,
+   15, 19, 20.  If all of the lookups succeed (i.e., result in proofs of
+   inclusion), this indicates that the target version of the label
+   exists in the log.  If the ladder stops early because a proof of non-
+   inclusion was produced, this indicates that the target version of the
+   label did not exist, as of the given log entry.
+
+   When executing a search in a Transparency Log for a specific version
+   of a label, a binary ladder is provided for each node on the search
+   path, verifiably guiding the search toward the log entry where the
+   desired label-version pair was first inserted (and therefore, the log
+   entry with the desired update).
+
+   Requiring proof that this series of versions are present in the
+   prefix tree, instead of requesting proof of just version 20, ensures
+   that all users are able to agree on which version of the label is
+   _most recent_, which is discussed further in the next section.
+
+4.3.  Most Recent Version
+
+   Often, users wish to search for the "most recent" version of a label.
+   That is, the label with the highest version possible.
+
+   To determine this, users request a *full binary ladder* for each node
+   on the *frontier* of the log.  The frontier consists of the root node
+   of a search, followed by the entries produced by repeatedly calling
+   right until reaching the last entry of the log.  Using the same
+   example of a search where the log has 50 entries, the frontier would
+   be entries: 31, 47, 49.
+
+   A full binary ladder is similar to the binary ladder discussed in the
+   previous section, except that it identifies the exact highest version
+   of a label that exists, as of a particular log entry, rather than
+   stopping at a target version.  It consists of the following lookups:
 
    1.  First, version x of the label is looked up, where x is a
        consecutively higher power of two minus one (0, 1, 3, 7, ...).
@@ -578,36 +634,9 @@ Log tree:       o                                o
        of inclusion or non-inclusion, which guides the search left or
        right, until it terminates.
 
-   As an example, if the highest version of a label is 6, a binary
-   ladder would consist of the following: proofs of inclusion for
-   versions 0, 1, 3, terminated by a proof of non-inclusion for version
-   7.  Then, proofs of inclusion for versions 5 and 6 would conclude the
-   proof that 6 is the highest version available.
-
-   While being able to determine the exact highest version of a label is
-   sometimes useful (as the next section discusses), this is not always
-   the case.  If a user is searching for a specific version of a label,
-   they only need to know whether the highest version at a given log
-   entry is greater than or less than their target version, not its
-   exact value.  A *truncated binary ladder* is one which stops after
-   the first proof of inclusion for a version greater than or equal to
-   the target version, or the first proof of non-inclusion for a version
-   less than the target version.
-
-4.3.  Most Recent Version
-
-   When users wish to search for the "most recent" version of a label,
-   they must determine the highest version of the label that exists in
-   the log overall -- not just a single log entry.  To do this, users
-   request a binary ladder for each node on the *frontier* of the log.
-   The frontier consists of the root node of a search, followed by the
-   entries produced by repeatedly calling right until reaching the last
-   entry of the log.  Using the same example of a search where the log
-   has 50 entries, the frontier would be entries: 31, 47, 49.
-
    For the purpose of finding the highest version possible, requesting a
-   binary ladder for each entry along the frontier is functionally the
-   same as doing so for only the rightmost log entry.  However,
+   full binary ladder for each entry along the frontier is functionally
+   the same as doing so for only the last log entry.  However,
    inspecting the entire frontier allows the user to verify that the
    search path leading to the last log entry represents a monotonic
    series of version increases, which minimizes opportunities for log
@@ -617,270 +646,64 @@ Log tree:       o                                o
    and determined the highest version, the user then continues a binary
    search for this specific version.
 
-4.4.  Maximum Lifetime
+4.4.  Putting it Together
 
-   A Transparency Log operator MAY define a maximum lifetime for log
-   entries.  This maximum lifetime MUST be greater than zero seconds.
-   Log entries which have exceeded their maximum lifetime will simply be
-   skipped in searches, instead of needing to produce a binary ladder.
-   This allows the Transparency Log to prune data which is sufficiently
-   old, and is explained in more detail in TODO.
+   As noted at the beginning of the section, a search in the tree will
+   either require producing a full proof, or an abridged proof may be
+   accepted if the user can trust a third-party to audit and not collude
+   with the Transparency Log.
 
-   Whether a log entry has surpassed its maximum lifetime is determined
-   by subtracting the timestamp of the most recent log entry from the
-   timestamp of the log entry in question.  If this is the case, the
-   binary search immediately proceeds to the log entry's right child in
-   the implicit binary search tree.
+   The steps for producing a full or abridged search proof are
+   summarized as follows:
 
-4.5.  Full Algorithm
+   *  Full proof:
 
-   The full process for performing a search is described below as a
-   recursive algorithm.  It starts with the root log entry, as defined
-   by the implicit binary search tree, and then recurses to left or
-   right children, each time starting back at step 1.
+      -  If searching for the most recent version of a label, a full
+         binary ladder is obtained for each node on the frontier of the
+         log.  This determines the highest version of the label
+         available, which allows the search to proceed for this specific
+         version.
 
-   1.  Verify that the log entry's timestamp is consistent with the
-       timestamps of all ancestor log entries.  That is, if the log
-       entry is in the ancestor's left subtree, then its timestamp is
-       less than the ancestor's.  If the log entry is in the ancestor's
-       right subtree, then its timestamp is greater than the ancestor's.
+      -  If searching for a specific version, the proof follows a binary
+         search for the first entry in the log where this version of the
+         label exists.  For each step in the binary search, the proof
+         contains a (non-full) binary ladder for the targeted version,
+         which proves whether the targeted version of the label existed
+         yet or not by this point in the log.  This indicates whether
+         the binary search should move forwards or backwards in the log.
 
-   2.  If the log entry has surpassed its maximum lifetime, recurse to
-       its right child in the implicit binary search tree.  Note that a
-       right child always exists, as the rightmost log entry cannot
-       exceed its maximum lifetime by definition.
+   *  Abridged proof:
 
-   3.  If searching for the most recent version of a label, obtain a
-       binary ladder from the current log entry.  Verify that the binary
-       ladder proves that the greatest version of the label at this log
-       entry is greater than or equal to that of its parent.  If this
-       check is successful, recurse to the log entry's right child.  If
-       there is no right child, then restart the search algorithm from
-       the root log entry, searching for the specific version of the
-       label that was identified as most recent.
+      -  If searching for the most recent version of a label, a full
+         binary ladder is obtained only from the last (most recent)
+         entry of the log.  The prefix tree entry for the most recent
+         version of the label will contain the commitment to the update,
+         ending the search.
 
-   4.  If searching for a specific version of a label, obtain a
-       truncated binary ladder from the current log entry for the target
-       version.  (If this is a continuation of a "most recent version"
-       search, the non-truncated binary ladders provided along the
-       frontier are re-used for this step.)  If the binary ladder stops
-       short of proving the target version is present, recurse to the
-       log entry's right child; else, recurse to its left child.  If the
-       child doesn't exist, terminate the search successfully.
+      -  If searching for a specific version, a (non-full) binary ladder
+         for this version is obtained only from the last entry of the
+         log.  Similar to the previous case, the prefix tree entry for
+         the targeted version will contain the commitment to the update.
 
-   To allow users to execute this algorithm, the concrete data provided
-   by the Transparency Log consists of:
-
-   *  For each version of the label looked up in a binary ladder: the
-      commitment corresponding to the label's value at that version.
-
-   *  For each log entry inspected:
-
-      -  The log entry's timestamp
-
-      -  If a binary ladder is required: a batch search proof in the log
-         entry's prefix tree for all of the different label-version
-         pairs that constitute the binary ladder.
-
-      -  If a binary ladder is not required: the log entry's prefix tree
-         root hash.
-
-   *  A batch inclusion proof for all inspected log entries.
-
-   While the same label-version pair may be looked up in several
-   different versions of the prefix tree, note that the corresponding
-   commitment is only provided once.  This ensures that the commitments
-   are the same in each version of the prefix tree; if they weren't,
-   verification of the proof would fail.
-
-5.  Updating Views of the Tree
-
-   The previous section on performing searches in the combined tree
-   assumes that we have a fixed root hash.  However, as users interact
-   with the tree over time, they will see many different root hashes as
-   the contents of the tree changes.  It is necessary for users to
-   guarantee that the root hashes they observe are consistent with
-   respect to a few important properties:
-
-   *  If root hash A is shown after root hash B, then root hash A
-      contains all the same log entries as B (with some new ones
-      potentially added).
-
-   *  If the rightmost log entry of the tree with root hash A has
-      timestamp T_a, and the rightmost log entry of the tree with root
-      hash B has timestamp T_b, then T_a is greater than T_b.
-
-      -  Furthermore, all log entries between the rightmost log entry of
-         A and the rightmost log entry of B have monotonically
-         increasing timestamps.
-
-   The first property is necessary to ensure that the Transparency Log
-   never removes a log entry after showing it to a user, as this would
-   allow the Transparency Log to remove evidence of its own misbehavior.
-   The second two properties ensure that all users have a consistent
-   view of when each portion of the tree was created.  Disagreement on
-   when portions of the tree were created is functionally a fork, and it
-   introduces the same security issues.  This is because users rely on
-   log entry timestamps to decide whether to continue monitoring certain
-   labels, or which portions of the tree to skip when searching.
-
-   To address this, users retain select information about the last tree
-   head they've observed:
-
-   1.  The "size" of the log tree (the number of log entries it
-       contains).
-
-   2.  The root hashes of the "full subtrees" of the log tree (those
-       subtrees which are the largest powers of two possible).  This
-       allows the Transparency Log to provide more space-efficient
-       consistency and inclusion proofs than if just the root hash was
-       retained.
-
-   3.  The timestamps of the log entries along the frontier.  As will be
-       described below, this will be used to ensure that subsequent log
-       entry timestamps are correct.
-
-   When users make queries to the Transparency Log, they advertise the
-   size of the last tree head observed.  If the Transparency Log
-   responds with an updated tree head, it provides additional
-   information in its query response to prove that the advertised tree
-   head and the more recent one are consistent.
-
-   Proving the latter two properties, that newly added log entries have
-   monotonically increasing timestamps, is done as follows:
-
-   *  Starting with the log entry that was advertised by the user,
-      compute its direct path (in terms of the implicit binary search
-      tree) in the new tree.  Provide the log entry timestamp and prefix
-      tree root hash for each element of the direct path that's to the
-      right of the advertised log entry.
-
-   *  Exactly one of these log entries will lie on the new tree's
-      frontier.  From this log entry, compute the remainder of the
-      frontier.  That is, compute the log entry's right child, and the
-      right child's right child, and so on.  Provide the timestamps and
-      prefix tree root hashes for these log entries as well.
-
-   Users verify that the presented timestamps represent a monotonic
-   series.  While this only requires users to verify a logarithmic
-   number of the newly added log entries' timestamps, it guarantees that
-   two users with overlapping views of the tree will detect any
-   violations.  Note that retaining only the rightmost log entry's
-   timestamp would be sufficient for this purpose, but users retain the
-   timestamps of all log entries along the frontier.  The additional
-   timestamps are retained so that the Transparency Log doesn't have to
-   provide them again in future queries if they've exceeded their
-   maximum lifetime.
-
-   Proving the first property, that the tree is append-only, is done by
-   providing a consistency proof combined with an inclusion proof for
-   the log entries that were provided to prove the latter two
-   properties.  That is, the minimum set of intermediate hashes from the
-   log tree are provided that are necessary to compute the new root hash
-   from the given log entries and the full subtrees retained by the
-   user.
-
-   Only once the user successfully verifies that the log entries'
-   timestamps are monotonic and that it correctly computed the new root
-   hash, can they update their stored state to replace the previous tree
-   head with the new one.
-
-   For users which have never interacted with the Transparency Log
-   before and don't have a previous tree head to advertise, the
-   Transparency Log simply provides the timestamps and prefix tree root
-   hashes of the log entries on the frontier, along with an inclusion
-   proof.  The user verifies that the timestamps are monotonic.  If this
-   is successful, the user retains the log tree's full subtrees and the
-   rightmost log entry's timestamp for future queries.
-
-6.  Monitoring the Tree
+5.  Monitoring the Tree
 
    As new entries are added to the log tree, the search path that's
    traversed to find a specific version of a label may change.  New
    intermediate nodes may become established in between the search root
    and the leaf, or a new search root may be created.  The goal of
    monitoring a label is to efficiently ensure that, when these new
-   parent nodes are created, they're created correctly such that
-   searches for the same versions continue converging to the same
-   entries in the log.
-
-   Monitoring is performed both by the users that own a label and the
-   users that lookup a label.  Owners monitor their labels to ensure
-   that past (expected) versions of a label are still correctly stored
-   in the log, and that no new (unexpected) versions have been added.
-   Users that looked up a label may need to monitor those labels
-   afterwards to ensure that the version of the label they observed was
-   not later concealed by the Transparency Log.
-
-6.1.  Reasonable Monitoring Window
-
-   Users that own a label, meaning that they are the authoritative
-   source for the label's value, MUST regularly monitor the label for
-   the entirety of the time that they own it.  This includes both
-   ensuring that past versions of the label are still correctly
-   represented in the log, and verifying that new versions of the label
-   are permissible (alerting the user if not).
-
-   Service Providers define a duration in seconds, referred to as the
-   *Reasonable Monitoring Window*, which is the frequency with which the
-   Transparency Log generally expects label owners to perform
-   monitoring.  The log entry maximum lifetime MUST be substantially
-   greater than the Reasonable Monitoring Window.
-
-   If a user looks up a label, and finds that the first log entry
-   containing the label-version pair has a timestamp within the
-   Reasonable Monitoring Window, they MUST regularly monitor the label
-   until this timestamp is outside of the window.  Whether a timestamp
-   is within the window or not is determined by subtracting it from the
-   timestamp of the rightmost log entry.  The purpose of this is to
-   ensure that the label-version pair is not removed or obscured by the
-   Transparency Log before the label owner is able to detect it.
-
-   However, if a user looks up a label and finds that the first log
-   entry containing the label-version pair has a timestamp outside of
-   the Reasonable Monitoring Window, they are not required to monitor it
-   afterwards or otherwise retain any state from the query.  This is
-   because it is assumed that the label-version pair has been in the
-   tree long enough for the label owner to have verified it already.
-
-   Users that own a label and are offline for longer than the Reasonable
-   Monitoring Window will be required to do multiple monitoring passes
-   when they come back online: one pass for each interval of the
-   duration that was missed.
-
-6.2.  Binary Ladder
-
-   Similar to the algorithm for searching the tree, the algorithm for
-   monitoring the tree requires a way to prove that the highest version
-   of a label stored in a particular log entry is greater than or equal
-   to a target version.  Since we already know that the target version
-   exists, we only need to prove that there has not been an unexpected
-   downgrade.  As such, the steps of the binary ladder for monitoring
-   are slightly different than for search:
-
-   1.  First, version x of the label is looked up, where x is
-       consecutively higher powers of two minus one (0, 1, 3, 7, ...).
-       This is repeated until x is the largest such value less than or
-       equal to the target version.
-
-   2.  Second, the largest x that was looked up is retained, and
-       consecutively smaller powers of two are added to it until it
-       equals the target version.  Each time a power of two is added,
-       this version of the label is looked up.
-
-   This could be equivalently computed as a search binary ladder,
-   excluding lookups for any versions greater than the target.
-
-6.3.  Algorithm
+   parent nodes are created, they're created correctly so that searches
+   for the same versions continue converging to the same entries in the
+   log.
 
    To monitor a given label, users maintain a small amount of state: a
    map from a position in the log to a version counter.  The version
    counter is the highest version of the label that's been proven to
    exist at that log position.  Users initially populate this map by
-   setting the position of the first log entry to contain the label-
-   version pair they've looked up to map to that version.  A map may
-   track several different versions of a label simultaneously, if a user
-   has been shown different versions of the same label.
+   setting the position of an entry they've looked up, to map to the
+   version of the label stored in that entry.  A map may track several
+   different versions of a label simultaneously, if a user has been
+   shown different versions of the same label.
 
    To update this map, users receive the most recent tree head from the
    server and follow these steps, for each entry in the map:
@@ -908,7 +731,7 @@ Log tree:       o                                o
    This algorithm progressively moves up the tree as new intermediate/
    root nodes are established and verifies that they're constructed
    correctly.  Note that users can often execute this process with the
-   output of Search or Update operations for a label without waiting to
+   output of Search or Update operations for a label, without waiting to
    make explicit Monitor queries.
 
    It is also worth noting that the work required to monitor several
@@ -918,10 +741,10 @@ Log tree:       o                                o
    therefore the amount of work that will be needed to monitor the label
    from then on.
 
-   TODO mention frontier checks when monitoring owned labels TODO
-   multiple monitoring passes
+   Finally, unlike searching, there is no abridged version of
+   monitoring.
 
-7.  Ciphersuites
+6.  Ciphersuites
 
    Each Transparency Log uses a single fixed ciphersuite, chosen when
    the log is initially created, that specifies the following primitives
@@ -940,11 +763,11 @@ Log tree:       o                                o
    of the VRF algorithms from [RFC9381] must be used.
 
    Ciphersuites are represented with the CipherSuite type.  The
-   ciphersuites are defined in Section 13.1.
+   ciphersuites are defined in Section 12.1.
 
-8.  Cryptographic Computations
+7.  Cryptographic Computations
 
-8.1.  Verifiable Random Function
+7.1.  Verifiable Random Function
 
    Each label-version pair created in a log will have a unique
    representation in the prefix tree.  This is computed by providing the
@@ -958,7 +781,7 @@ Log tree:       o                                o
    The VRF's output evaluated on VrfInput is the concrete value inserted
    into the prefix tree.
 
-8.2.  Commitment
+7.2.  Commitment
 
    As discussed in Section 3.4, commitments are stored in the leaves of
    the log tree and correspond to updates.  Commitments are computed
@@ -988,7 +811,7 @@ Log tree:       o                                o
    The output value commitment may be published, while opening should be
    kept private until the commitment is meant to be revealed.
 
-8.3.  Prefix Tree
+7.3.  Prefix Tree
 
    The leaf nodes of a prefix tree are serialized as:
 
@@ -1027,7 +850,7 @@ Log tree:       o                                o
 
    where Hash denotes the ciphersuite hash function.
 
-8.4.  Log Tree
+7.4.  Log Tree
 
    The leaf and parent nodes of a log tree are serialized as:
 
@@ -1041,7 +864,7 @@ Log tree:       o                                o
    } LogParent;
 
    The commitment field contains the output of evaluating HMAC on
-   CommitmentValue, as described in Section 8.2.  The prefix_tree field
+   CommitmentValue, as described in Section 7.2.  The prefix_tree field
    contains the root hash of the prefix tree, after inserting a new
    label-version pair for the label in CommitmentValue.
 
@@ -1063,7 +886,7 @@ Log tree:       o                                o
      else if node.type == parentNode:
        return node.value
 
-8.5.  Tree Head Signature
+7.5.  Tree Head Signature
 
    The head of a Transparency Log, which represents the log's most
    recent state, is represented as:
@@ -1112,9 +935,9 @@ Log tree:       o                                o
      opaque root<Hash.Nh>;
    } TreeHeadTBS;
 
-9.  Tree Proofs
+8.  Tree Proofs
 
-9.1.  Log Tree
+8.1.  Log Tree
 
    An inclusion proof for a single leaf in a log tree is given by
    providing the copath values of a leaf.  Similarly, a bulk inclusion
@@ -1130,7 +953,7 @@ Log tree:       o                                o
 
    Each NodeValue is a uniform size, computed by passing the relevant
    LogLeaf or LogParent structures through the nodeValue function in
-   Section 8.4.  The contents of the elements array is kept in left-to-
+   Section 7.4.  The contents of the elements array is kept in left-to-
    right order: if a node is present in the root's left subtree, its
    value must be listed before any values provided from nodes that are
    in the root's right subtree, and so on recursively.
@@ -1146,7 +969,7 @@ Log tree:       o                                o
    correspond to those output by the algorithm in Section 2.1.2 of
    [RFC6962].
 
-9.2.  Prefix Tree
+8.2.  Prefix Tree
 
    A proof from a prefix tree authenticates that a set of values are
    either members of, or are not members of, the total set of values
@@ -1203,9 +1026,9 @@ Log tree:       o                                o
    the left/right arrangement dictated by the tree structure, and
    checking that the result equals the root value of the prefix tree.
 
-9.3.  Combined Tree
+8.3.  Combined Tree
 
-9.3.1.  Proofs for Contact Monitoring
+8.3.1.  Proofs for Contact Monitoring
 
    A proof from a combined log and prefix tree follows the execution of
    a binary search through the leaves of the log tree, as described in
@@ -1272,7 +1095,7 @@ Log tree:       o                                o
    combined with the proof in inclusion to check that the output matches
    the root of the log tree.
 
-9.3.2.  Proofs for Third-Party Auditing
+8.3.2.  Proofs for Third-Party Auditing
 
    In third-party auditing, clients can rely on the assumption that the
    prefix tree is monitored to be append-only.  Therefore, they need not
@@ -1305,7 +1128,7 @@ Log tree:       o                                o
    root hash, and the leaf committing to the requested value will be at
    the index identified in the most recent prefix tree.
 
-10.  Update Format
+9.  Update Format
 
    The updates committed to by a combined tree structure contain the new
    value of a label, along with additional information depending on the
@@ -1341,7 +1164,7 @@ Log tree:       o                                o
    UpdateValue.value.  Clients MUST successfully verify this signature
    before consuming UpdateValue.value.
 
-11.  User Operations
+10.  User Operations
 
    The basic user operations are organized as a request-response
    protocol between a user and the Transparency Log operator.
@@ -1365,7 +1188,7 @@ Log tree:       o                                o
    consistency proof between the current tree and the tree when it was
    this size, in the consistency field of FullTreeHead.
 
-11.1.  Search
+10.1.  Search
 
    Users initiate a Search operation by submitting a SearchRequest to
    the Transparency Log containing the label that they're interested in.
@@ -1393,7 +1216,7 @@ Log tree:       o                                o
    Users verify a search response by following these steps:
 
    1.  Evaluate the search proof in search according to the steps in
-       Section 9.3.  This will produce a verdict as to whether the
+       Section 8.3.  This will produce a verdict as to whether the
        search was executed correctly and also a candidate root value for
        the tree.  If it's determined that the search was executed
        incorrectly, abort with an error.
@@ -1406,9 +1229,9 @@ Log tree:       o                                o
 
    Depending on the deployment mode of the Transparency Log, the value
    field may or may not require additional verification, specified in
-   Section 10, before its contents may be consumed.
+   Section 9, before its contents may be consumed.
 
-11.2.  Update
+10.2.  Update
 
    Users initiate an Update operation by submitting an UpdateRequest to
    the Transparency Log containing the new label and value to store.
@@ -1439,7 +1262,7 @@ Log tree:       o                                o
    response provides the UpdatePrefix structure necessary to reconstruct
    the UpdateValue.
 
-11.3.  Monitor
+10.3.  Monitor
 
    Users initiate a Monitor operation by submitting a MonitorRequest to
    the Transparency Log containing information about the labels they
@@ -1466,7 +1289,7 @@ Log tree:       o                                o
    Each MonitorLabel structure contains the label being monitored in
    label, the highest version of the label that the user has observed in
    highest_version, and a list of entries in the log tree corresponding
-   to the keys of the map described in Section 6.
+   to the keys of the map described in Section 5.
 
    The Transparency Log verifies the MonitorRequest by following these
    steps, for each MonitorLabel structure:
@@ -1521,7 +1344,7 @@ Log tree:       o                                o
 
    The steps field of a MonitorProof contains the proofs required to
    update the user's monitoring data following the algorithm in
-   Section 6.  That is, each ProofStep of a MonitorProof contains a
+   Section 5.  That is, each ProofStep of a MonitorProof contains a
    binary ladder for the version MonitorProof.version.  The steps are
    provided in the order that they're consumed by the monitoring
    algorithm.  If same proof is consumed by the monitoring algorithm
@@ -1550,7 +1373,7 @@ Log tree:       o                                o
        that's been previously observed.
 
    3.  For each MonitorProof structure, evalute the monitoring algorithm
-       in Section 6.  Abort with an error if the monitoring algorithm
+       in Section 5.  Abort with an error if the monitoring algorithm
        detects that the tree is constructed incorrectly, or if there are
        fewer or more steps provided than would be expected (keeping in
        mind that extra steps may be provided along the frontier of the
@@ -1568,32 +1391,32 @@ Log tree:       o                                o
    proofs for different versions of each label are not provided, given
    that these can be cached from the original Search or Update query.
 
-12.  Security Considerations
+11.  Security Considerations
 
-13.  IANA Considerations
+12.  IANA Considerations
 
    This document requests the creation of the following new IANA
    registries:
 
-   *  KT Ciphersuites (Section 13.1)
+   *  KT Ciphersuites (Section 12.1)
 
    All of these registries should be under a heading of "Key
    Transparency", and assignments are made via the Specification
-   Required policy [RFC8126].  See Section 13.2 for additional
+   Required policy [RFC8126].  See Section 12.2 for additional
    information about the KT Designated Experts (DEs).
 
    RFC EDITOR: Please replace XXXX throughout with the RFC number
    assigned to this document
 
-13.1.  KT Ciphersuites
+12.1.  KT Ciphersuites
 
    uint16 CipherSuite;
 
-13.2.  KT Designated Expert Pool
+12.2.  KT Designated Expert Pool
 
-14.  References
+13.  References
 
-14.1.  Normative References
+13.1.  Normative References
 
    [I-D.ietf-keytrans-architecture]
               McMillion, B., "Key Transparency Architecture", Work in
@@ -1634,11 +1457,24 @@ Log tree:       o                                o
               DOI 10.17487/RFC9381, August 2023,
               <https://www.rfc-editor.org/rfc/rfc9381>.
 
-14.2.  Informative References
+13.2.  Informative References
+
+   [CONIKS]   Melara, M. S., Blankstein, A., Bonneau, J., Felten, E. W.,
+              and M. J. Freedman, "CONIKS: Bringing Key Transparency to
+              End Users", 27 April 2014,
+              <https://eprint.iacr.org/2014/1004>.
 
    [Merkle2]  Hu, Y., Hooshmand, K., Kalidhindi, H., Yang, S. J., and R.
               A. Popa, "Merkle^2: A Low-Latency Transparency Log
               System", 8 April 2021, <https://eprint.iacr.org/2021/453>.
+
+   [OPTIKS]   Len, J., Chase, M., Ghosh, E., Laine, K., and R. C.
+              Moreno, "OPTIKS: An Optimized Key Transparency System", 4
+              October 2023, <https://eprint.iacr.org/2023/1515>.
+
+   [SEEMLess] Chase, M., Deshpande, A., Ghosh, E., and H. Malvai,
+              "SEEMless: Secure End-to-End Encrypted Messaging with less
+              trust", 18 June 2018, <https://eprint.iacr.org/2018/607>.
 
 Acknowledgments
 
