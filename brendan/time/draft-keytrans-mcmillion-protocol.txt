@@ -79,12 +79,12 @@ Table of Contents
      4.2.  Binary Ladder
      4.3.  Most Recent Version
      4.4.  Maximum Lifetime
-     4.5.  Full Algorithm
-   5.  Updating Views of the Tree
-   6.  Monitoring the Tree
-     6.1.  Reasonable Monitoring Window
-     6.2.  Binary Ladder
-     6.3.  Algorithm
+     4.5.  Algorithm
+   5.  Monitoring the Tree
+     5.1.  Reasonable Monitoring Window
+     5.2.  Binary Ladder
+     5.3.  Algorithm
+   6.  Updating Views of the Tree
    7.  Ciphersuites
    8.  Cryptographic Computations
      8.1.  Verifiable Random Function
@@ -657,7 +657,7 @@ Log tree:       o                                o
    lifetime will still be needed by users; the rest can be discarded.
    Pruning is explained in more detail in TODO.
 
-4.5.  Full Algorithm
+4.5.  Algorithm
 
    The full process for performing a search is described below as a
    recursive algorithm.  It starts with the root log entry, as defined
@@ -741,14 +741,139 @@ Log tree:       o                                o
    same in each version of the prefix tree; if they weren't,
    verification of the proof would fail.
 
-5.  Updating Views of the Tree
+5.  Monitoring the Tree
 
-   The previous section on performing searches in the combined tree
-   assumes that we have a fixed root hash.  However, as users interact
-   with the tree over time, they will see many different root hashes as
-   the contents of the tree changes.  It is necessary for users to
-   guarantee that the root hashes they observe are consistent with
-   respect to a few important properties:
+   As new entries are added to the log tree, the search path that's
+   traversed to find a specific version of a label may change.  New
+   intermediate nodes may be established between the search root and the
+   log entry, or a new search root may be created.  The goal of
+   monitoring a label is to efficiently ensure that, when these new
+   parent nodes are created, they're created correctly such that
+   searches for the same versions continue converging to the same
+   entries in the log.
+
+   Monitoring is performed both by the users that own a label (meaning
+   they are the authoritative source for the label's value) and the
+   users that lookup a label.  Owners monitor their labels to ensure
+   that past (expected) versions of a label are still correctly stored
+   in the log and that no new (unexpected) versions have been added.
+   Users that looked up a label may need to monitor it afterwards to
+   ensure that the version they observed isn't later concealed by the
+   Transparency Log.
+
+5.1.  Reasonable Monitoring Window
+
+   Label owners MUST monitor their labels regularly, ensuring that past
+   versions of the label are still correctly represented in the log and
+   that any new versions of the label are permissible (alerting the user
+   if not).  Service Providers define a duration in seconds, referred to
+   as the *Reasonable Monitoring Window* (RMW), which is the frequency
+   with which the Transparency Log generally expects label owners to
+   perform monitoring.  The log entry maximum lifetime, if defined, MUST
+   be greater than the RMW.
+
+   If a user looks up a label and finds that the first log entry
+   containing the label-version pair has a timestamp within the RMW,
+   they MUST regularly monitor the label until this timestamp is outside
+   of the window.  Whether a timestamp is within the window or not is
+   determined by subtracting it from the timestamp of the rightmost log
+   entry.  The purpose of this monitoring is to ensure that the label-
+   version pair is not removed or obscured by the Transparency Log
+   before the label owner has had an opportunity to detect it.
+
+   However, if a user looks up a label and finds that the first log
+   entry containing the label-version pair has a timestamp outside of
+   the RMW, they are not required to monitor it afterwards or otherwise
+   retain any state from the query.
+
+   "Regular" monitoring SHOULD be performed roughly as frequently as the
+   RMW and MUST (if at all possible) happen more frequently than the log
+   entry maximum lifetime.  Users that own a label and are offline for
+   longer than the RMW will need to do multiple monitoring passes when
+   they come back online: one pass for each interval of the duration
+   that was missed.
+
+5.2.  Binary Ladder
+
+   Similar to the algorithm for searching the tree, the algorithm for
+   monitoring the tree requires a way to prove that the highest version
+   of a label stored in a particular log entry is greater than or equal
+   to a target version.  Since we already know that the target version
+   exists, we only need to prove that there has not been an unexpected
+   downgrade.  As such, the steps of the binary ladder for monitoring
+   are slightly different than for search:
+
+   1.  First, version x of the label is looked up, where x is
+       consecutively higher powers of two minus one (0, 1, 3, 7, ...).
+       This is repeated until x is the largest such value less than or
+       equal to the target version.
+
+   2.  Second, the largest x that was looked up is retained, and
+       consecutively smaller powers of two are added to it until it
+       equals the target version.  Each time a power of two is added,
+       this version of the label is looked up.
+
+   This could be equivalently computed as a search binary ladder,
+   excluding lookups for any versions greater than the target.
+
+5.3.  Algorithm
+
+   To monitor a given label, users maintain a small amount of state: a
+   map from a position in the log to a version counter.  The version
+   counter is the highest version of the label that's been proven to
+   exist at that log position.  Users initially populate this map by
+   setting the position of the first log entry to contain the label-
+   version pair they've looked up to map to that version.  A map may
+   track several different versions of a label simultaneously, if a user
+   has been shown different versions of the same label.
+
+   To update this map, users receive the most recent tree head from the
+   server and follow these steps, for each entry in the map:
+
+   1.  Compute the entry's direct path (in terms of the Implicit Binary
+       Search Tree) based on the current tree size.
+
+   2.  If there are no entries in the direct path that are to the right
+       of the current entry, then skip updating this entry (there's no
+       new information to update it with).
+
+   3.  For each entry in the direct path that's to the right of the
+       current entry, from low to high:
+
+       1.  Receive and verify a binary ladder from that log entry, for
+           the version currently in the map.  This proves that, at the
+           indicated log entry, the highest version present is greater
+           than or equal to the previously-observed version.
+
+       2.  If the above check was successful, remove the current
+           position-version pair from the map and replace it with a
+           position-version pair corresponding to the entry in the log
+           that was just checked.
+
+   This algorithm progressively moves up the tree as new intermediate/
+   root nodes are established and verifies that they're constructed
+   correctly.  Note that users can often execute this process with the
+   output of Search or Update operations for a label without waiting to
+   make explicit Monitor queries.
+
+   It is also worth noting that the work required to monitor several
+   versions of the same label scales sublinearly, due to the fact that
+   the direct paths of the different versions will often intersect.
+   Intersections reduce the total number of entries in the map and
+   therefore the amount of work that will be needed to monitor the label
+   from then on.
+
+   TODO mention frontier checks when monitoring owned labels TODO
+   multiple monitoring passes
+
+6.  Updating Views of the Tree
+
+   The previous two sections on searching and monitoring the combined
+   tree assumes that we have a fixed root hash.  However, as users
+   interact with the tree over time, they will see many different root
+   hashes as the contents of the tree changes.  It is necessary for
+   users to guarantee that the root hashes they observe are consistent
+   with respect to a few important properties:
 
    *  If root hash A is shown after root hash B, then root hash A
       contains all the same log entries as B (with some new ones
@@ -840,134 +965,6 @@ Log tree:       o                                o
    proof.  The user verifies that the timestamps are monotonic.  If this
    is successful, the user retains the log tree's full subtrees and the
    rightmost log entry's timestamp for future queries.
-
-6.  Monitoring the Tree
-
-   As new entries are added to the log tree, the search path that's
-   traversed to find a specific version of a label may change.  New
-   intermediate nodes may become established in between the search root
-   and the leaf, or a new search root may be created.  The goal of
-   monitoring a label is to efficiently ensure that, when these new
-   parent nodes are created, they're created correctly such that
-   searches for the same versions continue converging to the same
-   entries in the log.
-
-   Monitoring is performed both by the users that own a label and the
-   users that lookup a label.  Owners monitor their labels to ensure
-   that past (expected) versions of a label are still correctly stored
-   in the log, and that no new (unexpected) versions have been added.
-   Users that looked up a label may need to monitor those labels
-   afterwards to ensure that the version of the label they observed was
-   not later concealed by the Transparency Log.
-
-6.1.  Reasonable Monitoring Window
-
-   Users that own a label, meaning that they are the authoritative
-   source for the label's value, MUST regularly monitor the label for
-   the entirety of the time that they own it.  This includes both
-   ensuring that past versions of the label are still correctly
-   represented in the log, and verifying that new versions of the label
-   are permissible (alerting the user if not).
-
-   Service Providers define a duration in seconds, referred to as the
-   *Reasonable Monitoring Window*, which is the frequency with which the
-   Transparency Log generally expects label owners to perform
-   monitoring.  The log entry maximum lifetime MUST be substantially
-   greater than the Reasonable Monitoring Window.
-
-   If a user looks up a label, and finds that the first log entry
-   containing the label-version pair has a timestamp within the
-   Reasonable Monitoring Window, they MUST regularly monitor the label
-   until this timestamp is outside of the window.  Whether a timestamp
-   is within the window or not is determined by subtracting it from the
-   timestamp of the rightmost log entry.  The purpose of this is to
-   ensure that the label-version pair is not removed or obscured by the
-   Transparency Log before the label owner is able to detect it.
-
-   However, if a user looks up a label and finds that the first log
-   entry containing the label-version pair has a timestamp outside of
-   the Reasonable Monitoring Window, they are not required to monitor it
-   afterwards or otherwise retain any state from the query.  This is
-   because it is assumed that the label-version pair has been in the
-   tree long enough for the label owner to have verified it already.
-
-   Users that own a label and are offline for longer than the Reasonable
-   Monitoring Window will be required to do multiple monitoring passes
-   when they come back online: one pass for each interval of the
-   duration that was missed.
-
-6.2.  Binary Ladder
-
-   Similar to the algorithm for searching the tree, the algorithm for
-   monitoring the tree requires a way to prove that the highest version
-   of a label stored in a particular log entry is greater than or equal
-   to a target version.  Since we already know that the target version
-   exists, we only need to prove that there has not been an unexpected
-   downgrade.  As such, the steps of the binary ladder for monitoring
-   are slightly different than for search:
-
-   1.  First, version x of the label is looked up, where x is
-       consecutively higher powers of two minus one (0, 1, 3, 7, ...).
-       This is repeated until x is the largest such value less than or
-       equal to the target version.
-
-   2.  Second, the largest x that was looked up is retained, and
-       consecutively smaller powers of two are added to it until it
-       equals the target version.  Each time a power of two is added,
-       this version of the label is looked up.
-
-   This could be equivalently computed as a search binary ladder,
-   excluding lookups for any versions greater than the target.
-
-6.3.  Algorithm
-
-   To monitor a given label, users maintain a small amount of state: a
-   map from a position in the log to a version counter.  The version
-   counter is the highest version of the label that's been proven to
-   exist at that log position.  Users initially populate this map by
-   setting the position of the first log entry to contain the label-
-   version pair they've looked up to map to that version.  A map may
-   track several different versions of a label simultaneously, if a user
-   has been shown different versions of the same label.
-
-   To update this map, users receive the most recent tree head from the
-   server and follow these steps, for each entry in the map:
-
-   1.  Compute the entry's direct path (in terms of the Implicit Binary
-       Search Tree) based on the current tree size.
-
-   2.  If there are no entries in the direct path that are to the right
-       of the current entry, then skip updating this entry (there's no
-       new information to update it with).
-
-   3.  For each entry in the direct path that's to the right of the
-       current entry, from low to high:
-
-       1.  Receive and verify a binary ladder from that log entry, for
-           the version currently in the map.  This proves that, at the
-           indicated log entry, the highest version present is greater
-           than or equal to the previously-observed version.
-
-       2.  If the above check was successful, remove the current
-           position-version pair from the map and replace it with a
-           position-version pair corresponding to the entry in the log
-           that was just checked.
-
-   This algorithm progressively moves up the tree as new intermediate/
-   root nodes are established and verifies that they're constructed
-   correctly.  Note that users can often execute this process with the
-   output of Search or Update operations for a label without waiting to
-   make explicit Monitor queries.
-
-   It is also worth noting that the work required to monitor several
-   versions of the same label scales sublinearly, due to the fact that
-   the direct paths of the different versions will often intersect.
-   Intersections reduce the total number of entries in the map and
-   therefore the amount of work that will be needed to monitor the label
-   from then on.
-
-   TODO mention frontier checks when monitoring owned labels TODO
-   multiple monitoring passes
 
 7.  Ciphersuites
 
@@ -1514,7 +1511,7 @@ Log tree:       o                                o
    Each MonitorLabel structure contains the label being monitored in
    label, the highest version of the label that the user has observed in
    highest_version, and a list of entries in the log tree corresponding
-   to the keys of the map described in Section 6.
+   to the keys of the map described in Section 5.
 
    The Transparency Log verifies the MonitorRequest by following these
    steps, for each MonitorLabel structure:
@@ -1569,7 +1566,7 @@ Log tree:       o                                o
 
    The steps field of a MonitorProof contains the proofs required to
    update the user's monitoring data following the algorithm in
-   Section 6.  That is, each ProofStep of a MonitorProof contains a
+   Section 5.  That is, each ProofStep of a MonitorProof contains a
    binary ladder for the version MonitorProof.version.  The steps are
    provided in the order that they're consumed by the monitoring
    algorithm.  If same proof is consumed by the monitoring algorithm
@@ -1598,7 +1595,7 @@ Log tree:       o                                o
        that's been previously observed.
 
    3.  For each MonitorProof structure, evalute the monitoring algorithm
-       in Section 6.  Abort with an error if the monitoring algorithm
+       in Section 5.  Abort with an error if the monitoring algorithm
        detects that the tree is constructed incorrectly, or if there are
        fewer or more steps provided than would be expected (keeping in
        mind that extra steps may be provided along the frontier of the
