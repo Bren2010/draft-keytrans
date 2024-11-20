@@ -700,15 +700,16 @@ Log tree:       o                                o
        not, recurse to the log entry's left child.  If, in either case,
        the child doesn't exist:
 
-   6.  It's possible at this point that a commitment to the contents of
-       the desired label-version pair has not been provided by the
-       Transparency Log. This can happen, for example, if multiple
-       versions of a label were inserted in a single epoch and the
-       binary ladder skipped the target version.  If this has happened,
-       out of the log entries touched by the binary search, identify
-       which log entry was first to contain the desired label-version
-       pair.  From this log entry's prefix tree, obtain a search proof
-       for the target label-version pair.
+   6.  This largely concludes the search.  However, it's possible at
+       this point that a commitment to the contents of the desired
+       label-version pair has not been provided by the Transparency Log.
+       This can happen, for example, if multiple versions of a label
+       were inserted in a single epoch and the binary ladder skipped the
+       target version.  If this has happened, out of the log entries
+       touched by the binary search, identify which log entry was first
+       to contain the desired label-version pair.  From this log entry's
+       prefix tree, obtain a search proof for the target label-version
+       pair.
 
    7.  Terminate the search successfully.
 
