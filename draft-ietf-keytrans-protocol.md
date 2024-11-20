@@ -602,55 +602,57 @@ back at step 1.
    subtree, then its timestamp is less than the ancestor's. If the log entry is
    in the ancestor's right subtree, then its timestamp is greater than the
    ancestor's.
-2. If the log entry has surpassed its maximum lifetime, recurse to its right
-   child in the implicit binary search tree. Note that a right child always
-   exists, as the rightmost log entry cannot exceed its maximum lifetime by
-   definition.
+2. If the log entry has surpassed its maximum lifetime and is on the frontier,
+   determine whether its right child has also surpassed its maximum lifetime. If
+   so, recurse to the right child; otherwise, continue to step 3. Note that a
+   right child always exists, as the rightmost log entry cannot exceed its
+   maximum lifetime by definition.
 3. If searching for the most recent version of a label, obtain a binary ladder
    from the current log entry. Verify that the binary ladder proves that the
    greatest version of the label at this log entry is greater than or equal to
-   that of its parent. If this check is successful, recurse to the log entry's
-   right child. If there is no right child, then restart the search algorithm
-   from the root log entry, searching for the specific version of the label that
-   was identified as most recent.
+   that of its parent (if any). If this check is successful, recurse to the log
+   entry's right child. If there is no right child, then restart the search
+   algorithm from the root log entry, searching for the specific version of the
+   label that was identified as most recent.
 4. If searching for a specific version of a label, obtain a truncated binary
    ladder from the current log entry for the target version. (If this is a
    continuation of a "most recent version" search, the non-truncated binary
-   ladders provided along the frontier are re-used for this step.) If the binary
-   ladder stops short of proving the target version is present, recurse to the
-   log entry's right child; else, recurse to its left child. If the child
-   doesn't exist:
-5. This concludes the recursive portion of the algorithm and begins final
-   verification of the results. Verification starts by identifying which log
-   entry which was first to contain the desired label-version pair.
-6. If the first log entry to contain the label-version pair is the leftmost log
-   entry to have not exceeded its maximum lifetime, and the version of the label
-   being searched for is **not** the most recent, then terminate the search
-   unsuccessfully. The desired version of the label has expired and is no longer
-   stored by the Transparency Log.
-7. If a commitment for the target version of the label hasn't been provided by
-   the Transparency Log (perhaps because multiple versions of the label were
-   created in the same epoch), obtain a search proof for the target
-   label-version pair from prefix tree in the log entry identified in step 5.
-8. Terminate the search successfully.
+   ladders provided along the frontier are re-used for this step.)
+5. If the binary ladder stops short of proving the target version is present,
+   recurse to the log entry's right child. Otherwise, check if the log entry has
+   surpassed its maximum lifetime. If so, abort the search with an error
+   indicating that the desired version of the label has expired and is no longer
+   available. If not, recurse to the log entry's left child. If, in either case,
+   the child doesn't exist:
+6. It's possible at this point that a commitment to the contents of the desired
+   label-version pair has not been provided by the Transparency Log. This can
+   happen, for example, if multiple versions of a label were inserted in a
+   single epoch and the binary ladder skipped the target version. If this has
+   happened, out of the log entries touched by the binary search, identify which
+   log entry was first to contain the desired label-version pair. From this log
+   entry's prefix tree, obtain a search proof for the target label-version pair.
+7. Terminate the search successfully.
 
 To allow users to execute this algorithm, the concrete data provided by the
 Transparency Log consists of:
 
 - For each version of the label looked up in a binary ladder: the commitment
   corresponding to the label's value at that version.
-- For each log entry inspected:
+- For each log entry inspected by the search:
   - The log entry's timestamp
   - If a binary ladder is required: a batch search proof in the log entry's
-    prefix tree for all of the different label-version pairs that constitute
-    the binary ladder.
+    prefix tree for all of the different label-version pairs that constitute the
+    binary ladder (potentially including the label-version pair needed by step
+    6).
   - If a binary ladder is not required: the log entry's prefix tree root hash.
 - A batch inclusion proof for all inspected log entries.
 
-While the same label-version pair may be looked up in several different versions
-of the prefix tree, note that the corresponding commitment is only provided
-once. This ensures that the commitments are the same in each version of the
-prefix tree; if they weren't, verification of the proof would fail.
+Users ultimately verify that the search was done correctly by using this
+information to recompute the log tree's root hash. While the same label-version
+pair may be looked up in several different versions of the prefix tree, note
+that the corresponding commitment is only provided once. This ensures that the
+commitments are the same in each version of the prefix tree; if they weren't,
+verification of the proof would fail.
 
 # Updating Views of the Tree
 
