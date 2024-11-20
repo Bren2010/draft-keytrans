@@ -122,13 +122,13 @@ identifiers, and a new version of a label is created each time the label's
 associated value changes. Transparency Logs have an *epoch* counter which is
 incremented every time a new set of label-version pairs are added.
 
-KT uses a *prefix tree* to commit to a mapping between each label-version pair
+KT uses a *prefix tree* to establish a mapping between each label-version pair
 and a commitment to the label's value at that version. Every time the prefix
 tree changes, its new root hash and the current timestamp are stored in a *log
 tree*. The benefit of the prefix tree is that it is easily searchable, and the
 benefit of the log tree is that it can easily be verified to be append-only. The
-data structure, which combines a log tree and a prefix tree, is called the
-*combined tree*.
+data structure powering KT combines a log tree and a prefix tree, and is called
+the *combined tree*.
 
 This section describes the operation of both prefix and log trees at a high
 level and the way that they're combined. More precise algorithms for computing
@@ -138,7 +138,7 @@ the intermediate and root values of the trees are given in
 ## Terminology
 
 Trees consist of
-*nodes* which have a byte string as their *hash value*. A node is either a
+*nodes*, which have a byte string as their *hash value*. A node is either a
 *leaf* if it has no children, or a *parent*
 if it has either a *left child* or a *right child*. A node is the *root* of a
 tree if it has no parents, and an *intermediate* if it has both children and
@@ -186,7 +186,7 @@ Index:  0     1     2     3     4
 {: title="A log tree containing five leaves."}
 
 Log trees initially consist of a single leaf node. New leaves are
-added to the right-most edge of the tree along with a single parent node, to
+added to the right-most edge of the tree along with a single parent node to
 construct the left-balanced binary tree with `n+1` leaves.
 
 ~~~ aasvg
@@ -229,8 +229,8 @@ However, the protocol described in this document generally doesn't provide pure
 inclusion or consistency proofs to verifiers. Instead, it relies on the more
 general idea of providing the minimum set of intermediate node values that are
 necessary to allow a verifier to compute one or more root values from
-intermediate/leaf values that they already have. The verifier may already have
-intermediate/leaf values because they were provided by the Transparency Log as
+intermediate and leaf values that they already have. The verifier may already have
+intermediate and leaf values because they were provided by the Transparency Log as
 part of its response to the current query, or because they were retained from
 responses to previous queries. This pattern of providing proofs ensures that
 there is minimal on-the-wire redundancy.
@@ -295,7 +295,7 @@ The root node, in particular, represents the empty string as a prefix. The
 root's left child contains all search keys that begin with a 0 bit, while the right
 child contains all search keys that begin with a 1 bit.
 
-A prefix tree can be searched by starting at the root node, and moving to the
+A prefix tree can be searched by starting at the root node and moving to the
 left child if the first bit of a search key is 0, or the right child if the first bit
 is 1. This is then repeated for the second bit, third bit, and so on until the
 search either terminates at a leaf node (which may or may not be for the desired
@@ -358,7 +358,7 @@ hash value of the tree.
 ## Combined Tree
 
 Log trees are desirable because they can provide efficient consistency proofs to
-assure verifiers that nothing has been removed from a log that was present in a
+convince verifiers that nothing has been removed from a log that was present in a
 previous version. However, log trees can't be efficiently searched without
 downloading the entire log. Prefix trees are efficient to search and can provide
 inclusion proofs to convince verifiers that the returned search results are
@@ -369,7 +369,7 @@ added.
 In the combined tree structure, which is based on {{Merkle2}}, a prefix tree
 contains a mapping where each label-version pair has a search key, and the
 search key's value is a cryptographic commitment to the label's new contents. A
-log tree contains a record of each version of the prefix tree that's created and
+log tree contains a record of each version of the prefix tree and
 the timestamp that it was created. With some caveats, this combined structure
 supports both efficient consistency proofs and can be efficiently searched.
 
@@ -508,7 +508,7 @@ label that's present at a given log entry is greater than, equal to, or less
 than a target version.
 
 A **binary ladder** is a series of lookups in a single log entry's prefix tree
-that determines the highest version of a label that exists, and proceeds as
+that determines the highest version of a label that exists, and it proceeds as
 follows:
 
 1. First, version `x` of the label is looked up, where `x` is a consecutively
@@ -530,7 +530,7 @@ While being able to determine the exact highest version of a label is sometimes
 useful (as the next section discusses), this is not always the case. If a user
 is searching for a specific version of a label, they only need to know whether
 the highest version at a given log entry is greater than or less than their
-target version, not its exact value. A **truncated binary ladder** is one which
+target version -- not its exact value. A **truncated binary ladder** is one which
 stops after the first proof of inclusion for a version greater than or equal to
 the target version, or the first proof of non-inclusion for a version less than
 the target version.
@@ -558,16 +558,37 @@ specific version.
 
 ## Maximum Lifetime
 
-A Transparency Log operator MAY define a maximum lifetime for log entries. This
-maximum lifetime MUST be greater than zero seconds. Log entries which have
-exceeded their maximum lifetime will simply be skipped in searches, instead of
-needing to produce a binary ladder. This allows the Transparency Log to prune
-data which is sufficiently old, and is explained in more detail in TODO.
+A Transparency Log operator MAY define a maximum lifetime for log entries. If
+defined, it MUST be greater than zero seconds. Whether a log entry has surpassed
+its maximum lifetime is determined by subtracting the timestamp of the most
+recent log entry from the timestamp of the log entry in question.
 
-Whether a log entry has surpassed its maximum lifetime is determined by
-subtracting the timestamp of the most recent log entry from the timestamp of the
-log entry in question. If this is the case, the binary search immediately
-proceeds to the log entry's right child in the implicit binary search tree.
+A user executing a search may arrive at a log entry which is past its maximum
+lifetime by either of two ways. The user may have inspected a log entry which is
+**not** expired and decided to recurse to the log entry's left child, which is
+expired. Alternatively, the root log entry may be expired, in which case the
+user would've started their search at the expired root log entry.
+
+When a user's search proceeds from a log entry which is not expired to a log
+entry which is expired, the user is provided with a binary ladder from the
+expired log entry as usual. If the user's search would recurse further into the
+expired portion of the tree (to the log entry's left child), the search is
+aborted. If the user's search would recurse away from the expired portion of the
+tree (to the log entry's right child), the user continues as normal.
+
+When the root and potentially multiple frontier log entries are expired, the
+user skips to the furthest-right expired frontier log entry without receiving
+binary ladders from any of its parent log entries. Similar to the previous case,
+the user is provided with a binary ladder from this log entry. If the user
+determines that its search would recurse to the left (further into the expired
+portion of the tree), it aborts; to the right (into the unexpired portion of the
+tree), it continues.
+
+This allows the Transparency Log to prune data which is sufficiently old, as
+only a small amount of the log tree and prefix tree outside of the maximum
+lifetime need to be retained. In particular, only a logarithmic number of log
+entries that have passed their maximum lifetime will still be needed by users;
+the rest can be discarded. Pruning is explained in more detail in TODO.
 
 ## Full Algorithm
 
@@ -598,7 +619,20 @@ back at step 1.
    ladders provided along the frontier are re-used for this step.) If the binary
    ladder stops short of proving the target version is present, recurse to the
    log entry's right child; else, recurse to its left child. If the child
-   doesn't exist, terminate the search successfully.
+   doesn't exist:
+5. This concludes the recursive portion of the algorithm and begins final
+   verification of the results. Verification starts by identifying which log
+   entry which was first to contain the desired label-version pair.
+6. If the first log entry to contain the label-version pair is the leftmost log
+   entry to have not exceeded its maximum lifetime, and the version of the label
+   being searched for is **not** the most recent, then terminate the search
+   unsuccessfully. The desired version of the label has expired and is no longer
+   stored by the Transparency Log.
+7. If a commitment for the target version of the label hasn't been provided by
+   the Transparency Log (perhaps because multiple versions of the label were
+   created in the same epoch), obtain a search proof for the target
+   label-version pair from prefix tree in the log entry identified in step 5.
+8. Terminate the search successfully.
 
 To allow users to execute this algorithm, the concrete data provided by the
 Transparency Log consists of:
@@ -617,21 +651,6 @@ While the same label-version pair may be looked up in several different versions
 of the prefix tree, note that the corresponding commitment is only provided
 once. This ensures that the commitments are the same in each version of the
 prefix tree; if they weren't, verification of the proof would fail.
-
-<!--
-TODO: Move to protocol section
-
-In addition to the verification steps described in the algorithm above, the user
-verifies the data provided by the Transparency Log by following these steps:
-
-1. Compute the prefix tree root hash of each log entry (when it is not provided
-   explicitly) by hashing together the binary ladder with the provided
-   commitments.
-2. Compute the set of log tree leaf hashes by hashing together each log
-   entry's timestamp and prefix tree root hash.
-3. Compute the log tree root hash by hashing together the leaf hashes with the
-   provided batch inclusion proof.
-4. Verify the Transparency Log's signature over the computed log tree root hash. -->
 
 # Updating Views of the Tree
 
