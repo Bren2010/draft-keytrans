@@ -395,7 +395,7 @@ Log tree:       o                                o
 new leaf is added to a log tree containing the timestamp T_n, and the new
 prefix tree root hash PT_n."}
 
-# Searching the Tree
+# Fixed-Version Searches
 
 When searching the combined tree structure described in {{combined-tree}}, users
 do a binary search for the first log entry where the prefix tree at that entry
@@ -405,8 +405,6 @@ efficient client-side auditing of the Transparency Log. The binary search uses
 an *implicit binary search tree* constructed over the leaves of the log tree
 (distinct from the structure of the log tree itself), which allows the search to
 have a complexity logarithmic in the number of the log's leaves.
-
-An abridged process for searching the tree is described in TODO.
 
 ## Implicit Binary Search Tree
 
@@ -497,15 +495,21 @@ to access would be `right(31, 50) = 47`. As more entries are added to the log,
 users will consistently revisit entries 31 and 47, while they may never revisit
 entry 25 after even a single new entry is added to the log.
 
+It is also frequently useful to refer to the **frontier** of the log. The
+frontier consists of the root node of a search, followed by the entries produced
+by repeatedly calling `right` until reaching the last entry of the log. Using
+the same example of a search where the log has 50 entries, the frontier would be
+entries: 31, 47, 49.
+
 ## Binary Ladder
 
-When executing searches on a Transparency Log, the implicit tree described in
+When executing searches, the implicit tree described in
 {{implicit-binary-search-tree}} is navigated according to a binary search. At
 each individual log entry, the binary search needs to determine whether it
 should move left or right. That is, it needs to determine, out of the set of
 label-version pairs stored in the prefix tree, whether the highest version of a
 label that's present at a given log entry is greater than, equal to, or less
-than a target version.
+than the target version.
 
 A **binary ladder** is a series of lookups in a single log entry's prefix tree
 that determines the highest version of a label that exists, and it proceeds as
@@ -527,47 +531,26 @@ versions 5 and 6 would conclude the proof that 6 is the highest version
 available.
 
 While being able to determine the exact highest version of a label is sometimes
-useful (as the next section discusses), this is not always the case. If a user
-is searching for a specific version of a label, they only need to know whether
+useful (as discussed in {{greatest-version-searches}}), this is not always the case. Users
+searching for a specific version of a label only need to know whether
 the highest version at a given log entry is greater than or less than their
 target version -- not its exact value. A **truncated binary ladder** is one which
 stops after the first proof of inclusion for a version greater than or equal to
 the target version, or the first proof of non-inclusion for a version less than
 the target version.
 
-## Most Recent Version
-
-When users wish to search for the "most recent" version of a label, they must
-determine the highest version of the label that exists in the log overall -- not
-just a single log entry. To do this, users request a binary ladder for each node
-on the **frontier** of the log. The frontier consists of the root node of a
-search, followed by the entries produced by repeatedly calling `right` until
-reaching the last entry of the log. Using the same example of a search where the
-log has 50 entries, the frontier would be entries: 31, 47, 49.
-
-For the purpose of finding the highest version possible, requesting a binary
-ladder for each entry along the frontier is functionally the same as doing so
-for only the rightmost log entry. However, inspecting the entire frontier allows
-the user to verify that the search path leading to the last log entry represents
-a monotonic series of version increases, which minimizes opportunities for log
-misbehavior.
-
-Once the user has verified that the frontier lookups are monotonic and
-determined the highest version, the user then continues a binary search for this
-specific version.
-
 ## Maximum Lifetime
 
 A Transparency Log operator MAY define a maximum lifetime for log entries. If
 defined, it MUST be greater than zero seconds. Whether a log entry has surpassed
-its maximum lifetime is determined by subtracting the timestamp of the most
-recent log entry from the timestamp of the log entry in question.
+its maximum lifetime is determined by subtracting the timestamp of the rightmost
+log entry from the timestamp of the log entry in question.
 
 A user executing a search may arrive at a log entry which is past its maximum
 lifetime by either of two ways. The user may have inspected a log entry which is
 **not** expired and decided to recurse to the log entry's left child, which is
 expired. Alternatively, the root log entry may be expired, in which case the
-user would've started their search at the expired root log entry.
+user would've started their search at an expired root log entry.
 
 When a user's search proceeds from a log entry which is not expired to a log
 entry which is expired, the user is provided with a binary ladder from the
@@ -592,47 +575,52 @@ the rest can be discarded. Pruning is explained in more detail in TODO.
 
 ## Algorithm
 
-The full process for performing a search is described below as a recursive
-algorithm. It starts with the root log entry, as defined by the implicit binary
-search tree, and then recurses to left or right children, each time starting
-back at step 1.
+The algorithm for performing a fixed-version search (a search for a specific
+version of a label) is described below as a recursive algorithm. It starts with
+the root log entry, as defined by the implicit binary search tree, and then
+recurses to left or right children, each time starting back at step 1.
 
 1. Verify that the log entry's timestamp is consistent with the timestamps of
    all ancestor log entries. That is, if the log entry is in the ancestor's left
-   subtree, then its timestamp is less than the ancestor's. If the log entry is
-   in the ancestor's right subtree, then its timestamp is greater than the
-   ancestor's.
+   subtree, then its timestamp is less than or equal to the ancestor's. If the
+   log entry is in the ancestor's right subtree, then its timestamp is greater
+   than or equal to the ancestor's.
 2. If the log entry has surpassed its maximum lifetime and is on the frontier,
    determine whether its right child has also surpassed its maximum lifetime. If
    so, recurse to the right child; otherwise, continue to step 3. Note that a
    right child always exists, as the rightmost log entry cannot exceed its
    maximum lifetime by definition.
-3. If searching for the most recent version of a label, obtain a binary ladder
-   from the current log entry. Verify that the binary ladder proves that the
-   greatest version of the label at this log entry is greater than or equal to
-   that of its parent (if any). If this check is successful, recurse to the log
-   entry's right child. If there is no right child, then restart the search
-   algorithm from the root log entry, searching for the specific version of the
-   label that was identified as most recent.
-4. If searching for a specific version of a label, obtain a truncated binary
-   ladder from the current log entry for the target version. (If this is a
-   continuation of a "most recent version" search, the non-truncated binary
-   ladders provided along the frontier are re-used for this step.)
-5. If the binary ladder stops short of proving the target version is present,
+3. Obtain a truncated binary ladder from the current log entry for the target
+   version.
+4. If the binary ladder stops short of proving the target version is present,
    recurse to the log entry's right child. Otherwise, check if the log entry has
    surpassed its maximum lifetime. If so, abort the search with an error
    indicating that the desired version of the label has expired and is no longer
    available. If not, recurse to the log entry's left child. If, in either case,
    the child doesn't exist:
-6. This largely concludes the search. However, it's possible at this point that
-   a commitment to the contents of the desired label-version pair has not been
-   provided by the Transparency Log. This can happen, for example, if multiple
-   versions of a label were inserted in a single epoch and the binary ladder
-   skipped the target version. If this has happened, out of the log entries
-   touched by the binary search, identify which log entry was first to contain
-   the desired label-version pair. From this log entry's prefix tree, obtain a
-   search proof for the target label-version pair.
-7. Terminate the search successfully.
+5. This largely concludes the search. However, there are some additional
+   technicalities to address. First, it's possible for the binary search to
+   conclude successfully even if the label-version pair that the user is
+   interested in has expired. Out of the log entries touched by the binary
+   search, identify which log entry was first to contain the desired
+   label-version pair. If it is a log entry that is past its maximum lifetime,
+   abort the search and return an error to the user.
+6. It's also possible at this point that a commitment to the contents of the
+   desired label-version pair has not been provided by the Transparency Log.
+   This can happen, for example, if multiple versions of a label were inserted
+   in a single epoch and the binary ladder skipped the target version. If this
+   has happened, obtain a search proof for the target label-version pair from
+   the prefix tree in the first log entry to contain it (identified in step 5).
+
+The most important goal of this algorithm is correctly identifying the first log
+entry that contains the target label-version pair. The fundamental purpose for
+doing this is to make monitoring more efficient for the label owner. If a label
+has a large number of versions, it can become prohibitively expensive for its
+owner to repeatedly check that every single version is represented correctly in
+different log entries. Instead, the label owner can check that the version was
+created correctly in the one epoch where it was first added, and then enforce
+that binary searches for that version will always converge back to that log
+entry.
 
 To allow users to execute this algorithm, the concrete data provided by the
 Transparency Log consists of:
@@ -648,12 +636,35 @@ Transparency Log consists of:
   - If a binary ladder is not required: the log entry's prefix tree root hash.
 - A batch inclusion proof for all inspected log entries.
 
-Users ultimately verify that the search was done correctly by using this
-information to recompute the log tree's root hash. While the same label-version
-pair may be looked up in several different versions of the prefix tree, note
-that the corresponding commitment is only provided once. This ensures that the
-commitments are the same in each version of the prefix tree; if they weren't,
-verification of the proof would fail.
+Ultimately, users verify that the search was done correctly by using this
+information to recompute the log tree's root hash.
+
+
+# Greatest-Version Searches
+
+Users often wish to search for the "most recent" version, or the greatest
+version, of a label. Unlike searches for a specific version, label owners
+regularly verify that their most recent version is correctly represented in the
+log. This enables a simpler, more efficient approach to searching.
+
+{{distinguished-log-entries}} defines the concept of a **distinguished** log
+entry, which is a specific log entry that label owners are required to check for
+correctness. To perform a greatest-version search, users start at the rightmost
+distinguished log entry. This log entry will always be on the frontier of the
+log and will never be past its maximum lifetime.
+
+Users receive a non-truncated binary ladder from the rightmost distinguished log
+entry, which identifies the greatest version of the label that it contains.
+Users then proceed down the remainder of the frontier: the distinguished log
+entry's right child, the right child's right child, and so on until reaching the
+last log entry. From each of these log entries, the user also receives a
+non-truncated binary ladder identifying the greatest version of the label that
+each contains.
+
+If any of the frontier log entries have a different greatest version than the
+distinguished log entry, the user verifies that they represent a monotonic
+series of version increases. Assuming they do, the user is provided with the
+value for the greatest version identified.
 
 
 # Monitoring the Tree
@@ -684,12 +695,12 @@ expects label owners to perform monitoring. The log entry maximum lifetime, if
 defined, MUST be greater than the RMW.
 
 If a user looks up a label and finds that the first log entry containing the
-label-version pair has a timestamp within the RMW, they MUST regularly monitor
-the label until this timestamp is outside of the window. Whether a timestamp is
-within the window or not is determined by subtracting it from the timestamp of
-the rightmost log entry. The purpose of this monitoring is to ensure that the
-label-version pair is not removed or obscured by the Transparency Log before the
-label owner has had an opportunity to detect it.
+label-version pair they're interested in has a timestamp within the RMW, they
+MUST regularly monitor the label until this timestamp is outside of the window.
+Whether a timestamp is within the window or not is determined by subtracting it
+from the timestamp of the rightmost log entry. The purpose of this monitoring is
+to ensure that the label-version pair is not removed or obscured by the
+Transparency Log before the label owner has had an opportunity to detect it.
 
 However, if a user looks up a label and finds that the first log entry
 containing the label-version pair has a timestamp outside of the RMW, they are
@@ -701,6 +712,37 @@ MUST (if at all possible) happen more frequently than the log entry maximum
 lifetime. Users that own a label and are offline for longer than the RMW will
 need to do multiple monitoring passes when they come back online: one pass for
 each interval of the duration that was missed.
+
+## Distinguished Log Entries
+
+As discussed in {{reasonable-monitoring-window}}, users that consume data from
+log entries that have timestamps within the RMW must perform extra monitoring
+afterwards, at least until that log entry is outside of the RMW.
+**Distinguished** log entries are chosen, roughly one per interval of the RMW,
+such that any user that does the required monitoring will intersect with one of
+the distinguished log entries.
+
+
+
+
+, roughly one per interval of the RMW,
+such that the label owner can check only these log entries for correctness. As
+long as the users that looked up the labels perform the required monitoring, any
+misbehavior by the Transparency Log is guaranteed to be detected.
+
+
+looks up a label and finds that the first log
+entry containing the label-version pair they're interested in has a timestamp
+within the Reasonable Monitoring Window
+
+
+As the tree grows, certain log entries are chosen to be **distinguished**.
+Distinguished log entries are chosen such that they intersect with the nodes monitored by any user that looked up a label
+
+
+
+as predictably as possible, and such that
+there is at least one per interval of the Reasonable Monitoring Window.
 
 ## Binary Ladder
 
@@ -766,11 +808,11 @@ TODO multiple monitoring passes
 
 # Updating Views of the Tree
 
-The previous two sections on searching and monitoring the combined tree assumes that we
-have a fixed root hash. However, as users interact with the tree over time, they
-will see many different root hashes as the contents of the tree changes. It is
-necessary for users to guarantee that the root hashes they observe are
-consistent with respect to a few important properties:
+The previous sections on searching and monitoring always operate on a single,
+fixed version of the combined tree. However, as users interact with the tree
+over time, they will see many different root hashes as the contents of the tree
+changes. It's necessary for users to guarantee that the root hashes they observe
+are consistent with respect to a few important properties:
 
 - If root hash A is shown after root hash B, then root hash A contains all the
   same log entries as B (with some new ones potentially added).
@@ -785,7 +827,7 @@ removes a log entry after showing it to a user, as this would allow the
 Transparency Log to remove evidence of its own misbehavior. The second two
 properties ensure that all users have a consistent view of when each portion of
 the tree was created. Disagreement on when portions of the tree were created is
-functionally a fork, and it introduces the same security issues. This is because
+functionally a fork and it introduces the same security issues. This is because
 users rely on log entry timestamps to decide whether to continue monitoring
 certain labels, or which portions of the tree to skip when searching.
 
@@ -843,7 +885,7 @@ have a previous tree head to advertise, the Transparency Log simply provides the
 timestamps and prefix tree root hashes of the log entries on the frontier, along
 with an inclusion proof. The user verifies that the timestamps are monotonic. If
 this is successful, the user retains the log tree's full subtrees and the
-rightmost log entry's timestamp for future queries.
+frontier timestamps for future queries.
 
 
 # Ciphersuites
