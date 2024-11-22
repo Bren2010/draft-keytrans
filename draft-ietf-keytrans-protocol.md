@@ -561,7 +561,7 @@ tree (to the log entry's right child), the user continues as normal.
 
 When the root and potentially multiple frontier log entries are expired, the
 user skips to the furthest-right expired frontier log entry without receiving
-binary ladders from any of its parent log entries. Similar to the previous case,
+binary ladders from any of its parents. Similar to the previous case,
 the user is provided with a binary ladder from this log entry. If the user
 determines that its search would recurse to the left (further into the expired
 portion of the tree), it aborts; to the right (into the unexpired portion of the
@@ -611,15 +611,19 @@ recurses to left or right children, each time starting back at step 1.
    in a single epoch and the binary ladder skipped the target version. If this
    has happened, obtain a search proof for the target label-version pair from
    the prefix tree in the first log entry to contain it (identified in step 5).
+7. Finally, if the binary search failed to find a log entry containing the
+   desired label-version pair, or if the search proof in step 6 returned a proof
+   of non-inclusion, return an error to the user indicating that the version of
+   the label does not exist. Otherwise, terminate the search successfully.
 
 The most important goal of this algorithm is correctly identifying the first log
 entry that contains the target label-version pair. The fundamental purpose for
 doing this is to make monitoring more efficient for the label owner. If a label
 has a large number of versions, it can become prohibitively expensive for its
 owner to repeatedly check that every single version is represented correctly in
-different log entries. Instead, the label owner can check that the version was
-created correctly in the one epoch where it was first added, and then enforce
-that binary searches for that version will always converge back to that log
+multiple log entries. Instead, the label owner can check that the version was
+created correctly in the one epoch where it was first added and then enforce
+that binary searches for that version will always converge back to that same log
 entry.
 
 To allow users to execute this algorithm, the concrete data provided by the
@@ -651,20 +655,20 @@ log. This enables a simpler, more efficient approach to searching.
 entry, which is a specific log entry that label owners are required to check for
 correctness. To perform a greatest-version search, users start at the rightmost
 distinguished log entry. This log entry will always be on the frontier of the
-log and will never be past its maximum lifetime.
+log and will never be past its maximum lifetime. If there is no distinguished
+log entry yet, users start at the root instead.
 
-Users receive a non-truncated binary ladder from the rightmost distinguished log
-entry, which identifies the greatest version of the label that it contains.
-Users then proceed down the remainder of the frontier: the distinguished log
-entry's right child, the right child's right child, and so on until reaching the
-last log entry. From each of these log entries, the user also receives a
-non-truncated binary ladder identifying the greatest version of the label that
-each contains.
+Users receive a non-truncated binary ladder from their starting log entry. This
+identifies the greatest version of the label that it contains. Users then
+proceed down the remainder of the frontier: the starting log entry's right
+child, the right child's right child, and so on until reaching the last log
+entry. From each of these log entries, the user also receives a non-truncated
+binary ladder identifying the greatest version of the label that each contains.
 
 If any of the frontier log entries have a different greatest version than the
-distinguished log entry, the user verifies that they represent a monotonic
-series of version increases. Assuming they do, the user is provided with the
-value for the greatest version identified.
+starting log entry, the user verifies that they represent a monotonic series of
+version increases. Assuming they do, the user is provided with the value for the
+greatest version identified.
 
 
 # Monitoring the Tree
@@ -876,9 +880,15 @@ intermediate hashes from the log tree are provided that are necessary to compute
 the new root hash from the given log entries and the full subtrees retained by
 the user.
 
+Additionally, the Transparency Log defines two durations: how old of a view of
+the tree is acceptable, and how far ahead of the current time a view of the tree
+may claim to be. Users verify that the rightmost log entry's timestamp falls
+within this range according to their local clock.
+
 Only once the user successfully verifies that the log entries' timestamps are
-monotonic and that it correctly computed the new root hash, can they update
-their stored state to replace the previous tree head with the new one.
+monotonic, that it correctly computed the new root hash, and that the rightmost
+log entry's timestamp is in an acceptable range, can they update their stored
+state to replace the previous tree head with the new one.
 
 For users which have never interacted with the Transparency Log before and don't
 have a previous tree head to advertise, the Transparency Log simply provides the
@@ -1227,7 +1237,7 @@ Each element of `vrf_proofs` contains the output of evaluating the VRF on a
 different version of the label. The versions chosen correspond either to
 the binary ladder described in {{binary-ladder}} (when searching for a specific
 version of a label), or to the full binary ladder described in
-{{most-recent-version}} (when searching for the most recent version of a label).
+TODO (when searching for the most recent version of a label).
 The proofs are sorted from lowest version to highest version.
 
 Each `ProofStep` structure in `steps` is one log entry that was inspected as
@@ -1235,7 +1245,7 @@ part of the binary search. The first step corresponds to the "middle" leaf of
 the log tree (calculated with the `root` function in
 {{implicit-binary-search-tree}}). From there, each subsequent step moves left or
 right in the tree, according to the procedure discussed in {{binary-ladder}} and
-{{most-recent-version}}.
+TODO.
 
 The `prefix_proof` field of a `ProofStep` is the output of executing a binary
 ladder, excluding any ladder steps for which a proof of inclusion is expected,
