@@ -2156,12 +2156,13 @@ information to recompute the log tree's root hash.<a href="#section-4.4-6" class
 version, of a label. Unlike searches for a specific version, label owners
 regularly verify that their most recent version is correctly represented in the
 log. This enables a simpler, more efficient approach to searching.<a href="#section-5-1" class="pilcrow">¶</a></p>
-<p id="section-5-2"><a href="#distinguished-log-entries" class="auto internal xref">Section 6.2</a> defines the concept of a <strong>distinguished</strong> log
-entry, which is a specific log entry that label owners are required to check for
-correctness. To perform a greatest-version search, users start at the rightmost
-distinguished log entry. This log entry will always be on the frontier of the
-log and will never be past its maximum lifetime. If there is no distinguished
-log entry yet, users start at the root instead.<a href="#section-5-2" class="pilcrow">¶</a></p>
+<p id="section-5-2"><a href="#reasonable-monitoring-window" class="auto internal xref">Section 6.1</a> and <a href="#distinguished-log-entries" class="auto internal xref">Section 6.2</a> define the
+concept of a <strong>distinguished</strong> log entry, which is a specific log entry that
+label owners are required to check for correctness. To perform a
+greatest-version search, users start at the rightmost distinguished log entry.
+This log entry will always be on the frontier of the log and will never be past
+its maximum lifetime. If there is no distinguished log entry yet, users start at
+the root instead.<a href="#section-5-2" class="pilcrow">¶</a></p>
 <p id="section-5-3">Users receive a non-truncated binary ladder from their starting log entry. This
 identifies the greatest version of the label that it contains. Users then
 proceed down the remainder of the frontier: the starting log entry's right
@@ -2189,9 +2190,9 @@ for the same versions continue converging to the same entries in the log.<a href
 authoritative source for the label's value) and the users that lookup a label.
 Owners monitor their labels to ensure that past (expected) versions of a label
 are still correctly stored in the log and that no new (unexpected) versions have
-been added. Users that looked up a label may need to monitor it afterwards to
-ensure that the version they observed isn't later concealed by the Transparency
-Log.<a href="#section-6-2" class="pilcrow">¶</a></p>
+been added. Users that looked up a label may sometimes need to monitor it
+afterwards to ensure that the version they observed isn't later concealed by the
+Transparency Log.<a href="#section-6-2" class="pilcrow">¶</a></p>
 <div id="reasonable-monitoring-window">
 <section id="section-6.1">
         <h3 id="name-reasonable-monitoring-windo">
@@ -2204,22 +2205,23 @@ define a duration in seconds, referred to as the <strong>Reasonable Monitoring
 Window</strong> (RMW), which is the frequency with which the Transparency Log generally
 expects label owners to perform monitoring. The log entry maximum lifetime, if
 defined, <span class="bcp14">MUST</span> be greater than the RMW.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
-<p id="section-6.1-2">If a user looks up a label and finds that the first log entry containing the
-label-version pair they're interested in has a timestamp within the RMW, they
-<span class="bcp14">MUST</span> regularly monitor the label until this timestamp is outside of the window.
-Whether a timestamp is within the window or not is determined by subtracting it
-from the timestamp of the rightmost log entry. The purpose of this monitoring is
-to ensure that the label-version pair is not removed or obscured by the
+<p id="section-6.1-2"><strong>Distinguished</strong> log entries are chosen such that there is roughly one per
+every interval of the RMW. If a user looks up a label and finds that the first
+log entry containing their desired label-version pair is to the right of the
+rightmost distinguished log entry, they <span class="bcp14">MUST</span> regularly monitor the label-version
+pair until its monitoring path intersects a distinguished log entry. That is,
+until a new distinguished log entry is established to its right and the two log
+entries are verified to be consistent. The purpose of this monitoring is to
+ensure that the label-version pair is not removed or obscured by the
 Transparency Log before the label owner has had an opportunity to detect it.<a href="#section-6.1-2" class="pilcrow">¶</a></p>
 <p id="section-6.1-3">However, if a user looks up a label and finds that the first log entry
-containing the label-version pair has a timestamp outside of the RMW, they are
-not required to monitor it afterwards or otherwise retain any state from the
-query.<a href="#section-6.1-3" class="pilcrow">¶</a></p>
-<p id="section-6.1-4">"Regular" monitoring <span class="bcp14">SHOULD</span> be performed roughly as frequently as the RMW and
+containing the label-version pair is to the left of any distinguished log entry,
+they are not required to monitor it afterwards or otherwise retain any state
+from the query (beyond the tree head, discussed in
+<a href="#updating-views-of-the-tree" class="auto internal xref">Section 7</a>).<a href="#section-6.1-3" class="pilcrow">¶</a></p>
+<p id="section-6.1-4">"Regular" monitoring <span class="bcp14">SHOULD</span> be performed at least as frequently as the RMW and
 <span class="bcp14">MUST</span> (if at all possible) happen more frequently than the log entry maximum
-lifetime. Users that own a label and are offline for longer than the RMW will
-need to do multiple monitoring passes when they come back online: one pass for
-each interval of the duration that was missed.<a href="#section-6.1-4" class="pilcrow">¶</a></p>
+lifetime.<a href="#section-6.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="distinguished-log-entries">
@@ -2227,23 +2229,59 @@ each interval of the duration that was missed.<a href="#section-6.1-4" class="pi
         <h3 id="name-distinguished-log-entries">
 <a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-distinguished-log-entries" class="section-name selfRef">Distinguished Log Entries</a>
         </h3>
-<p id="section-6.2-1">As discussed in <a href="#reasonable-monitoring-window" class="auto internal xref">Section 6.1</a>, users that consume data from
-log entries that have timestamps within the RMW must perform extra monitoring
-afterwards, at least until that log entry is outside of the RMW.
-<strong>Distinguished</strong> log entries are chosen, roughly one per interval of the RMW,
-such that any user that does the required monitoring will intersect with one of
-the distinguished log entries.<a href="#section-6.2-1" class="pilcrow">¶</a></p>
-<p id="section-6.2-2">, roughly one per interval of the RMW,
-such that the label owner can check only these log entries for correctness. As
-long as the users that looked up the labels perform the required monitoring, any
-misbehavior by the Transparency Log is guaranteed to be detected.<a href="#section-6.2-2" class="pilcrow">¶</a></p>
-<p id="section-6.2-3">looks up a label and finds that the first log
-entry containing the label-version pair they're interested in has a timestamp
-within the Reasonable Monitoring Window<a href="#section-6.2-3" class="pilcrow">¶</a></p>
-<p id="section-6.2-4">As the tree grows, certain log entries are chosen to be <strong>distinguished</strong>.
-Distinguished log entries are chosen such that they intersect with the nodes monitored by any user that looked up a label<a href="#section-6.2-4" class="pilcrow">¶</a></p>
-<p id="section-6.2-5">as predictably as possible, and such that
-there is at least one per interval of the Reasonable Monitoring Window.<a href="#section-6.2-5" class="pilcrow">¶</a></p>
+<p id="section-6.2-1">The process for choosing distinguished log entries is required to meet a number
+of criteria:<a href="#section-6.2-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-6.2-2.1">
+            <p id="section-6.2-2.1.1">Regularly Spaced: Having irregularly-spaced distinguished log entries risks
+either overwhelming label owners with a large number of them, or delaying
+consensus between users by having arbitrarily few. Distinguished log entries
+must reliably occur at roughly the same interval as the Reasonable Monitoring
+Window regardless of variations in the tree's growth rate or other factors.<a href="#section-6.2-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-6.2-2.2">
+            <p id="section-6.2-2.2.1">Stable: Once a log entry is chosen to be distinguished, it may never stop
+being distinguished. This ensures that if a user that looked up a label checks
+consistency with a distinguished log entry, that log entry will not later lose
+its distinguished status and potentially avoid inspection by the label owner.<a href="#section-6.2-2.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li class="normal" id="section-6.2-2.3">
+            <p id="section-6.2-2.3.1">Verifiable: All users in the system must be capable of interacting with the
+Transparency Log and determining for themselves which log entries are
+distinguished and which aren't. This prevents misbehavior by the Transparency
+Log.<a href="#section-6.2-2.3.1" class="pilcrow">¶</a></p>
+</li>
+        </ul>
+<p id="section-6.2-3">To satisfy these criteria, distinguished log entries are chosen according to the
+following recursive algorithm:<a href="#section-6.2-3" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-6.2-4">
+<li id="section-6.2-4.1">
+            <p id="section-6.2-4.1.1">Take as input: a log entry, the timestamp of a log entry to its left, and the
+timestamp of a log entry to its right.<a href="#section-6.2-4.1.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.2-4.2">
+            <p id="section-6.2-4.2.1">If the right timestamp minus the left timestamp is less than the Reasonable
+Monitoring Window, terminate the algorithm. Otherwise:<a href="#section-6.2-4.2.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.2-4.3">
+            <p id="section-6.2-4.3.1">Assert that the log entry is distinguished.<a href="#section-6.2-4.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.2-4.4">
+            <p id="section-6.2-4.4.1">If the given log entry has a left child in the implicit binary search tree,
+then recurse to its subtree by executing this algorithm with: the given log
+entry's left child, the given left timestamp, and the timestamp of the given
+log entry.<a href="#section-6.2-4.4.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-6.2-4.5">
+            <p id="section-6.2-4.5.1">If the given log entry has a right child, then recurse to its right subtree
+by executing this algorithm with: the given log entry's right child, the
+timestamp of the given log entry, and the given right timestamp.<a href="#section-6.2-4.5.1" class="pilcrow">¶</a></p>
+</li>
+        </ol>
+<p id="section-6.2-5">The recursive nature of the algorithm allows users to easily compute specific
+distinguished log entries such as the rightmost one. Note that step 2 is
+specifically "less than" and not "less than or equal to"; this ensures correct
+behavior when the RMW is zero.<a href="#section-6.2-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="binary-ladder-1">
