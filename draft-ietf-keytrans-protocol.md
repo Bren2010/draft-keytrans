@@ -651,12 +651,13 @@ version, of a label. Unlike searches for a specific version, label owners
 regularly verify that their most recent version is correctly represented in the
 log. This enables a simpler, more efficient approach to searching.
 
-{{distinguished-log-entries}} defines the concept of a **distinguished** log
-entry, which is a specific log entry that label owners are required to check for
-correctness. To perform a greatest-version search, users start at the rightmost
-distinguished log entry. This log entry will always be on the frontier of the
-log and will never be past its maximum lifetime. If there is no distinguished
-log entry yet, users start at the root instead.
+{{reasonable-monitoring-window}} and {{distinguished-log-entries}} define the
+concept of a **distinguished** log entry, which is a specific log entry that
+label owners are required to check for correctness. To perform a
+greatest-version search, users start at the rightmost distinguished log entry.
+This log entry will always be on the frontier of the log and will never be past
+its maximum lifetime. If there is no distinguished log entry yet, users start at
+the root instead.
 
 Users receive a non-truncated binary ladder from their starting log entry. This
 identifies the greatest version of the label that it contains. Users then
@@ -684,9 +685,9 @@ Monitoring is performed both by the users that own a label (meaning they are the
 authoritative source for the label's value) and the users that lookup a label.
 Owners monitor their labels to ensure that past (expected) versions of a label
 are still correctly stored in the log and that no new (unexpected) versions have
-been added. Users that looked up a label may need to monitor it afterwards to
-ensure that the version they observed isn't later concealed by the Transparency
-Log.
+been added. Users that looked up a label may sometimes need to monitor it
+afterwards to ensure that the version they observed isn't later concealed by the
+Transparency Log.
 
 ## Reasonable Monitoring Window
 
@@ -698,55 +699,65 @@ Window** (RMW), which is the frequency with which the Transparency Log generally
 expects label owners to perform monitoring. The log entry maximum lifetime, if
 defined, MUST be greater than the RMW.
 
-If a user looks up a label and finds that the first log entry containing the
-label-version pair they're interested in has a timestamp within the RMW, they
-MUST regularly monitor the label until this timestamp is outside of the window.
-Whether a timestamp is within the window or not is determined by subtracting it
-from the timestamp of the rightmost log entry. The purpose of this monitoring is
-to ensure that the label-version pair is not removed or obscured by the
+**Distinguished** log entries are chosen such that there is roughly one per
+every interval of the RMW. If a user looks up a label and finds that the first
+log entry containing their desired label-version pair is to the right of the
+rightmost distinguished log entry, they MUST regularly monitor the label-version
+pair until its monitoring path intersects a distinguished log entry. That is,
+until a new distinguished log entry is established to its right and the two log
+entries are verified to be consistent. The purpose of this monitoring is to
+ensure that the label-version pair is not removed or obscured by the
 Transparency Log before the label owner has had an opportunity to detect it.
 
 However, if a user looks up a label and finds that the first log entry
-containing the label-version pair has a timestamp outside of the RMW, they are
-not required to monitor it afterwards or otherwise retain any state from the
-query.
+containing the label-version pair is to the left of any distinguished log entry,
+they are not required to monitor it afterwards or otherwise retain any state
+from the query (beyond the tree head, discussed in
+{{updating-views-of-the-tree}}).
 
-"Regular" monitoring SHOULD be performed roughly as frequently as the RMW and
+"Regular" monitoring SHOULD be performed at least as frequently as the RMW and
 MUST (if at all possible) happen more frequently than the log entry maximum
-lifetime. Users that own a label and are offline for longer than the RMW will
-need to do multiple monitoring passes when they come back online: one pass for
-each interval of the duration that was missed.
+lifetime.
 
 ## Distinguished Log Entries
 
-As discussed in {{reasonable-monitoring-window}}, users that consume data from
-log entries that have timestamps within the RMW must perform extra monitoring
-afterwards, at least until that log entry is outside of the RMW.
-**Distinguished** log entries are chosen, roughly one per interval of the RMW,
-such that any user that does the required monitoring will intersect with one of
-the distinguished log entries.
+The process for choosing distinguished log entries is required to meet a number
+of criteria:
 
+- Regularly Spaced: Having irregularly-spaced distinguished log entries risks
+  either overwhelming label owners with a large number of them, or delaying
+  consensus between users by having arbitrarily few. Distinguished log entries
+  must reliably occur at roughly the same interval as the Reasonable Monitoring
+  Window regardless of variations in the tree's growth rate or other factors.
+- Stable: Once a log entry is chosen to be distinguished, it may never stop
+  being distinguished. This ensures that if a user that looked up a label checks
+  consistency with a distinguished log entry, that log entry will not later lose
+  its distinguished status and potentially avoid inspection by the label owner.
+- Verifiable: All users in the system must be capable of interacting with the
+  Transparency Log and determining for themselves which log entries are
+  distinguished and which aren't. This prevents misbehavior by the Transparency
+  Log.
 
+To satisfy these criteria, distinguished log entries are chosen according to the
+following recursive algorithm:
 
+1. Take as input: a log entry, the timestamp of a log entry to its left, and the
+   timestamp of a log entry to its right.
+2. If the right timestamp minus the left timestamp is less than the Reasonable
+   Monitoring Window, terminate the algorithm. Otherwise:
+3. Assert that the log entry is distinguished.
+4. If the given log entry has a left child in the implicit binary search tree,
+   then recurse to its subtree by executing this algorithm with: the given log
+   entry's left child, the given left timestamp, and the timestamp of the given
+   log entry.
+5. If the given log entry has a right child, then recurse to its right subtree
+   by executing this algorithm with: the given log entry's right child, the
+   timestamp of the given log entry, and the given right timestamp.
 
-, roughly one per interval of the RMW,
-such that the label owner can check only these log entries for correctness. As
-long as the users that looked up the labels perform the required monitoring, any
-misbehavior by the Transparency Log is guaranteed to be detected.
-
-
-looks up a label and finds that the first log
-entry containing the label-version pair they're interested in has a timestamp
-within the Reasonable Monitoring Window
-
-
-As the tree grows, certain log entries are chosen to be **distinguished**.
-Distinguished log entries are chosen such that they intersect with the nodes monitored by any user that looked up a label
-
-
-
-as predictably as possible, and such that
-there is at least one per interval of the Reasonable Monitoring Window.
+The recursive nature of the algorithm allows users to easily compute specific
+distinguished log entries such as the rightmost one. Note that step 2 is
+specifically "less than" and not "less than or equal to"; this ensures correct
+behavior when the RMW is zero.
 
 ## Binary Ladder
 
