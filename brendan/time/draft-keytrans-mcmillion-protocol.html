@@ -1050,7 +1050,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">McMillion &amp; Linker</td>
-<td class="center">Expires 24 May 2025</td>
+<td class="center">Expires 26 May 2025</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1063,12 +1063,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-keytrans-mcmillion-protocol-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2024-11-20" class="published">20 November 2024</time>
+<time datetime="2024-11-22" class="published">22 November 2024</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2025-05-24">24 May 2025</time></dd>
+<dd class="expires"><time datetime="2025-05-26">26 May 2025</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1121,7 +1121,7 @@ timely manner.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 24 May 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 26 May 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1174,7 +1174,7 @@ timely manner.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4">
-            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-searching-the-tree" class="internal xref">Searching the Tree</a></p>
+            <p id="section-toc.1-1.4.1"><a href="#section-4" class="auto internal xref">4</a>.  <a href="#name-fixed-version-searches" class="internal xref">Fixed-Version Searches</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.1">
                 <p id="section-toc.1-1.4.2.1.1"><a href="#section-4.1" class="auto internal xref">4.1</a>.  <a href="#name-implicit-binary-search-tree" class="internal xref">Implicit Binary Search Tree</a></p>
@@ -1183,125 +1183,128 @@ timely manner.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
                 <p id="section-toc.1-1.4.2.2.1"><a href="#section-4.2" class="auto internal xref">4.2</a>.  <a href="#name-binary-ladder" class="internal xref">Binary Ladder</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.3">
-                <p id="section-toc.1-1.4.2.3.1"><a href="#section-4.3" class="auto internal xref">4.3</a>.  <a href="#name-most-recent-version" class="internal xref">Most Recent Version</a></p>
+                <p id="section-toc.1-1.4.2.3.1"><a href="#section-4.3" class="auto internal xref">4.3</a>.  <a href="#name-maximum-lifetime" class="internal xref">Maximum Lifetime</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.4">
-                <p id="section-toc.1-1.4.2.4.1"><a href="#section-4.4" class="auto internal xref">4.4</a>.  <a href="#name-maximum-lifetime" class="internal xref">Maximum Lifetime</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.4.2.5">
-                <p id="section-toc.1-1.4.2.5.1"><a href="#section-4.5" class="auto internal xref">4.5</a>.  <a href="#name-algorithm" class="internal xref">Algorithm</a></p>
+                <p id="section-toc.1-1.4.2.4.1"><a href="#section-4.4" class="auto internal xref">4.4</a>.  <a href="#name-algorithm" class="internal xref">Algorithm</a></p>
 </li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5">
-            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-monitoring-the-tree" class="internal xref">Monitoring the Tree</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.1">
-                <p id="section-toc.1-1.5.2.1.1"><a href="#section-5.1" class="auto internal xref">5.1</a>.  <a href="#name-reasonable-monitoring-windo" class="internal xref">Reasonable Monitoring Window</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.2">
-                <p id="section-toc.1-1.5.2.2.1"><a href="#section-5.2" class="auto internal xref">5.2</a>.  <a href="#name-binary-ladder-2" class="internal xref">Binary Ladder</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.5.2.3">
-                <p id="section-toc.1-1.5.2.3.1"><a href="#section-5.3" class="auto internal xref">5.3</a>.  <a href="#name-algorithm-2" class="internal xref">Algorithm</a></p>
-</li>
-            </ul>
+            <p id="section-toc.1-1.5.1"><a href="#section-5" class="auto internal xref">5</a>.  <a href="#name-greatest-version-searches" class="internal xref">Greatest-Version Searches</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6">
-            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-updating-views-of-the-tree" class="internal xref">Updating Views of the Tree</a></p>
-</li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
-            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-ciphersuites" class="internal xref">Ciphersuites</a></p>
-</li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
-            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-cryptographic-computations" class="internal xref">Cryptographic Computations</a></p>
+            <p id="section-toc.1-1.6.1"><a href="#section-6" class="auto internal xref">6</a>.  <a href="#name-monitoring-the-tree" class="internal xref">Monitoring the Tree</a></p>
 <ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.1">
-                <p id="section-toc.1-1.8.2.1.1"><a href="#section-8.1" class="auto internal xref">8.1</a>.  <a href="#name-verifiable-random-function" class="internal xref">Verifiable Random Function</a></p>
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.1">
+                <p id="section-toc.1-1.6.2.1.1"><a href="#section-6.1" class="auto internal xref">6.1</a>.  <a href="#name-reasonable-monitoring-windo" class="internal xref">Reasonable Monitoring Window</a></p>
 </li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.2">
-                <p id="section-toc.1-1.8.2.2.1"><a href="#section-8.2" class="auto internal xref">8.2</a>.  <a href="#name-commitment" class="internal xref">Commitment</a></p>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.2">
+                <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-distinguished-log-entries" class="internal xref">Distinguished Log Entries</a></p>
 </li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.3">
-                <p id="section-toc.1-1.8.2.3.1"><a href="#section-8.3" class="auto internal xref">8.3</a>.  <a href="#name-prefix-tree-2" class="internal xref">Prefix Tree</a></p>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3">
+                <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="auto internal xref">6.3</a>.  <a href="#name-binary-ladder-2" class="internal xref">Binary Ladder</a></p>
 </li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.4">
-                <p id="section-toc.1-1.8.2.4.1"><a href="#section-8.4" class="auto internal xref">8.4</a>.  <a href="#name-log-tree-2" class="internal xref">Log Tree</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.5">
-                <p id="section-toc.1-1.8.2.5.1"><a href="#section-8.5" class="auto internal xref">8.5</a>.  <a href="#name-tree-head-signature" class="internal xref">Tree Head Signature</a></p>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.4">
+                <p id="section-toc.1-1.6.2.4.1"><a href="#section-6.4" class="auto internal xref">6.4</a>.  <a href="#name-algorithm-2" class="internal xref">Algorithm</a></p>
 </li>
             </ul>
 </li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7">
+            <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-updating-views-of-the-tree" class="internal xref">Updating Views of the Tree</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8">
+            <p id="section-toc.1-1.8.1"><a href="#section-8" class="auto internal xref">8</a>.  <a href="#name-ciphersuites" class="internal xref">Ciphersuites</a></p>
+</li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
-            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-tree-proofs" class="internal xref">Tree Proofs</a></p>
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-cryptographic-computations" class="internal xref">Cryptographic Computations</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.1">
-                <p id="section-toc.1-1.9.2.1.1"><a href="#section-9.1" class="auto internal xref">9.1</a>.  <a href="#name-log-tree-3" class="internal xref">Log Tree</a></p>
+                <p id="section-toc.1-1.9.2.1.1"><a href="#section-9.1" class="auto internal xref">9.1</a>.  <a href="#name-verifiable-random-function" class="internal xref">Verifiable Random Function</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.2">
-                <p id="section-toc.1-1.9.2.2.1"><a href="#section-9.2" class="auto internal xref">9.2</a>.  <a href="#name-prefix-tree-3" class="internal xref">Prefix Tree</a></p>
+                <p id="section-toc.1-1.9.2.2.1"><a href="#section-9.2" class="auto internal xref">9.2</a>.  <a href="#name-commitment" class="internal xref">Commitment</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.3">
-                <p id="section-toc.1-1.9.2.3.1"><a href="#section-9.3" class="auto internal xref">9.3</a>.  <a href="#name-combined-tree-2" class="internal xref">Combined Tree</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.3.2.1">
-                    <p id="section-toc.1-1.9.2.3.2.1.1"><a href="#section-9.3.1" class="auto internal xref">9.3.1</a>.  <a href="#name-proofs-for-contact-monitori" class="internal xref">Proofs for Contact Monitoring</a></p>
+                <p id="section-toc.1-1.9.2.3.1"><a href="#section-9.3" class="auto internal xref">9.3</a>.  <a href="#name-prefix-tree-2" class="internal xref">Prefix Tree</a></p>
 </li>
-                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.3.2.2">
-                    <p id="section-toc.1-1.9.2.3.2.2.1"><a href="#section-9.3.2" class="auto internal xref">9.3.2</a>.  <a href="#name-proofs-for-third-party-audi" class="internal xref">Proofs for Third-Party Auditing</a></p>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.4">
+                <p id="section-toc.1-1.9.2.4.1"><a href="#section-9.4" class="auto internal xref">9.4</a>.  <a href="#name-log-tree-2" class="internal xref">Log Tree</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9.2.5">
+                <p id="section-toc.1-1.9.2.5.1"><a href="#section-9.5" class="auto internal xref">9.5</a>.  <a href="#name-tree-head-signature" class="internal xref">Tree Head Signature</a></p>
+</li>
+            </ul>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
+            <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-tree-proofs" class="internal xref">Tree Proofs</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.1">
+                <p id="section-toc.1-1.10.2.1.1"><a href="#section-10.1" class="auto internal xref">10.1</a>.  <a href="#name-log-tree-3" class="internal xref">Log Tree</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.2">
+                <p id="section-toc.1-1.10.2.2.1"><a href="#section-10.2" class="auto internal xref">10.2</a>.  <a href="#name-prefix-tree-3" class="internal xref">Prefix Tree</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.3">
+                <p id="section-toc.1-1.10.2.3.1"><a href="#section-10.3" class="auto internal xref">10.3</a>.  <a href="#name-combined-tree-2" class="internal xref">Combined Tree</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.3.2.1">
+                    <p id="section-toc.1-1.10.2.3.2.1.1"><a href="#section-10.3.1" class="auto internal xref">10.3.1</a>.  <a href="#name-proofs-for-contact-monitori" class="internal xref">Proofs for Contact Monitoring</a></p>
+</li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.3.2.2">
+                    <p id="section-toc.1-1.10.2.3.2.2.1"><a href="#section-10.3.2" class="auto internal xref">10.3.2</a>.  <a href="#name-proofs-for-third-party-audi" class="internal xref">Proofs for Third-Party Auditing</a></p>
 </li>
                 </ul>
 </li>
             </ul>
 </li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
-            <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-update-format" class="internal xref">Update Format</a></p>
-</li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11">
-            <p id="section-toc.1-1.11.1"><a href="#section-11" class="auto internal xref">11</a>. <a href="#name-user-operations" class="internal xref">User Operations</a></p>
-<ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.1">
-                <p id="section-toc.1-1.11.2.1.1"><a href="#section-11.1" class="auto internal xref">11.1</a>.  <a href="#name-search" class="internal xref">Search</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.2">
-                <p id="section-toc.1-1.11.2.2.1"><a href="#section-11.2" class="auto internal xref">11.2</a>.  <a href="#name-update" class="internal xref">Update</a></p>
-</li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.3">
-                <p id="section-toc.1-1.11.2.3.1"><a href="#section-11.3" class="auto internal xref">11.3</a>.  <a href="#name-monitor" class="internal xref">Monitor</a></p>
-</li>
-            </ul>
+            <p id="section-toc.1-1.11.1"><a href="#section-11" class="auto internal xref">11</a>. <a href="#name-update-format" class="internal xref">Update Format</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12">
-            <p id="section-toc.1-1.12.1"><a href="#section-12" class="auto internal xref">12</a>. <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
-</li>
-          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
-            <p id="section-toc.1-1.13.1"><a href="#section-13" class="auto internal xref">13</a>. <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
+            <p id="section-toc.1-1.12.1"><a href="#section-12" class="auto internal xref">12</a>. <a href="#name-user-operations" class="internal xref">User Operations</a></p>
 <ul class="compact toc ulBare ulEmpty">
-<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.1">
-                <p id="section-toc.1-1.13.2.1.1"><a href="#section-13.1" class="auto internal xref">13.1</a>.  <a href="#name-kt-ciphersuites" class="internal xref">KT Ciphersuites</a></p>
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.1">
+                <p id="section-toc.1-1.12.2.1.1"><a href="#section-12.1" class="auto internal xref">12.1</a>.  <a href="#name-search" class="internal xref">Search</a></p>
 </li>
-              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13.2.2">
-                <p id="section-toc.1-1.13.2.2.1"><a href="#section-13.2" class="auto internal xref">13.2</a>.  <a href="#name-kt-designated-expert-pool" class="internal xref">KT Designated Expert Pool</a></p>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.2">
+                <p id="section-toc.1-1.12.2.2.1"><a href="#section-12.2" class="auto internal xref">12.2</a>.  <a href="#name-update" class="internal xref">Update</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.12.2.3">
+                <p id="section-toc.1-1.12.2.3.1"><a href="#section-12.3" class="auto internal xref">12.3</a>.  <a href="#name-monitor" class="internal xref">Monitor</a></p>
 </li>
             </ul>
 </li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.13">
+            <p id="section-toc.1-1.13.1"><a href="#section-13" class="auto internal xref">13</a>. <a href="#name-security-considerations" class="internal xref">Security Considerations</a></p>
+</li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14">
-            <p id="section-toc.1-1.14.1"><a href="#section-14" class="auto internal xref">14</a>. <a href="#name-references" class="internal xref">References</a></p>
+            <p id="section-toc.1-1.14.1"><a href="#section-14" class="auto internal xref">14</a>. <a href="#name-iana-considerations" class="internal xref">IANA Considerations</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14.2.1">
-                <p id="section-toc.1-1.14.2.1.1"><a href="#section-14.1" class="auto internal xref">14.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+                <p id="section-toc.1-1.14.2.1.1"><a href="#section-14.1" class="auto internal xref">14.1</a>.  <a href="#name-kt-ciphersuites" class="internal xref">KT Ciphersuites</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.14.2.2">
-                <p id="section-toc.1-1.14.2.2.1"><a href="#section-14.2" class="auto internal xref">14.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+                <p id="section-toc.1-1.14.2.2.1"><a href="#section-14.2" class="auto internal xref">14.2</a>.  <a href="#name-kt-designated-expert-pool" class="internal xref">KT Designated Expert Pool</a></p>
 </li>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15">
-            <p id="section-toc.1-1.15.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+            <p id="section-toc.1-1.15.1"><a href="#section-15" class="auto internal xref">15</a>. <a href="#name-references" class="internal xref">References</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15.2.1">
+                <p id="section-toc.1-1.15.2.1.1"><a href="#section-15.1" class="auto internal xref">15.1</a>.  <a href="#name-normative-references" class="internal xref">Normative References</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15.2.2">
+                <p id="section-toc.1-1.15.2.2.1"><a href="#section-15.2" class="auto internal xref">15.2</a>.  <a href="#name-informative-references" class="internal xref">Informative References</a></p>
+</li>
+            </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.16">
-            <p id="section-toc.1-1.16.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
+            <p id="section-toc.1-1.16.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+</li>
+          <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.17">
+            <p id="section-toc.1-1.17.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
 </li>
         </ul>
 </nav>
@@ -1366,7 +1369,7 @@ the <em>combined tree</em>.<a href="#section-3-2" class="pilcrow">¶</a></p>
 <p id="section-3-3">This section describes the operation of both prefix and log trees at a high
 level and the way that they're combined. More precise algorithms for computing
 the intermediate and root values of the trees are given in
-<a href="#cryptographic-computations" class="auto internal xref">Section 8</a>.<a href="#section-3-3" class="pilcrow">¶</a></p>
+<a href="#cryptographic-computations" class="auto internal xref">Section 9</a>.<a href="#section-3-3" class="pilcrow">¶</a></p>
 <div id="terminology">
 <section id="section-3.1">
         <h3 id="name-terminology">
@@ -1813,10 +1816,10 @@ entry" refers to a leaf of the log tree).<a href="#section-3.4-3" class="pilcrow
 </div>
 </section>
 </div>
-<div id="searching-the-tree">
+<div id="fixed-version-searches">
 <section id="section-4">
-      <h2 id="name-searching-the-tree">
-<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-searching-the-tree" class="section-name selfRef">Searching the Tree</a>
+      <h2 id="name-fixed-version-searches">
+<a href="#section-4" class="section-number selfRef">4. </a><a href="#name-fixed-version-searches" class="section-name selfRef">Fixed-Version Searches</a>
       </h2>
 <p id="section-4-1">When searching the combined tree structure described in <a href="#combined-tree" class="auto internal xref">Section 3.4</a>, users
 do a binary search for the first log entry where the prefix tree at that entry
@@ -1826,7 +1829,6 @@ efficient client-side auditing of the Transparency Log. The binary search uses
 an <em>implicit binary search tree</em> constructed over the leaves of the log tree
 (distinct from the structure of the log tree itself), which allows the search to
 have a complexity logarithmic in the number of the log's leaves.<a href="#section-4-1" class="pilcrow">¶</a></p>
-<p id="section-4-2">An abridged process for searching the tree is described in TODO.<a href="#section-4-2" class="pilcrow">¶</a></p>
 <div id="implicit-binary-search-tree">
 <section id="section-4.1">
         <h3 id="name-implicit-binary-search-tree">
@@ -1957,6 +1959,11 @@ search at the typical "middle" entry of <code>50/2 = 25</code>, users would star
 to access would be <code>right(31, 50) = 47</code>. As more entries are added to the log,
 users will consistently revisit entries 31 and 47, while they may never revisit
 entry 25 after even a single new entry is added to the log.<a href="#section-4.1-7" class="pilcrow">¶</a></p>
+<p id="section-4.1-8">It is also frequently useful to refer to the <strong>frontier</strong> of the log. The
+frontier consists of the root node of a search, followed by the entries produced
+by repeatedly calling <code>right</code> until reaching the last entry of the log. Using
+the same example of a search where the log has 50 entries, the frontier would be
+entries: 31, 47, 49.<a href="#section-4.1-8" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="binary-ladder">
@@ -1964,13 +1971,13 @@ entry 25 after even a single new entry is added to the log.<a href="#section-4.1
         <h3 id="name-binary-ladder">
 <a href="#section-4.2" class="section-number selfRef">4.2. </a><a href="#name-binary-ladder" class="section-name selfRef">Binary Ladder</a>
         </h3>
-<p id="section-4.2-1">When executing searches on a Transparency Log, the implicit tree described in
+<p id="section-4.2-1">When executing searches, the implicit tree described in
 <a href="#implicit-binary-search-tree" class="auto internal xref">Section 4.1</a> is navigated according to a binary search. At
 each individual log entry, the binary search needs to determine whether it
 should move left or right. That is, it needs to determine, out of the set of
 label-version pairs stored in the prefix tree, whether the highest version of a
 label that's present at a given log entry is greater than, equal to, or less
-than a target version.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
+than the target version.<a href="#section-4.2-1" class="pilcrow">¶</a></p>
 <p id="section-4.2-2">A <strong>binary ladder</strong> is a series of lookups in a single log entry's prefix tree
 that determines the highest version of a label that exists, and it proceeds as
 follows:<a href="#section-4.2-2" class="pilcrow">¶</a></p>
@@ -1994,8 +2001,8 @@ by a proof of non-inclusion for version 7. Then, proofs of inclusion for
 versions 5 and 6 would conclude the proof that 6 is the highest version
 available.<a href="#section-4.2-4" class="pilcrow">¶</a></p>
 <p id="section-4.2-5">While being able to determine the exact highest version of a label is sometimes
-useful (as the next section discusses), this is not always the case. If a user
-is searching for a specific version of a label, they only need to know whether
+useful (as discussed in <a href="#greatest-version-searches" class="auto internal xref">Section 5</a>), this is not always the case. Users
+searching for a specific version of a label only need to know whether
 the highest version at a given log entry is greater than or less than their
 target version -- not its exact value. A <strong>truncated binary ladder</strong> is one which
 stops after the first proof of inclusion for a version greater than or equal to
@@ -2003,514 +2010,551 @@ the target version, or the first proof of non-inclusion for a version less than
 the target version.<a href="#section-4.2-5" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="most-recent-version">
-<section id="section-4.3">
-        <h3 id="name-most-recent-version">
-<a href="#section-4.3" class="section-number selfRef">4.3. </a><a href="#name-most-recent-version" class="section-name selfRef">Most Recent Version</a>
-        </h3>
-<p id="section-4.3-1">When users wish to search for the "most recent" version of a label, they must
-determine the highest version of the label that exists in the log overall -- not
-just a single log entry. To do this, users request a binary ladder for each node
-on the <strong>frontier</strong> of the log. The frontier consists of the root node of a
-search, followed by the entries produced by repeatedly calling <code>right</code> until
-reaching the last entry of the log. Using the same example of a search where the
-log has 50 entries, the frontier would be entries: 31, 47, 49.<a href="#section-4.3-1" class="pilcrow">¶</a></p>
-<p id="section-4.3-2">For the purpose of finding the highest version possible, requesting a binary
-ladder for each entry along the frontier is functionally the same as doing so
-for only the rightmost log entry. However, inspecting the entire frontier allows
-the user to verify that the search path leading to the last log entry represents
-a monotonic series of version increases, which minimizes opportunities for log
-misbehavior.<a href="#section-4.3-2" class="pilcrow">¶</a></p>
-<p id="section-4.3-3">Once the user has verified that the frontier lookups are monotonic and
-determined the highest version, the user then continues a binary search for this
-specific version.<a href="#section-4.3-3" class="pilcrow">¶</a></p>
-</section>
-</div>
 <div id="maximum-lifetime">
-<section id="section-4.4">
+<section id="section-4.3">
         <h3 id="name-maximum-lifetime">
-<a href="#section-4.4" class="section-number selfRef">4.4. </a><a href="#name-maximum-lifetime" class="section-name selfRef">Maximum Lifetime</a>
+<a href="#section-4.3" class="section-number selfRef">4.3. </a><a href="#name-maximum-lifetime" class="section-name selfRef">Maximum Lifetime</a>
         </h3>
-<p id="section-4.4-1">A Transparency Log operator <span class="bcp14">MAY</span> define a maximum lifetime for log entries. If
+<p id="section-4.3-1">A Transparency Log operator <span class="bcp14">MAY</span> define a maximum lifetime for log entries. If
 defined, it <span class="bcp14">MUST</span> be greater than zero seconds. Whether a log entry has surpassed
-its maximum lifetime is determined by subtracting the timestamp of the most
-recent log entry from the timestamp of the log entry in question.<a href="#section-4.4-1" class="pilcrow">¶</a></p>
-<p id="section-4.4-2">A user executing a search may arrive at a log entry which is past its maximum
+its maximum lifetime is determined by subtracting the timestamp of the rightmost
+log entry from the timestamp of the log entry in question.<a href="#section-4.3-1" class="pilcrow">¶</a></p>
+<p id="section-4.3-2">A user executing a search may arrive at a log entry which is past its maximum
 lifetime by either of two ways. The user may have inspected a log entry which is
 <strong>not</strong> expired and decided to recurse to the log entry's left child, which is
 expired. Alternatively, the root log entry may be expired, in which case the
-user would've started their search at the expired root log entry.<a href="#section-4.4-2" class="pilcrow">¶</a></p>
-<p id="section-4.4-3">When a user's search proceeds from a log entry which is not expired to a log
+user would've started their search at an expired root log entry.<a href="#section-4.3-2" class="pilcrow">¶</a></p>
+<p id="section-4.3-3">When a user's search proceeds from a log entry which is not expired to a log
 entry which is expired, the user is provided with a binary ladder from the
 expired log entry as usual. If the user's search would recurse further into the
 expired portion of the tree (to the log entry's left child), the search is
 aborted. If the user's search would recurse away from the expired portion of the
-tree (to the log entry's right child), the user continues as normal.<a href="#section-4.4-3" class="pilcrow">¶</a></p>
-<p id="section-4.4-4">When the root and potentially multiple frontier log entries are expired, the
+tree (to the log entry's right child), the user continues as normal.<a href="#section-4.3-3" class="pilcrow">¶</a></p>
+<p id="section-4.3-4">When the root and potentially multiple frontier log entries are expired, the
 user skips to the furthest-right expired frontier log entry without receiving
-binary ladders from any of its parent log entries. Similar to the previous case,
+binary ladders from any of its parents. Similar to the previous case,
 the user is provided with a binary ladder from this log entry. If the user
 determines that its search would recurse to the left (further into the expired
 portion of the tree), it aborts; to the right (into the unexpired portion of the
-tree), it continues.<a href="#section-4.4-4" class="pilcrow">¶</a></p>
-<p id="section-4.4-5">This allows the Transparency Log to prune data which is sufficiently old, as
+tree), it continues.<a href="#section-4.3-4" class="pilcrow">¶</a></p>
+<p id="section-4.3-5">This allows the Transparency Log to prune data which is sufficiently old, as
 only a small amount of the log tree and prefix tree outside of the maximum
 lifetime need to be retained. In particular, only a logarithmic number of log
 entries that have passed their maximum lifetime will still be needed by users;
-the rest can be discarded. Pruning is explained in more detail in TODO.<a href="#section-4.4-5" class="pilcrow">¶</a></p>
+the rest can be discarded. Pruning is explained in more detail in TODO.<a href="#section-4.3-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="algorithm">
-<section id="section-4.5">
+<section id="section-4.4">
         <h3 id="name-algorithm">
-<a href="#section-4.5" class="section-number selfRef">4.5. </a><a href="#name-algorithm" class="section-name selfRef">Algorithm</a>
+<a href="#section-4.4" class="section-number selfRef">4.4. </a><a href="#name-algorithm" class="section-name selfRef">Algorithm</a>
         </h3>
-<p id="section-4.5-1">The full process for performing a search is described below as a recursive
-algorithm. It starts with the root log entry, as defined by the implicit binary
-search tree, and then recurses to left or right children, each time starting
-back at step 1.<a href="#section-4.5-1" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-4.5-2">
-<li id="section-4.5-2.1">
-            <p id="section-4.5-2.1.1">Verify that the log entry's timestamp is consistent with the timestamps of
+<p id="section-4.4-1">The algorithm for performing a fixed-version search (a search for a specific
+version of a label) is described below as a recursive algorithm. It starts with
+the root log entry, as defined by the implicit binary search tree, and then
+recurses to left or right children, each time starting back at step 1.<a href="#section-4.4-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-4.4-2">
+<li id="section-4.4-2.1">
+            <p id="section-4.4-2.1.1">Verify that the log entry's timestamp is consistent with the timestamps of
 all ancestor log entries. That is, if the log entry is in the ancestor's left
-subtree, then its timestamp is less than the ancestor's. If the log entry is
-in the ancestor's right subtree, then its timestamp is greater than the
-ancestor's.<a href="#section-4.5-2.1.1" class="pilcrow">¶</a></p>
+subtree, then its timestamp is less than or equal to the ancestor's. If the
+log entry is in the ancestor's right subtree, then its timestamp is greater
+than or equal to the ancestor's.<a href="#section-4.4-2.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-4.5-2.2">
-            <p id="section-4.5-2.2.1">If the log entry has surpassed its maximum lifetime and is on the frontier,
+          <li id="section-4.4-2.2">
+            <p id="section-4.4-2.2.1">If the log entry has surpassed its maximum lifetime and is on the frontier,
 determine whether its right child has also surpassed its maximum lifetime. If
 so, recurse to the right child; otherwise, continue to step 3. Note that a
 right child always exists, as the rightmost log entry cannot exceed its
-maximum lifetime by definition.<a href="#section-4.5-2.2.1" class="pilcrow">¶</a></p>
+maximum lifetime by definition.<a href="#section-4.4-2.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-4.5-2.3">
-            <p id="section-4.5-2.3.1">If searching for the most recent version of a label, obtain a binary ladder
-from the current log entry. Verify that the binary ladder proves that the
-greatest version of the label at this log entry is greater than or equal to
-that of its parent (if any). If this check is successful, recurse to the log
-entry's right child. If there is no right child, then restart the search
-algorithm from the root log entry, searching for the specific version of the
-label that was identified as most recent.<a href="#section-4.5-2.3.1" class="pilcrow">¶</a></p>
+          <li id="section-4.4-2.3">
+            <p id="section-4.4-2.3.1">Obtain a truncated binary ladder from the current log entry for the target
+version.<a href="#section-4.4-2.3.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-4.5-2.4">
-            <p id="section-4.5-2.4.1">If searching for a specific version of a label, obtain a truncated binary
-ladder from the current log entry for the target version. (If this is a
-continuation of a "most recent version" search, the non-truncated binary
-ladders provided along the frontier are re-used for this step.)<a href="#section-4.5-2.4.1" class="pilcrow">¶</a></p>
-</li>
-          <li id="section-4.5-2.5">
-            <p id="section-4.5-2.5.1">If the binary ladder stops short of proving the target version is present,
+          <li id="section-4.4-2.4">
+            <p id="section-4.4-2.4.1">If the binary ladder stops short of proving the target version is present,
 recurse to the log entry's right child. Otherwise, check if the log entry has
 surpassed its maximum lifetime. If so, abort the search with an error
 indicating that the desired version of the label has expired and is no longer
 available. If not, recurse to the log entry's left child. If, in either case,
-the child doesn't exist:<a href="#section-4.5-2.5.1" class="pilcrow">¶</a></p>
+the child doesn't exist:<a href="#section-4.4-2.4.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-4.5-2.6">
-            <p id="section-4.5-2.6.1">This largely concludes the search. However, it's possible at this point that
-a commitment to the contents of the desired label-version pair has not been
-provided by the Transparency Log. This can happen, for example, if multiple
-versions of a label were inserted in a single epoch and the binary ladder
-skipped the target version. If this has happened, out of the log entries
-touched by the binary search, identify which log entry was first to contain
-the desired label-version pair. From this log entry's prefix tree, obtain a
-search proof for the target label-version pair.<a href="#section-4.5-2.6.1" class="pilcrow">¶</a></p>
+          <li id="section-4.4-2.5">
+            <p id="section-4.4-2.5.1">This largely concludes the search. However, there are some additional
+technicalities to address. First, it's possible for the binary search to
+conclude successfully even if the label-version pair that the user is
+interested in has expired. Out of the log entries touched by the binary
+search, identify which log entry was first to contain the desired
+label-version pair. If it is a log entry that is past its maximum lifetime,
+abort the search and return an error to the user.<a href="#section-4.4-2.5.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-4.5-2.7">
-            <p id="section-4.5-2.7.1">Terminate the search successfully.<a href="#section-4.5-2.7.1" class="pilcrow">¶</a></p>
+          <li id="section-4.4-2.6">
+            <p id="section-4.4-2.6.1">It's also possible at this point that a commitment to the contents of the
+desired label-version pair has not been provided by the Transparency Log.
+This can happen, for example, if multiple versions of a label were inserted
+in a single epoch and the binary ladder skipped the target version. If this
+has happened, obtain a search proof for the target label-version pair from
+the prefix tree in the first log entry to contain it (identified in step 5).<a href="#section-4.4-2.6.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-4.4-2.7">
+            <p id="section-4.4-2.7.1">Finally, if the binary search failed to find a log entry containing the
+desired label-version pair, or if the search proof in step 6 returned a proof
+of non-inclusion, return an error to the user indicating that the version of
+the label does not exist. Otherwise, terminate the search successfully.<a href="#section-4.4-2.7.1" class="pilcrow">¶</a></p>
 </li>
         </ol>
-<p id="section-4.5-3">To allow users to execute this algorithm, the concrete data provided by the
-Transparency Log consists of:<a href="#section-4.5-3" class="pilcrow">¶</a></p>
+<p id="section-4.4-3">The most important goal of this algorithm is correctly identifying the first log
+entry that contains the target label-version pair. The fundamental purpose for
+doing this is to make monitoring more efficient for the label owner. If a label
+has a large number of versions, it can become prohibitively expensive for its
+owner to repeatedly check that every single version is represented correctly in
+multiple log entries. Instead, the label owner can check that the version was
+created correctly in the one epoch where it was first added and then enforce
+that binary searches for that version will always converge back to that same log
+entry.<a href="#section-4.4-3" class="pilcrow">¶</a></p>
+<p id="section-4.4-4">To allow users to execute this algorithm, the concrete data provided by the
+Transparency Log consists of:<a href="#section-4.4-4" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-4.5-4.1">
-            <p id="section-4.5-4.1.1">For each version of the label looked up in a binary ladder: the commitment
-corresponding to the label's value at that version.<a href="#section-4.5-4.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-4.4-5.1">
+            <p id="section-4.4-5.1.1">For each version of the label looked up in a binary ladder: the commitment
+corresponding to the label's value at that version.<a href="#section-4.4-5.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-4.5-4.2">
-            <p id="section-4.5-4.2.1">For each log entry inspected by the search:<a href="#section-4.5-4.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-4.4-5.2">
+            <p id="section-4.4-5.2.1">For each log entry inspected by the search:<a href="#section-4.4-5.2.1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-4.5-4.2.2.1">
-                <p id="section-4.5-4.2.2.1.1">The log entry's timestamp<a href="#section-4.5-4.2.2.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-4.4-5.2.2.1">
+                <p id="section-4.4-5.2.2.1.1">The log entry's timestamp<a href="#section-4.4-5.2.2.1.1" class="pilcrow">¶</a></p>
 </li>
-              <li class="normal" id="section-4.5-4.2.2.2">
-                <p id="section-4.5-4.2.2.2.1">If a binary ladder is required: a batch search proof in the log entry's
+              <li class="normal" id="section-4.4-5.2.2.2">
+                <p id="section-4.4-5.2.2.2.1">If a binary ladder is required: a batch search proof in the log entry's
 prefix tree for all of the different label-version pairs that constitute the
 binary ladder (potentially including the label-version pair needed by step
-6).<a href="#section-4.5-4.2.2.2.1" class="pilcrow">¶</a></p>
+6).<a href="#section-4.4-5.2.2.2.1" class="pilcrow">¶</a></p>
 </li>
-              <li class="normal" id="section-4.5-4.2.2.3">
-                <p id="section-4.5-4.2.2.3.1">If a binary ladder is not required: the log entry's prefix tree root hash.<a href="#section-4.5-4.2.2.3.1" class="pilcrow">¶</a></p>
+              <li class="normal" id="section-4.4-5.2.2.3">
+                <p id="section-4.4-5.2.2.3.1">If a binary ladder is not required: the log entry's prefix tree root hash.<a href="#section-4.4-5.2.2.3.1" class="pilcrow">¶</a></p>
 </li>
             </ul>
 </li>
-          <li class="normal" id="section-4.5-4.3">
-            <p id="section-4.5-4.3.1">A batch inclusion proof for all inspected log entries.<a href="#section-4.5-4.3.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-4.4-5.3">
+            <p id="section-4.4-5.3.1">A batch inclusion proof for all inspected log entries.<a href="#section-4.4-5.3.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-4.5-5">Users ultimately verify that the search was done correctly by using this
-information to recompute the log tree's root hash. While the same label-version
-pair may be looked up in several different versions of the prefix tree, note
-that the corresponding commitment is only provided once. This ensures that the
-commitments are the same in each version of the prefix tree; if they weren't,
-verification of the proof would fail.<a href="#section-4.5-5" class="pilcrow">¶</a></p>
+<p id="section-4.4-6">Ultimately, users verify that the search was done correctly by using this
+information to recompute the log tree's root hash.<a href="#section-4.4-6" class="pilcrow">¶</a></p>
 </section>
 </div>
+</section>
+</div>
+<div id="greatest-version-searches">
+<section id="section-5">
+      <h2 id="name-greatest-version-searches">
+<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-greatest-version-searches" class="section-name selfRef">Greatest-Version Searches</a>
+      </h2>
+<p id="section-5-1">Users often wish to search for the "most recent" version, or the greatest
+version, of a label. Unlike searches for a specific version, label owners
+regularly verify that their most recent version is correctly represented in the
+log. This enables a simpler, more efficient approach to searching.<a href="#section-5-1" class="pilcrow">¶</a></p>
+<p id="section-5-2"><a href="#distinguished-log-entries" class="auto internal xref">Section 6.2</a> defines the concept of a <strong>distinguished</strong> log
+entry, which is a specific log entry that label owners are required to check for
+correctness. To perform a greatest-version search, users start at the rightmost
+distinguished log entry. This log entry will always be on the frontier of the
+log and will never be past its maximum lifetime. If there is no distinguished
+log entry yet, users start at the root instead.<a href="#section-5-2" class="pilcrow">¶</a></p>
+<p id="section-5-3">Users receive a non-truncated binary ladder from their starting log entry. This
+identifies the greatest version of the label that it contains. Users then
+proceed down the remainder of the frontier: the starting log entry's right
+child, the right child's right child, and so on until reaching the last log
+entry. From each of these log entries, the user also receives a non-truncated
+binary ladder identifying the greatest version of the label that each contains.<a href="#section-5-3" class="pilcrow">¶</a></p>
+<p id="section-5-4">If any of the frontier log entries have a different greatest version than the
+starting log entry, the user verifies that they represent a monotonic series of
+version increases. Assuming they do, the user is provided with the value for the
+greatest version identified.<a href="#section-5-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="monitoring-the-tree">
-<section id="section-5">
+<section id="section-6">
       <h2 id="name-monitoring-the-tree">
-<a href="#section-5" class="section-number selfRef">5. </a><a href="#name-monitoring-the-tree" class="section-name selfRef">Monitoring the Tree</a>
+<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-monitoring-the-tree" class="section-name selfRef">Monitoring the Tree</a>
       </h2>
-<p id="section-5-1">As new entries are added to the log tree, the search path that's traversed to
+<p id="section-6-1">As new entries are added to the log tree, the search path that's traversed to
 find a specific version of a label may change. New intermediate nodes may be
 established between the search root and the log entry, or a new search root may be
 created. The goal of monitoring a label is to efficiently ensure that, when
 these new parent nodes are created, they're created correctly such that searches
-for the same versions continue converging to the same entries in the log.<a href="#section-5-1" class="pilcrow">¶</a></p>
-<p id="section-5-2">Monitoring is performed both by the users that own a label (meaning they are the
+for the same versions continue converging to the same entries in the log.<a href="#section-6-1" class="pilcrow">¶</a></p>
+<p id="section-6-2">Monitoring is performed both by the users that own a label (meaning they are the
 authoritative source for the label's value) and the users that lookup a label.
 Owners monitor their labels to ensure that past (expected) versions of a label
 are still correctly stored in the log and that no new (unexpected) versions have
 been added. Users that looked up a label may need to monitor it afterwards to
 ensure that the version they observed isn't later concealed by the Transparency
-Log.<a href="#section-5-2" class="pilcrow">¶</a></p>
+Log.<a href="#section-6-2" class="pilcrow">¶</a></p>
 <div id="reasonable-monitoring-window">
-<section id="section-5.1">
+<section id="section-6.1">
         <h3 id="name-reasonable-monitoring-windo">
-<a href="#section-5.1" class="section-number selfRef">5.1. </a><a href="#name-reasonable-monitoring-windo" class="section-name selfRef">Reasonable Monitoring Window</a>
+<a href="#section-6.1" class="section-number selfRef">6.1. </a><a href="#name-reasonable-monitoring-windo" class="section-name selfRef">Reasonable Monitoring Window</a>
         </h3>
-<p id="section-5.1-1">Label owners <span class="bcp14">MUST</span> monitor their labels regularly, ensuring that past versions of
+<p id="section-6.1-1">Label owners <span class="bcp14">MUST</span> monitor their labels regularly, ensuring that past versions of
 the label are still correctly represented in the log and that any new versions
 of the label are permissible (alerting the user if not). Service Providers
 define a duration in seconds, referred to as the <strong>Reasonable Monitoring
 Window</strong> (RMW), which is the frequency with which the Transparency Log generally
 expects label owners to perform monitoring. The log entry maximum lifetime, if
-defined, <span class="bcp14">MUST</span> be greater than the RMW.<a href="#section-5.1-1" class="pilcrow">¶</a></p>
-<p id="section-5.1-2">If a user looks up a label and finds that the first log entry containing the
-label-version pair has a timestamp within the RMW, they <span class="bcp14">MUST</span> regularly monitor
-the label until this timestamp is outside of the window. Whether a timestamp is
-within the window or not is determined by subtracting it from the timestamp of
-the rightmost log entry. The purpose of this monitoring is to ensure that the
-label-version pair is not removed or obscured by the Transparency Log before the
-label owner has had an opportunity to detect it.<a href="#section-5.1-2" class="pilcrow">¶</a></p>
-<p id="section-5.1-3">However, if a user looks up a label and finds that the first log entry
+defined, <span class="bcp14">MUST</span> be greater than the RMW.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
+<p id="section-6.1-2">If a user looks up a label and finds that the first log entry containing the
+label-version pair they're interested in has a timestamp within the RMW, they
+<span class="bcp14">MUST</span> regularly monitor the label until this timestamp is outside of the window.
+Whether a timestamp is within the window or not is determined by subtracting it
+from the timestamp of the rightmost log entry. The purpose of this monitoring is
+to ensure that the label-version pair is not removed or obscured by the
+Transparency Log before the label owner has had an opportunity to detect it.<a href="#section-6.1-2" class="pilcrow">¶</a></p>
+<p id="section-6.1-3">However, if a user looks up a label and finds that the first log entry
 containing the label-version pair has a timestamp outside of the RMW, they are
 not required to monitor it afterwards or otherwise retain any state from the
-query.<a href="#section-5.1-3" class="pilcrow">¶</a></p>
-<p id="section-5.1-4">"Regular" monitoring <span class="bcp14">SHOULD</span> be performed roughly as frequently as the RMW and
+query.<a href="#section-6.1-3" class="pilcrow">¶</a></p>
+<p id="section-6.1-4">"Regular" monitoring <span class="bcp14">SHOULD</span> be performed roughly as frequently as the RMW and
 <span class="bcp14">MUST</span> (if at all possible) happen more frequently than the log entry maximum
 lifetime. Users that own a label and are offline for longer than the RMW will
 need to do multiple monitoring passes when they come back online: one pass for
-each interval of the duration that was missed.<a href="#section-5.1-4" class="pilcrow">¶</a></p>
+each interval of the duration that was missed.<a href="#section-6.1-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="distinguished-log-entries">
+<section id="section-6.2">
+        <h3 id="name-distinguished-log-entries">
+<a href="#section-6.2" class="section-number selfRef">6.2. </a><a href="#name-distinguished-log-entries" class="section-name selfRef">Distinguished Log Entries</a>
+        </h3>
+<p id="section-6.2-1">As discussed in <a href="#reasonable-monitoring-window" class="auto internal xref">Section 6.1</a>, users that consume data from
+log entries that have timestamps within the RMW must perform extra monitoring
+afterwards, at least until that log entry is outside of the RMW.
+<strong>Distinguished</strong> log entries are chosen, roughly one per interval of the RMW,
+such that any user that does the required monitoring will intersect with one of
+the distinguished log entries.<a href="#section-6.2-1" class="pilcrow">¶</a></p>
+<p id="section-6.2-2">, roughly one per interval of the RMW,
+such that the label owner can check only these log entries for correctness. As
+long as the users that looked up the labels perform the required monitoring, any
+misbehavior by the Transparency Log is guaranteed to be detected.<a href="#section-6.2-2" class="pilcrow">¶</a></p>
+<p id="section-6.2-3">looks up a label and finds that the first log
+entry containing the label-version pair they're interested in has a timestamp
+within the Reasonable Monitoring Window<a href="#section-6.2-3" class="pilcrow">¶</a></p>
+<p id="section-6.2-4">As the tree grows, certain log entries are chosen to be <strong>distinguished</strong>.
+Distinguished log entries are chosen such that they intersect with the nodes monitored by any user that looked up a label<a href="#section-6.2-4" class="pilcrow">¶</a></p>
+<p id="section-6.2-5">as predictably as possible, and such that
+there is at least one per interval of the Reasonable Monitoring Window.<a href="#section-6.2-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="binary-ladder-1">
-<section id="section-5.2">
+<section id="section-6.3">
         <h3 id="name-binary-ladder-2">
-<a href="#section-5.2" class="section-number selfRef">5.2. </a><a href="#name-binary-ladder-2" class="section-name selfRef">Binary Ladder</a>
+<a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-binary-ladder-2" class="section-name selfRef">Binary Ladder</a>
         </h3>
-<p id="section-5.2-1">Similar to the algorithm for searching the tree, the algorithm for monitoring
+<p id="section-6.3-1">Similar to the algorithm for searching the tree, the algorithm for monitoring
 the tree requires a way to prove that the highest version of a label stored in a
 particular log entry is greater than or equal to a target version. Since we
 already know that the target version exists, we only need to prove that there
 has not been an unexpected downgrade. As such, the steps of the binary ladder
-for monitoring are slightly different than for search:<a href="#section-5.2-1" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-5.2-2">
-<li id="section-5.2-2.1">
-            <p id="section-5.2-2.1.1">First, version <code>x</code> of the label is looked up, where <code>x</code> is consecutively higher
+for monitoring are slightly different than for search:<a href="#section-6.3-1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-6.3-2">
+<li id="section-6.3-2.1">
+            <p id="section-6.3-2.1.1">First, version <code>x</code> of the label is looked up, where <code>x</code> is consecutively higher
 powers of two minus one (0, 1, 3, 7, ...). This is repeated until <code>x</code> is the
-largest such value less than or equal to the target version.<a href="#section-5.2-2.1.1" class="pilcrow">¶</a></p>
+largest such value less than or equal to the target version.<a href="#section-6.3-2.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-5.2-2.2">
-            <p id="section-5.2-2.2.1">Second, the largest <code>x</code> that was looked up is retained, and consecutively
+          <li id="section-6.3-2.2">
+            <p id="section-6.3-2.2.1">Second, the largest <code>x</code> that was looked up is retained, and consecutively
 smaller powers of two are added to it until it equals the target version.
-Each time a power of two is added, this version of the label is looked up.<a href="#section-5.2-2.2.1" class="pilcrow">¶</a></p>
+Each time a power of two is added, this version of the label is looked up.<a href="#section-6.3-2.2.1" class="pilcrow">¶</a></p>
 </li>
         </ol>
-<p id="section-5.2-3">This could be equivalently computed as a search binary ladder, excluding lookups
-for any versions greater than the target.<a href="#section-5.2-3" class="pilcrow">¶</a></p>
+<p id="section-6.3-3">This could be equivalently computed as a search binary ladder, excluding lookups
+for any versions greater than the target.<a href="#section-6.3-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="algorithm-1">
-<section id="section-5.3">
+<section id="section-6.4">
         <h3 id="name-algorithm-2">
-<a href="#section-5.3" class="section-number selfRef">5.3. </a><a href="#name-algorithm-2" class="section-name selfRef">Algorithm</a>
+<a href="#section-6.4" class="section-number selfRef">6.4. </a><a href="#name-algorithm-2" class="section-name selfRef">Algorithm</a>
         </h3>
-<p id="section-5.3-1">To monitor a given label, users maintain a small amount of state: a map from a
+<p id="section-6.4-1">To monitor a given label, users maintain a small amount of state: a map from a
 position in the log to a version counter. The version counter is the highest
 version of the label that's been proven to exist at that log position. Users
 initially populate this map by setting the position of the first log entry to
 contain the label-version pair they've looked up to map to that version. A map
 may track several different versions of a label simultaneously, if a user has
-been shown different versions of the same label.<a href="#section-5.3-1" class="pilcrow">¶</a></p>
-<p id="section-5.3-2">To update this map, users receive the most recent tree head from the server and
-follow these steps, for each entry in the map:<a href="#section-5.3-2" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-5.3-3">
-<li id="section-5.3-3.1">
-            <p id="section-5.3-3.1.1">Compute the entry's direct path (in terms of the Implicit Binary Search Tree)
-based on the current tree size.<a href="#section-5.3-3.1.1" class="pilcrow">¶</a></p>
+been shown different versions of the same label.<a href="#section-6.4-1" class="pilcrow">¶</a></p>
+<p id="section-6.4-2">To update this map, users receive the most recent tree head from the server and
+follow these steps, for each entry in the map:<a href="#section-6.4-2" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-6.4-3">
+<li id="section-6.4-3.1">
+            <p id="section-6.4-3.1.1">Compute the entry's direct path (in terms of the Implicit Binary Search Tree)
+based on the current tree size.<a href="#section-6.4-3.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-5.3-3.2">
-            <p id="section-5.3-3.2.1">If there are no entries in the direct path that are to the right of the
+          <li id="section-6.4-3.2">
+            <p id="section-6.4-3.2.1">If there are no entries in the direct path that are to the right of the
 current entry, then skip updating this entry (there's no new information to
-update it with).<a href="#section-5.3-3.2.1" class="pilcrow">¶</a></p>
+update it with).<a href="#section-6.4-3.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-5.3-3.3">
-            <p id="section-5.3-3.3.1">For each entry in the direct path that's to the right of the current entry,
-from low to high:<a href="#section-5.3-3.3.1" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-5.3-3.3.2">
-<li id="section-5.3-3.3.2.1">
-                <p id="section-5.3-3.3.2.1.1">Receive and verify a binary ladder from that log entry, for the version
+          <li id="section-6.4-3.3">
+            <p id="section-6.4-3.3.1">For each entry in the direct path that's to the right of the current entry,
+from low to high:<a href="#section-6.4-3.3.1" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-6.4-3.3.2">
+<li id="section-6.4-3.3.2.1">
+                <p id="section-6.4-3.3.2.1.1">Receive and verify a binary ladder from that log entry, for the version
 currently in the map. This proves that, at the indicated log entry, the
 highest version present is greater than or equal to the
-previously-observed version.<a href="#section-5.3-3.3.2.1.1" class="pilcrow">¶</a></p>
+previously-observed version.<a href="#section-6.4-3.3.2.1.1" class="pilcrow">¶</a></p>
 </li>
-              <li id="section-5.3-3.3.2.2">
-                <p id="section-5.3-3.3.2.2.1">If the above check was successful, remove the current position-version
+              <li id="section-6.4-3.3.2.2">
+                <p id="section-6.4-3.3.2.2.1">If the above check was successful, remove the current position-version
 pair from the map and replace it with a position-version pair
-corresponding to the entry in the log that was just checked.<a href="#section-5.3-3.3.2.2.1" class="pilcrow">¶</a></p>
+corresponding to the entry in the log that was just checked.<a href="#section-6.4-3.3.2.2.1" class="pilcrow">¶</a></p>
 </li>
             </ol>
 </li>
         </ol>
-<p id="section-5.3-4">This algorithm progressively moves up the tree as new intermediate/root nodes
+<p id="section-6.4-4">This algorithm progressively moves up the tree as new intermediate/root nodes
 are established and verifies that they're constructed correctly. Note that users
 can often execute this process with the output of Search or Update operations
-for a label without waiting to make explicit Monitor queries.<a href="#section-5.3-4" class="pilcrow">¶</a></p>
-<p id="section-5.3-5">It is also worth noting that the work required to monitor several versions of
+for a label without waiting to make explicit Monitor queries.<a href="#section-6.4-4" class="pilcrow">¶</a></p>
+<p id="section-6.4-5">It is also worth noting that the work required to monitor several versions of
 the same label scales sublinearly, due to the fact that the direct paths of the
 different versions will often intersect. Intersections reduce the total number
 of entries in the map and therefore the amount of work that will be needed to
-monitor the label from then on.<a href="#section-5.3-5" class="pilcrow">¶</a></p>
-<p id="section-5.3-6">TODO mention frontier checks when monitoring owned labels
-TODO multiple monitoring passes<a href="#section-5.3-6" class="pilcrow">¶</a></p>
+monitor the label from then on.<a href="#section-6.4-5" class="pilcrow">¶</a></p>
+<p id="section-6.4-6">TODO mention frontier checks when monitoring owned labels
+TODO multiple monitoring passes<a href="#section-6.4-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
 <div id="updating-views-of-the-tree">
-<section id="section-6">
+<section id="section-7">
       <h2 id="name-updating-views-of-the-tree">
-<a href="#section-6" class="section-number selfRef">6. </a><a href="#name-updating-views-of-the-tree" class="section-name selfRef">Updating Views of the Tree</a>
+<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-updating-views-of-the-tree" class="section-name selfRef">Updating Views of the Tree</a>
       </h2>
-<p id="section-6-1">The previous two sections on searching and monitoring the combined tree assumes that we
-have a fixed root hash. However, as users interact with the tree over time, they
-will see many different root hashes as the contents of the tree changes. It is
-necessary for users to guarantee that the root hashes they observe are
-consistent with respect to a few important properties:<a href="#section-6-1" class="pilcrow">¶</a></p>
+<p id="section-7-1">The previous sections on searching and monitoring always operate on a single,
+fixed version of the combined tree. However, as users interact with the tree
+over time, they will see many different root hashes as the contents of the tree
+changes. It's necessary for users to guarantee that the root hashes they observe
+are consistent with respect to a few important properties:<a href="#section-7-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-6-2.1">
-          <p id="section-6-2.1.1">If root hash A is shown after root hash B, then root hash A contains all the
-same log entries as B (with some new ones potentially added).<a href="#section-6-2.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-7-2.1">
+          <p id="section-7-2.1.1">If root hash A is shown after root hash B, then root hash A contains all the
+same log entries as B (with some new ones potentially added).<a href="#section-7-2.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-6-2.2">
-          <p id="section-6-2.2.1">If the rightmost log entry of the tree with root hash A has timestamp
+        <li class="normal" id="section-7-2.2">
+          <p id="section-7-2.2.1">If the rightmost log entry of the tree with root hash A has timestamp
 T_a, and the rightmost log entry of the tree with root hash B has timestamp
-T_b, then T_a is greater than T_b.<a href="#section-6-2.2.1" class="pilcrow">¶</a></p>
+T_b, then T_a is greater than T_b.<a href="#section-7-2.2.1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-6-2.2.2.1">
-              <p id="section-6-2.2.2.1.1">Furthermore, all log entries between the rightmost log entry of A and the
-rightmost log entry of B have monotonically increasing timestamps.<a href="#section-6-2.2.2.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-7-2.2.2.1">
+              <p id="section-7-2.2.2.1.1">Furthermore, all log entries between the rightmost log entry of A and the
+rightmost log entry of B have monotonically increasing timestamps.<a href="#section-7-2.2.2.1.1" class="pilcrow">¶</a></p>
 </li>
           </ul>
 </li>
       </ul>
-<p id="section-6-3">The first property is necessary to ensure that the Transparency Log never
+<p id="section-7-3">The first property is necessary to ensure that the Transparency Log never
 removes a log entry after showing it to a user, as this would allow the
 Transparency Log to remove evidence of its own misbehavior. The second two
 properties ensure that all users have a consistent view of when each portion of
 the tree was created. Disagreement on when portions of the tree were created is
-functionally a fork, and it introduces the same security issues. This is because
+functionally a fork and it introduces the same security issues. This is because
 users rely on log entry timestamps to decide whether to continue monitoring
-certain labels, or which portions of the tree to skip when searching.<a href="#section-6-3" class="pilcrow">¶</a></p>
-<p id="section-6-4">To address this, users retain select information about the last tree head
-they've observed:<a href="#section-6-4" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-6-5">
-<li id="section-6-5.1">
-          <p id="section-6-5.1.1">The "size" of the log tree (the number of log entries it contains).<a href="#section-6-5.1.1" class="pilcrow">¶</a></p>
+certain labels, or which portions of the tree to skip when searching.<a href="#section-7-3" class="pilcrow">¶</a></p>
+<p id="section-7-4">To address this, users retain select information about the last tree head
+they've observed:<a href="#section-7-4" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-7-5">
+<li id="section-7-5.1">
+          <p id="section-7-5.1.1">The "size" of the log tree (the number of log entries it contains).<a href="#section-7-5.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-6-5.2">
-          <p id="section-6-5.2.1">The root hashes of the "full subtrees" of the log tree (those subtrees which
+        <li id="section-7-5.2">
+          <p id="section-7-5.2.1">The root hashes of the "full subtrees" of the log tree (those subtrees which
 are the largest powers of two possible). This allows the Transparency Log to
 provide more space-efficient consistency and inclusion proofs than if just
-the root hash was retained.<a href="#section-6-5.2.1" class="pilcrow">¶</a></p>
+the root hash was retained.<a href="#section-7-5.2.1" class="pilcrow">¶</a></p>
 </li>
-        <li id="section-6-5.3">
-          <p id="section-6-5.3.1">The timestamps of the log entries along the frontier. As will be described
+        <li id="section-7-5.3">
+          <p id="section-7-5.3.1">The timestamps of the log entries along the frontier. As will be described
 below, this will be used to ensure that subsequent log entry timestamps are
-correct.<a href="#section-6-5.3.1" class="pilcrow">¶</a></p>
+correct.<a href="#section-7-5.3.1" class="pilcrow">¶</a></p>
 </li>
       </ol>
-<p id="section-6-6">When users make queries to the Transparency Log, they advertise the size of the
+<p id="section-7-6">When users make queries to the Transparency Log, they advertise the size of the
 last tree head observed. If the Transparency Log responds with an updated tree
 head, it provides additional information in its query response to prove that the
-advertised tree head and the more recent one are consistent.<a href="#section-6-6" class="pilcrow">¶</a></p>
-<p id="section-6-7">Proving the latter two properties, that newly added log entries have
-monotonically increasing timestamps, is done as follows:<a href="#section-6-7" class="pilcrow">¶</a></p>
+advertised tree head and the more recent one are consistent.<a href="#section-7-6" class="pilcrow">¶</a></p>
+<p id="section-7-7">Proving the latter two properties, that newly added log entries have
+monotonically increasing timestamps, is done as follows:<a href="#section-7-7" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-6-8.1">
-          <p id="section-6-8.1.1">Starting with the log entry that was advertised by the user, compute its
+<li class="normal" id="section-7-8.1">
+          <p id="section-7-8.1.1">Starting with the log entry that was advertised by the user, compute its
 direct path (in terms of the implicit binary search tree) in the new tree.
 Provide the log entry timestamp and prefix tree root hash for each element
-of the direct path that's to the right of the advertised log entry.<a href="#section-6-8.1.1" class="pilcrow">¶</a></p>
+of the direct path that's to the right of the advertised log entry.<a href="#section-7-8.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-6-8.2">
-          <p id="section-6-8.2.1">Exactly one of these log entries will lie on the new tree's frontier. From
+        <li class="normal" id="section-7-8.2">
+          <p id="section-7-8.2.1">Exactly one of these log entries will lie on the new tree's frontier. From
 this log entry, compute the remainder of the frontier. That is, compute the
 log entry's right child, and the right child's right child, and so on. Provide
-the timestamps and prefix tree root hashes for these log entries as well.<a href="#section-6-8.2.1" class="pilcrow">¶</a></p>
+the timestamps and prefix tree root hashes for these log entries as well.<a href="#section-7-8.2.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
-<p id="section-6-9">Users verify that the presented timestamps represent a monotonic series. While
+<p id="section-7-9">Users verify that the presented timestamps represent a monotonic series. While
 this only requires users to verify a logarithmic number of the newly added log
 entries' timestamps, it guarantees that two users with overlapping views of the
 tree will detect any violations. Note that retaining only the rightmost log
 entry's timestamp would be sufficient for this purpose, but users retain the
 timestamps of all log entries along the frontier. The additional timestamps are
 retained so that the Transparency Log doesn't have to provide them again in
-future queries if they've exceeded their maximum lifetime.<a href="#section-6-9" class="pilcrow">¶</a></p>
-<p id="section-6-10">Proving the first property, that the tree is append-only, is done by providing a
+future queries if they've exceeded their maximum lifetime.<a href="#section-7-9" class="pilcrow">¶</a></p>
+<p id="section-7-10">Proving the first property, that the tree is append-only, is done by providing a
 consistency proof combined with an inclusion proof for the log entries that were
 provided to prove the latter two properties. That is, the minimum set of
 intermediate hashes from the log tree are provided that are necessary to compute
 the new root hash from the given log entries and the full subtrees retained by
-the user.<a href="#section-6-10" class="pilcrow">¶</a></p>
-<p id="section-6-11">Only once the user successfully verifies that the log entries' timestamps are
-monotonic and that it correctly computed the new root hash, can they update
-their stored state to replace the previous tree head with the new one.<a href="#section-6-11" class="pilcrow">¶</a></p>
-<p id="section-6-12">For users which have never interacted with the Transparency Log before and don't
+the user.<a href="#section-7-10" class="pilcrow">¶</a></p>
+<p id="section-7-11">Additionally, the Transparency Log defines two durations: how old of a view of
+the tree is acceptable, and how far ahead of the current time a view of the tree
+may claim to be. Users verify that the rightmost log entry's timestamp falls
+within this range according to their local clock.<a href="#section-7-11" class="pilcrow">¶</a></p>
+<p id="section-7-12">Only once the user successfully verifies that the log entries' timestamps are
+monotonic, that it correctly computed the new root hash, and that the rightmost
+log entry's timestamp is in an acceptable range, can they update their stored
+state to replace the previous tree head with the new one.<a href="#section-7-12" class="pilcrow">¶</a></p>
+<p id="section-7-13">For users which have never interacted with the Transparency Log before and don't
 have a previous tree head to advertise, the Transparency Log simply provides the
 timestamps and prefix tree root hashes of the log entries on the frontier, along
 with an inclusion proof. The user verifies that the timestamps are monotonic. If
 this is successful, the user retains the log tree's full subtrees and the
-rightmost log entry's timestamp for future queries.<a href="#section-6-12" class="pilcrow">¶</a></p>
+frontier timestamps for future queries.<a href="#section-7-13" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="ciphersuites">
-<section id="section-7">
+<section id="section-8">
       <h2 id="name-ciphersuites">
-<a href="#section-7" class="section-number selfRef">7. </a><a href="#name-ciphersuites" class="section-name selfRef">Ciphersuites</a>
+<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-ciphersuites" class="section-name selfRef">Ciphersuites</a>
       </h2>
-<p id="section-7-1">Each Transparency Log uses a single fixed ciphersuite, chosen when the log is
+<p id="section-8-1">Each Transparency Log uses a single fixed ciphersuite, chosen when the log is
 initially created, that specifies the following primitives to be used for
-cryptographic computations:<a href="#section-7-1" class="pilcrow">¶</a></p>
+cryptographic computations:<a href="#section-8-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-7-2.1">
-          <p id="section-7-2.1.1">A hash algorithm<a href="#section-7-2.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-8-2.1">
+          <p id="section-8-2.1.1">A hash algorithm<a href="#section-8-2.1.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-7-2.2">
-          <p id="section-7-2.2.1">A signature algorithm<a href="#section-7-2.2.1" class="pilcrow">¶</a></p>
+        <li class="normal" id="section-8-2.2">
+          <p id="section-8-2.2.1">A signature algorithm<a href="#section-8-2.2.1" class="pilcrow">¶</a></p>
 </li>
-        <li class="normal" id="section-7-2.3">
-          <p id="section-7-2.3.1">A Verifiable Random Function (VRF) algorithm<a href="#section-7-2.3.1" class="pilcrow">¶</a></p>
+        <li class="normal" id="section-8-2.3">
+          <p id="section-8-2.3.1">A Verifiable Random Function (VRF) algorithm<a href="#section-8-2.3.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
-<p id="section-7-3">The hash algorithm is used for computing the intermediate and root values of
+<p id="section-8-3">The hash algorithm is used for computing the intermediate and root values of
 hash trees. The signature algorithm is used for signatures from both the service
 operator and the third party, if one is present. The VRF is used for preserving
 the privacy of labels. One of the VRF algorithms from <span>[<a href="#RFC9381" class="cite xref">RFC9381</a>]</span> must be
-used.<a href="#section-7-3" class="pilcrow">¶</a></p>
-<p id="section-7-4">Ciphersuites are represented with the CipherSuite type. The ciphersuites are
-defined in <a href="#kt-ciphersuites" class="auto internal xref">Section 13.1</a>.<a href="#section-7-4" class="pilcrow">¶</a></p>
+used.<a href="#section-8-3" class="pilcrow">¶</a></p>
+<p id="section-8-4">Ciphersuites are represented with the CipherSuite type. The ciphersuites are
+defined in <a href="#kt-ciphersuites" class="auto internal xref">Section 14.1</a>.<a href="#section-8-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="cryptographic-computations">
-<section id="section-8">
+<section id="section-9">
       <h2 id="name-cryptographic-computations">
-<a href="#section-8" class="section-number selfRef">8. </a><a href="#name-cryptographic-computations" class="section-name selfRef">Cryptographic Computations</a>
+<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-cryptographic-computations" class="section-name selfRef">Cryptographic Computations</a>
       </h2>
 <div id="verifiable-random-function">
-<section id="section-8.1">
+<section id="section-9.1">
         <h3 id="name-verifiable-random-function">
-<a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-verifiable-random-function" class="section-name selfRef">Verifiable Random Function</a>
+<a href="#section-9.1" class="section-number selfRef">9.1. </a><a href="#name-verifiable-random-function" class="section-name selfRef">Verifiable Random Function</a>
         </h3>
-<p id="section-8.1-1">Each label-version pair created in a log will have a unique
+<p id="section-9.1-1">Each label-version pair created in a log will have a unique
 representation in the prefix tree. This is computed by providing the combined
-label and version as inputs to the VRF:<a href="#section-8.1-1" class="pilcrow">¶</a></p>
-<div class="lang-tls-presentation sourcecode" id="section-8.1-2">
+label and version as inputs to the VRF:<a href="#section-9.1-1" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-9.1-2">
 <pre>
 struct {
   opaque label&lt;0..2^8-1&gt;;
   uint32 version;
 } VrfInput;
-</pre><a href="#section-8.1-2" class="pilcrow">¶</a>
+</pre><a href="#section-9.1-2" class="pilcrow">¶</a>
 </div>
-<p id="section-8.1-3">The VRF's output evaluated on <code>VrfInput</code> is the concrete value inserted into the
-prefix tree.<a href="#section-8.1-3" class="pilcrow">¶</a></p>
+<p id="section-9.1-3">The VRF's output evaluated on <code>VrfInput</code> is the concrete value inserted into the
+prefix tree.<a href="#section-9.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="commitment">
-<section id="section-8.2">
+<section id="section-9.2">
         <h3 id="name-commitment">
-<a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-commitment" class="section-name selfRef">Commitment</a>
+<a href="#section-9.2" class="section-number selfRef">9.2. </a><a href="#name-commitment" class="section-name selfRef">Commitment</a>
         </h3>
-<p id="section-8.2-1">As discussed in <a href="#combined-tree" class="auto internal xref">Section 3.4</a>, commitments are stored in the leaves of the
+<p id="section-9.2-1">As discussed in <a href="#combined-tree" class="auto internal xref">Section 3.4</a>, commitments are stored in the leaves of the
 log tree and correspond to updates. Commitments are computed
 with HMAC <span>[<a href="#RFC2104" class="cite xref">RFC2104</a>]</span>, using the hash function specified by the ciphersuite. To
 produce a new commitment, the application generates a random 16 byte value
-called <code>opening</code> and computes:<a href="#section-8.2-1" class="pilcrow">¶</a></p>
-<div class="lang-pseudocode sourcecode" id="section-8.2-2">
+called <code>opening</code> and computes:<a href="#section-9.2-1" class="pilcrow">¶</a></p>
+<div class="lang-pseudocode sourcecode" id="section-9.2-2">
 <pre>
 commitment = HMAC(fixedKey, CommitmentValue)
-</pre><a href="#section-8.2-2" class="pilcrow">¶</a>
+</pre><a href="#section-9.2-2" class="pilcrow">¶</a>
 </div>
-<p id="section-8.2-3">where <code>fixedKey</code> is the 16 byte hex-decoded value:<a href="#section-8.2-3" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-8.2-4">
+<p id="section-9.2-3">where <code>fixedKey</code> is the 16 byte hex-decoded value:<a href="#section-9.2-3" class="pilcrow">¶</a></p>
+<div class="alignLeft art-text artwork" id="section-9.2-4">
 <pre>
 d821f8790d97709796b4d7903357c3f5
-</pre><a href="#section-8.2-4" class="pilcrow">¶</a>
+</pre><a href="#section-9.2-4" class="pilcrow">¶</a>
 </div>
-<p id="section-8.2-5">and CommitmentValue is specified as:<a href="#section-8.2-5" class="pilcrow">¶</a></p>
-<div class="lang-tls-presentation sourcecode" id="section-8.2-6">
+<p id="section-9.2-5">and CommitmentValue is specified as:<a href="#section-9.2-5" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-9.2-6">
 <pre>
 struct {
   opaque opening&lt;16&gt;;
   opaque label&lt;0..2^8-1&gt;;
   UpdateValue update;
 } CommitmentValue;
-</pre><a href="#section-8.2-6" class="pilcrow">¶</a>
+</pre><a href="#section-9.2-6" class="pilcrow">¶</a>
 </div>
-<p id="section-8.2-7">This fixed key allows the HMAC function, and thereby the commitment scheme, to
+<p id="section-9.2-7">This fixed key allows the HMAC function, and thereby the commitment scheme, to
 be modeled as a random oracle. The <code>label</code> field of CommitmentValue
 contains the label being updated
-and the <code>update</code> field contains the new value for the label.<a href="#section-8.2-7" class="pilcrow">¶</a></p>
-<p id="section-8.2-8">The output value <code>commitment</code> may be published, while <code>opening</code> should be kept
-private until the commitment is meant to be revealed.<a href="#section-8.2-8" class="pilcrow">¶</a></p>
+and the <code>update</code> field contains the new value for the label.<a href="#section-9.2-7" class="pilcrow">¶</a></p>
+<p id="section-9.2-8">The output value <code>commitment</code> may be published, while <code>opening</code> should be kept
+private until the commitment is meant to be revealed.<a href="#section-9.2-8" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="prefix-tree-1">
-<section id="section-8.3">
+<section id="section-9.3">
         <h3 id="name-prefix-tree-2">
-<a href="#section-8.3" class="section-number selfRef">8.3. </a><a href="#name-prefix-tree-2" class="section-name selfRef">Prefix Tree</a>
+<a href="#section-9.3" class="section-number selfRef">9.3. </a><a href="#name-prefix-tree-2" class="section-name selfRef">Prefix Tree</a>
         </h3>
-<p id="section-8.3-1">The leaf nodes of a prefix tree are serialized as:<a href="#section-8.3-1" class="pilcrow">¶</a></p>
-<div class="lang-tls sourcecode" id="section-8.3-2">
+<p id="section-9.3-1">The leaf nodes of a prefix tree are serialized as:<a href="#section-9.3-1" class="pilcrow">¶</a></p>
+<div class="lang-tls sourcecode" id="section-9.3-2">
 <pre>
 struct {
     opaque vrf_output&lt;VRF.Nh&gt;;
     uint64 update_index;
 } PrefixLeaf;
-</pre><a href="#section-8.3-2" class="pilcrow">¶</a>
+</pre><a href="#section-9.3-2" class="pilcrow">¶</a>
 </div>
-<p id="section-8.3-3">where <code>vrf_output</code> is the VRF output for the label-version pair, <code>VRF.Nh</code> is the
+<p id="section-9.3-3">where <code>vrf_output</code> is the VRF output for the label-version pair, <code>VRF.Nh</code> is the
 output size of the ciphersuite VRF in bytes, and <code>update_index</code> is the index of
 the log tree's leaf committing to the respective value, i.e., the log tree's
-<code>tree_size</code> just after the respective label-version pair was inserted minus one.<a href="#section-8.3-3" class="pilcrow">¶</a></p>
-<p id="section-8.3-4">The parent nodes of a prefix tree are serialized as:<a href="#section-8.3-4" class="pilcrow">¶</a></p>
-<div class="lang-tls sourcecode" id="section-8.3-5">
+<code>tree_size</code> just after the respective label-version pair was inserted minus one.<a href="#section-9.3-3" class="pilcrow">¶</a></p>
+<p id="section-9.3-4">The parent nodes of a prefix tree are serialized as:<a href="#section-9.3-4" class="pilcrow">¶</a></p>
+<div class="lang-tls sourcecode" id="section-9.3-5">
 <pre>
 struct {
   opaque value&lt;Hash.Nh&gt;;
 } PrefixParent;
-</pre><a href="#section-8.3-5" class="pilcrow">¶</a>
+</pre><a href="#section-9.3-5" class="pilcrow">¶</a>
 </div>
-<p id="section-8.3-6">where <code>Hash.Nh</code> is the output length of the ciphersuite hash function. The value
+<p id="section-9.3-6">where <code>Hash.Nh</code> is the output length of the ciphersuite hash function. The value
 of a parent node is computed by hashing together the values of its left and
-right children:<a href="#section-8.3-6" class="pilcrow">¶</a></p>
-<div class="lang-pseudocode sourcecode" id="section-8.3-7">
+right children:<a href="#section-9.3-6" class="pilcrow">¶</a></p>
+<div class="lang-pseudocode sourcecode" id="section-9.3-7">
 <pre>
 parent.value = Hash(0x01 ||
                    nodeValue(parent.leftChild) ||
@@ -2523,18 +2567,18 @@ nodeValue(node):
     return Hash(0x00 || node.vrf_output || node.update_index)
   else if node.type == parentNode:
     return node.value
-</pre><a href="#section-8.3-7" class="pilcrow">¶</a>
+</pre><a href="#section-9.3-7" class="pilcrow">¶</a>
 </div>
-<p id="section-8.3-8">where <code>Hash</code> denotes the ciphersuite hash function.<a href="#section-8.3-8" class="pilcrow">¶</a></p>
+<p id="section-9.3-8">where <code>Hash</code> denotes the ciphersuite hash function.<a href="#section-9.3-8" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="crypto-log-tree">
-<section id="section-8.4">
+<section id="section-9.4">
         <h3 id="name-log-tree-2">
-<a href="#section-8.4" class="section-number selfRef">8.4. </a><a href="#name-log-tree-2" class="section-name selfRef">Log Tree</a>
+<a href="#section-9.4" class="section-number selfRef">9.4. </a><a href="#name-log-tree-2" class="section-name selfRef">Log Tree</a>
         </h3>
-<p id="section-8.4-1">The leaf and parent nodes of a log tree are serialized as:<a href="#section-8.4-1" class="pilcrow">¶</a></p>
-<div class="lang-tls-presentation sourcecode" id="section-8.4-2">
+<p id="section-9.4-1">The leaf and parent nodes of a log tree are serialized as:<a href="#section-9.4-1" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-9.4-2">
 <pre>
 struct {
   opaque commitment&lt;Hash.Nh&gt;;
@@ -2544,15 +2588,15 @@ struct {
 struct {
   opaque value&lt;Hash.Nh&gt;;
 } LogParent;
-</pre><a href="#section-8.4-2" class="pilcrow">¶</a>
+</pre><a href="#section-9.4-2" class="pilcrow">¶</a>
 </div>
-<p id="section-8.4-3">The <code>commitment</code> field contains the output of evaluating HMAC on
-<code>CommitmentValue</code>, as described in <a href="#commitment" class="auto internal xref">Section 8.2</a>. The <code>prefix_tree</code> field
+<p id="section-9.4-3">The <code>commitment</code> field contains the output of evaluating HMAC on
+<code>CommitmentValue</code>, as described in <a href="#commitment" class="auto internal xref">Section 9.2</a>. The <code>prefix_tree</code> field
 contains the root hash of the prefix tree, after inserting a new label-version
-pair for the <code>label</code> in <code>CommitmentValue</code>.<a href="#section-8.4-3" class="pilcrow">¶</a></p>
-<p id="section-8.4-4">The value of a parent node is computed by hashing together the values of its
-left and right children:<a href="#section-8.4-4" class="pilcrow">¶</a></p>
-<div class="lang-pseudocode sourcecode" id="section-8.4-5">
+pair for the <code>label</code> in <code>CommitmentValue</code>.<a href="#section-9.4-3" class="pilcrow">¶</a></p>
+<p id="section-9.4-4">The value of a parent node is computed by hashing together the values of its
+left and right children:<a href="#section-9.4-4" class="pilcrow">¶</a></p>
+<div class="lang-pseudocode sourcecode" id="section-9.4-5">
 <pre>
 parent.value = Hash(hashContent(parent.leftChild) ||
                     hashContent(parent.rightChild))
@@ -2568,32 +2612,32 @@ nodeValue(node):
     return Hash(node.commitment || node.prefix_tree)
   else if node.type == parentNode:
     return node.value
-</pre><a href="#section-8.4-5" class="pilcrow">¶</a>
+</pre><a href="#section-9.4-5" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
 <div id="tree-head-signature">
-<section id="section-8.5">
+<section id="section-9.5">
         <h3 id="name-tree-head-signature">
-<a href="#section-8.5" class="section-number selfRef">8.5. </a><a href="#name-tree-head-signature" class="section-name selfRef">Tree Head Signature</a>
+<a href="#section-9.5" class="section-number selfRef">9.5. </a><a href="#name-tree-head-signature" class="section-name selfRef">Tree Head Signature</a>
         </h3>
-<p id="section-8.5-1">The head of a Transparency Log, which represents the log's most recent state, is
-represented as:<a href="#section-8.5-1" class="pilcrow">¶</a></p>
-<div class="lang-tls-presentation sourcecode" id="section-8.5-2">
+<p id="section-9.5-1">The head of a Transparency Log, which represents the log's most recent state, is
+represented as:<a href="#section-9.5-1" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-9.5-2">
 <pre>
 struct {
   uint64 tree_size;
   opaque signature&lt;0..2^16-1&gt;;
 } TreeHead;
-</pre><a href="#section-8.5-2" class="pilcrow">¶</a>
+</pre><a href="#section-9.5-2" class="pilcrow">¶</a>
 </div>
-<p id="section-8.5-3">where <code>tree_size</code> counts the number of entries in the log tree. If the
+<p id="section-9.5-3">where <code>tree_size</code> counts the number of entries in the log tree. If the
 Transparency Log is deployed with Third-party Management then the public key
 used to verify the signature belongs to the third-party manager; otherwise the
-public key used belongs to the service operator.<a href="#section-8.5-3" class="pilcrow">¶</a></p>
-<p id="section-8.5-4">The signature itself is computed over a <code>TreeHeadTBS</code> structure, which
-incorporates the log's current state as well as long-term log configuration:<a href="#section-8.5-4" class="pilcrow">¶</a></p>
-<div class="lang-tls-presentation sourcecode" id="section-8.5-5">
+public key used belongs to the service operator.<a href="#section-9.5-3" class="pilcrow">¶</a></p>
+<p id="section-9.5-4">The signature itself is computed over a <code>TreeHeadTBS</code> structure, which
+incorporates the log's current state as well as long-term log configuration:<a href="#section-9.5-4" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-9.5-5">
 <pre>
 enum {
   reserved(0),
@@ -2623,63 +2667,63 @@ struct {
   uint64 tree_size;
   opaque root&lt;Hash.Nh&gt;;
 } TreeHeadTBS;
-</pre><a href="#section-8.5-5" class="pilcrow">¶</a>
+</pre><a href="#section-9.5-5" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
 </section>
 </div>
 <div id="tree-proofs">
-<section id="section-9">
+<section id="section-10">
       <h2 id="name-tree-proofs">
-<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-tree-proofs" class="section-name selfRef">Tree Proofs</a>
+<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-tree-proofs" class="section-name selfRef">Tree Proofs</a>
       </h2>
 <div id="log-tree-1">
-<section id="section-9.1">
+<section id="section-10.1">
         <h3 id="name-log-tree-3">
-<a href="#section-9.1" class="section-number selfRef">9.1. </a><a href="#name-log-tree-3" class="section-name selfRef">Log Tree</a>
+<a href="#section-10.1" class="section-number selfRef">10.1. </a><a href="#name-log-tree-3" class="section-name selfRef">Log Tree</a>
         </h3>
-<p id="section-9.1-1">An inclusion proof for a single leaf in a log tree is given by providing the
+<p id="section-10.1-1">An inclusion proof for a single leaf in a log tree is given by providing the
 copath values of a leaf. Similarly, a bulk inclusion proof for any number of
 leaves is given by providing the fewest node values that can be hashed together
-with the specified leaves to produce the root value. Such a proof is encoded as:<a href="#section-9.1-1" class="pilcrow">¶</a></p>
-<div class="lang-tls-presentation sourcecode" id="section-9.1-2">
+with the specified leaves to produce the root value. Such a proof is encoded as:<a href="#section-10.1-1" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-10.1-2">
 <pre>
 opaque NodeValue&lt;Hash.Nh&gt;;
 
 struct {
   NodeValue elements&lt;0..2^16-1&gt;;
 } InclusionProof;
-</pre><a href="#section-9.1-2" class="pilcrow">¶</a>
+</pre><a href="#section-10.1-2" class="pilcrow">¶</a>
 </div>
-<p id="section-9.1-3">Each <code>NodeValue</code> is a uniform size, computed by passing the relevant <code>LogLeaf</code>
+<p id="section-10.1-3">Each <code>NodeValue</code> is a uniform size, computed by passing the relevant <code>LogLeaf</code>
 or <code>LogParent</code> structures through the <code>nodeValue</code> function in
-<a href="#crypto-log-tree" class="auto internal xref">Section 8.4</a>. The contents of the <code>elements</code> array is kept in
+<a href="#crypto-log-tree" class="auto internal xref">Section 9.4</a>. The contents of the <code>elements</code> array is kept in
 left-to-right order: if a node is present in the root's left subtree, its value
 must be listed before any values provided from nodes that are in the root's
-right subtree, and so on recursively.<a href="#section-9.1-3" class="pilcrow">¶</a></p>
-<p id="section-9.1-4">Consistency proofs are encoded similarly:<a href="#section-9.1-4" class="pilcrow">¶</a></p>
-<div class="lang-tls-presentation sourcecode" id="section-9.1-5">
+right subtree, and so on recursively.<a href="#section-10.1-3" class="pilcrow">¶</a></p>
+<p id="section-10.1-4">Consistency proofs are encoded similarly:<a href="#section-10.1-4" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-10.1-5">
 <pre>
 struct {
   NodeValue elements&lt;0..2^8-1&gt;;
 } ConsistencyProof;
-</pre><a href="#section-9.1-5" class="pilcrow">¶</a>
+</pre><a href="#section-10.1-5" class="pilcrow">¶</a>
 </div>
-<p id="section-9.1-6">Again, each <code>NodeValue</code> is computed by passing the relevant <code>LogLeaf</code> or
+<p id="section-10.1-6">Again, each <code>NodeValue</code> is computed by passing the relevant <code>LogLeaf</code> or
 <code>LogParent</code> structure through the <code>nodeValue</code> function. The nodes chosen
-correspond to those output by the algorithm in Section 2.1.2 of <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span>.<a href="#section-9.1-6" class="pilcrow">¶</a></p>
+correspond to those output by the algorithm in Section 2.1.2 of <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span>.<a href="#section-10.1-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="prefix-tree-2">
-<section id="section-9.2">
+<section id="section-10.2">
         <h3 id="name-prefix-tree-3">
-<a href="#section-9.2" class="section-number selfRef">9.2. </a><a href="#name-prefix-tree-3" class="section-name selfRef">Prefix Tree</a>
+<a href="#section-10.2" class="section-number selfRef">10.2. </a><a href="#name-prefix-tree-3" class="section-name selfRef">Prefix Tree</a>
         </h3>
-<p id="section-9.2-1">A proof from a prefix tree authenticates that a set of values are either members
+<p id="section-10.2-1">A proof from a prefix tree authenticates that a set of values are either members
 of, or are not members of, the total set of values represented by the prefix
-tree. Such a proof is encoded as:<a href="#section-9.2-1" class="pilcrow">¶</a></p>
-<div class="lang-tls sourcecode" id="section-9.2-2">
+tree. Such a proof is encoded as:<a href="#section-10.2-1" class="pilcrow">¶</a></p>
+<div class="lang-tls sourcecode" id="section-10.2-2">
 <pre>
 enum {
   reserved(0),
@@ -2703,52 +2747,52 @@ struct {
   PrefixSearchResult results&lt;0..2^8-1&gt;;
   NodeValue elements&lt;0..2^16-1&gt;;
 } PrefixProof;
-</pre><a href="#section-9.2-2" class="pilcrow">¶</a>
+</pre><a href="#section-10.2-2" class="pilcrow">¶</a>
 </div>
-<p id="section-9.2-3">The <code>results</code> field contains the search result for each individual value. It is
+<p id="section-10.2-3">The <code>results</code> field contains the search result for each individual value. It is
 sorted lexicographically by corresponding value. The <code>result_type</code> field of each
 <code>PrefixSearchResult</code> struct indicates what the terminal node of the search for
-that value was:<a href="#section-9.2-3" class="pilcrow">¶</a></p>
+that value was:<a href="#section-10.2-3" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-9.2-4.1">
-            <p id="section-9.2-4.1.1"><code>inclusion</code> for a leaf node matching the requested value.<a href="#section-9.2-4.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-10.2-4.1">
+            <p id="section-10.2-4.1.1"><code>inclusion</code> for a leaf node matching the requested value.<a href="#section-10.2-4.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-9.2-4.2">
-            <p id="section-9.2-4.2.1"><code>nonInclusionLeaf</code> for a leaf node not matching the requested value. In this
-case, the terminal node's value is provided given that it can not be inferred.<a href="#section-9.2-4.2.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-10.2-4.2">
+            <p id="section-10.2-4.2.1"><code>nonInclusionLeaf</code> for a leaf node not matching the requested value. In this
+case, the terminal node's value is provided given that it can not be inferred.<a href="#section-10.2-4.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li class="normal" id="section-9.2-4.3">
-            <p id="section-9.2-4.3.1"><code>nonInclusionParent</code> for a parent node that lacks the desired child.<a href="#section-9.2-4.3.1" class="pilcrow">¶</a></p>
+          <li class="normal" id="section-10.2-4.3">
+            <p id="section-10.2-4.3.1"><code>nonInclusionParent</code> for a parent node that lacks the desired child.<a href="#section-10.2-4.3.1" class="pilcrow">¶</a></p>
 </li>
         </ul>
-<p id="section-9.2-5">The <code>depth</code> field indicates the depth of the terminal node of the search, and is
-provided to assist proof verification.<a href="#section-9.2-5" class="pilcrow">¶</a></p>
-<p id="section-9.2-6">The <code>elements</code> array consists of the fewest node values that can be hashed
+<p id="section-10.2-5">The <code>depth</code> field indicates the depth of the terminal node of the search, and is
+provided to assist proof verification.<a href="#section-10.2-5" class="pilcrow">¶</a></p>
+<p id="section-10.2-6">The <code>elements</code> array consists of the fewest node values that can be hashed
 together with the provided leaves to produce the root. The contents of the
 <code>elements</code> array is kept in left-to-right order: if a node is present in the
 root's left subtree, its value must be listed before any values provided from
 nodes that are in the root's right subtree, and so on recursively. In the event
 that a node is not present, an all-zero byte string of length <code>Hash.Nh</code> is
-listed instead.<a href="#section-9.2-6" class="pilcrow">¶</a></p>
-<p id="section-9.2-7">The proof is verified by hashing together the provided elements, in the
+listed instead.<a href="#section-10.2-6" class="pilcrow">¶</a></p>
+<p id="section-10.2-7">The proof is verified by hashing together the provided elements, in the
 left/right arrangement dictated by the tree structure, and checking that the
-result equals the root value of the prefix tree.<a href="#section-9.2-7" class="pilcrow">¶</a></p>
+result equals the root value of the prefix tree.<a href="#section-10.2-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="proof-combined-tree">
-<section id="section-9.3">
+<section id="section-10.3">
         <h3 id="name-combined-tree-2">
-<a href="#section-9.3" class="section-number selfRef">9.3. </a><a href="#name-combined-tree-2" class="section-name selfRef">Combined Tree</a>
+<a href="#section-10.3" class="section-number selfRef">10.3. </a><a href="#name-combined-tree-2" class="section-name selfRef">Combined Tree</a>
         </h3>
 <div id="proofs-for-contact-monitoring">
-<section id="section-9.3.1">
+<section id="section-10.3.1">
           <h4 id="name-proofs-for-contact-monitori">
-<a href="#section-9.3.1" class="section-number selfRef">9.3.1. </a><a href="#name-proofs-for-contact-monitori" class="section-name selfRef">Proofs for Contact Monitoring</a>
+<a href="#section-10.3.1" class="section-number selfRef">10.3.1. </a><a href="#name-proofs-for-contact-monitori" class="section-name selfRef">Proofs for Contact Monitoring</a>
           </h4>
-<p id="section-9.3.1-1">A proof from a combined log and prefix tree follows the execution of a binary
+<p id="section-10.3.1-1">A proof from a combined log and prefix tree follows the execution of a binary
 search through the leaves of the log tree, as described in <a href="#combined-tree" class="auto internal xref">Section 3.4</a>. It
-is serialized as follows:<a href="#section-9.3.1-1" class="pilcrow">¶</a></p>
-<div class="lang-tls-presentation sourcecode" id="section-9.3.1-2">
+is serialized as follows:<a href="#section-10.3.1-1" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-10.3.1-2">
 <pre>
 struct {
   opaque proof&lt;VRF.Np&gt;;
@@ -2765,58 +2809,58 @@ struct {
   ProofStep steps&lt;0..2^8-1&gt;;
   InclusionProof inclusion;
 } SearchProof;
-</pre><a href="#section-9.3.1-2" class="pilcrow">¶</a>
+</pre><a href="#section-10.3.1-2" class="pilcrow">¶</a>
 </div>
-<p id="section-9.3.1-3">If searching for the most recent version of a label, the most recent version is
+<p id="section-10.3.1-3">If searching for the most recent version of a label, the most recent version is
 provided in <code>version</code>. If searching for a specific version, this field is
-omitted.<a href="#section-9.3.1-3" class="pilcrow">¶</a></p>
-<p id="section-9.3.1-4">Each element of <code>vrf_proofs</code> contains the output of evaluating the VRF on a
+omitted.<a href="#section-10.3.1-3" class="pilcrow">¶</a></p>
+<p id="section-10.3.1-4">Each element of <code>vrf_proofs</code> contains the output of evaluating the VRF on a
 different version of the label. The versions chosen correspond either to
 the binary ladder described in <a href="#binary-ladder" class="auto internal xref">Section 4.2</a> (when searching for a specific
 version of a label), or to the full binary ladder described in
-<a href="#most-recent-version" class="auto internal xref">Section 4.3</a> (when searching for the most recent version of a label).
-The proofs are sorted from lowest version to highest version.<a href="#section-9.3.1-4" class="pilcrow">¶</a></p>
-<p id="section-9.3.1-5">Each <code>ProofStep</code> structure in <code>steps</code> is one log entry that was inspected as
+TODO (when searching for the most recent version of a label).
+The proofs are sorted from lowest version to highest version.<a href="#section-10.3.1-4" class="pilcrow">¶</a></p>
+<p id="section-10.3.1-5">Each <code>ProofStep</code> structure in <code>steps</code> is one log entry that was inspected as
 part of the binary search. The first step corresponds to the "middle" leaf of
 the log tree (calculated with the <code>root</code> function in
 <a href="#implicit-binary-search-tree" class="auto internal xref">Section 4.1</a>). From there, each subsequent step moves left or
 right in the tree, according to the procedure discussed in <a href="#binary-ladder" class="auto internal xref">Section 4.2</a> and
-<a href="#most-recent-version" class="auto internal xref">Section 4.3</a>.<a href="#section-9.3.1-5" class="pilcrow">¶</a></p>
-<p id="section-9.3.1-6">The <code>prefix_proof</code> field of a <code>ProofStep</code> is the output of executing a binary
+TODO.<a href="#section-10.3.1-5" class="pilcrow">¶</a></p>
+<p id="section-10.3.1-6">The <code>prefix_proof</code> field of a <code>ProofStep</code> is the output of executing a binary
 ladder, excluding any ladder steps for which a proof of inclusion is expected,
 and a proof of inclusion was already provided in a previous <code>ProofStep</code> for a
-log entry to the left of the current one.<a href="#section-9.3.1-6" class="pilcrow">¶</a></p>
-<p id="section-9.3.1-7">The <code>commitment</code> field of a <code>ProofStep</code> contains the commitment to the update at
+log entry to the left of the current one.<a href="#section-10.3.1-6" class="pilcrow">¶</a></p>
+<p id="section-10.3.1-7">The <code>commitment</code> field of a <code>ProofStep</code> contains the commitment to the update at
 that leaf. The <code>inclusion</code> field of <code>SearchProof</code> contains a batch inclusion
-proof for all of the leaves accessed by the binary search.<a href="#section-9.3.1-7" class="pilcrow">¶</a></p>
-<p id="section-9.3.1-8">The proof can be verified by checking that:<a href="#section-9.3.1-8" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-9.3.1-9">
-<li id="section-9.3.1-9.1">
-              <p id="section-9.3.1-9.1.1">The elements of <code>steps</code> represent a monotonic series over the leaves of the
-log, and<a href="#section-9.3.1-9.1.1" class="pilcrow">¶</a></p>
+proof for all of the leaves accessed by the binary search.<a href="#section-10.3.1-7" class="pilcrow">¶</a></p>
+<p id="section-10.3.1-8">The proof can be verified by checking that:<a href="#section-10.3.1-8" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-10.3.1-9">
+<li id="section-10.3.1-9.1">
+              <p id="section-10.3.1-9.1.1">The elements of <code>steps</code> represent a monotonic series over the leaves of the
+log, and<a href="#section-10.3.1-9.1.1" class="pilcrow">¶</a></p>
 </li>
-            <li id="section-9.3.1-9.2">
-              <p id="section-9.3.1-9.2.1">The <code>steps</code> array has the expected number of entries (no more or less than
-are necessary to execute the binary search).<a href="#section-9.3.1-9.2.1" class="pilcrow">¶</a></p>
+            <li id="section-10.3.1-9.2">
+              <p id="section-10.3.1-9.2.1">The <code>steps</code> array has the expected number of entries (no more or less than
+are necessary to execute the binary search).<a href="#section-10.3.1-9.2.1" class="pilcrow">¶</a></p>
 </li>
           </ol>
-<p id="section-9.3.1-10">Once the validity of the search steps has been established, the verifier can
+<p id="section-10.3.1-10">Once the validity of the search steps has been established, the verifier can
 compute the root of each prefix tree represented by a <code>prefix_proof</code> and combine
 it with the corresponding <code>commitment</code> to obtain the value of each leaf. These
 leaf values can then be combined with the proof in <code>inclusion</code> to check that the
-output matches the root of the log tree.<a href="#section-9.3.1-10" class="pilcrow">¶</a></p>
+output matches the root of the log tree.<a href="#section-10.3.1-10" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="proofs-for-third-party-auditing">
-<section id="section-9.3.2">
+<section id="section-10.3.2">
           <h4 id="name-proofs-for-third-party-audi">
-<a href="#section-9.3.2" class="section-number selfRef">9.3.2. </a><a href="#name-proofs-for-third-party-audi" class="section-name selfRef">Proofs for Third-Party Auditing</a>
+<a href="#section-10.3.2" class="section-number selfRef">10.3.2. </a><a href="#name-proofs-for-third-party-audi" class="section-name selfRef">Proofs for Third-Party Auditing</a>
           </h4>
-<p id="section-9.3.2-1">In third-party auditing, clients can rely on the assumption that the prefix tree
+<p id="section-10.3.2-1">In third-party auditing, clients can rely on the assumption that the prefix tree
 is monitored to be append-only. Therefore, they need not execute the binary
 ladder but the proof can directly jump to the index identified by the prefix
-tree leaf.<a href="#section-9.3.2-1" class="pilcrow">¶</a></p>
-<div class="lang-tls-presentation sourcecode" id="section-9.3.2-2">
+tree leaf.<a href="#section-10.3.2-1" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-10.3.2-2">
 <pre>
 struct {
   optional&lt;uint32&gt; version;
@@ -2824,22 +2868,22 @@ struct {
   PrefixProof prefix_proof;
   InclusionProof inclusion;
 } SearchProofCompact;
-</pre><a href="#section-9.3.2-2" class="pilcrow">¶</a>
+</pre><a href="#section-10.3.2-2" class="pilcrow">¶</a>
 </div>
-<p id="section-9.3.2-3">The semantics of the <code>version</code> field do not change.<a href="#section-9.3.2-3" class="pilcrow">¶</a></p>
-<p id="section-9.3.2-4">Similarly to <code>SearchProof</code>, <code>vrf_proofs</code> contains the output of evaluating the
+<p id="section-10.3.2-3">The semantics of the <code>version</code> field do not change.<a href="#section-10.3.2-3" class="pilcrow">¶</a></p>
+<p id="section-10.3.2-4">Similarly to <code>SearchProof</code>, <code>vrf_proofs</code> contains the output of evaluating the
 VRF on a different version of the label. Either one version will be included
 (when requesting a specific version) or the versions to verify the full binary
-ladder (when requesting the latest version).<a href="#section-9.3.2-4" class="pilcrow">¶</a></p>
-<p id="section-9.3.2-5"><code>prefix_proof</code> contains the proof to either verify the inclusion of the
+ladder (when requesting the latest version).<a href="#section-10.3.2-4" class="pilcrow">¶</a></p>
+<p id="section-10.3.2-5"><code>prefix_proof</code> contains the proof to either verify the inclusion of the
 label-version pair (when requesting a specific version) or to verify the full
 binary ladder (when requesting the latest version). Both types of proofs are for
-the most recent prefix tree.<a href="#section-9.3.2-5" class="pilcrow">¶</a></p>
-<p id="section-9.3.2-6"><code>inclusion</code> contains a batch inclusion of the most recent leaf and the leaf that
+the most recent prefix tree.<a href="#section-10.3.2-5" class="pilcrow">¶</a></p>
+<p id="section-10.3.2-6"><code>inclusion</code> contains a batch inclusion of the most recent leaf and the leaf that
 commits to respective value for the request label-version pair. The most recent
 leaf is needed to obtain the prefix tree's root hash, and the leaf committing to
 the requested value will be at the index identified in the most recent prefix
-tree.<a href="#section-9.3.2-6" class="pilcrow">¶</a></p>
+tree.<a href="#section-10.3.2-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2847,14 +2891,14 @@ tree.<a href="#section-9.3.2-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="update-format">
-<section id="section-10">
+<section id="section-11">
       <h2 id="name-update-format">
-<a href="#section-10" class="section-number selfRef">10. </a><a href="#name-update-format" class="section-name selfRef">Update Format</a>
+<a href="#section-11" class="section-number selfRef">11. </a><a href="#name-update-format" class="section-name selfRef">Update Format</a>
       </h2>
-<p id="section-10-1">The updates committed to by a combined tree structure contain the new value of a
+<p id="section-11-1">The updates committed to by a combined tree structure contain the new value of a
 label, along with additional information depending on the deployment mode
-of the Transparency Log. They are serialized as follows:<a href="#section-10-1" class="pilcrow">¶</a></p>
-<div class="lang-tls-presentation sourcecode" id="section-10-2">
+of the Transparency Log. They are serialized as follows:<a href="#section-11-1" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-11-2">
 <pre>
 struct {
   select (Configuration.mode) {
@@ -2867,38 +2911,38 @@ struct {
   UpdatePrefix prefix;
   opaque value&lt;0..2^32-1&gt;;
 } UpdateValue;
-</pre><a href="#section-10-2" class="pilcrow">¶</a>
+</pre><a href="#section-11-2" class="pilcrow">¶</a>
 </div>
-<p id="section-10-3">The <code>value</code> field contains the new value associated with the label.<a href="#section-10-3" class="pilcrow">¶</a></p>
-<p id="section-10-4">In the event that third-party management is used, the <code>prefix</code> field contains a
+<p id="section-11-3">The <code>value</code> field contains the new value associated with the label.<a href="#section-11-3" class="pilcrow">¶</a></p>
+<p id="section-11-4">In the event that third-party management is used, the <code>prefix</code> field contains a
 signature from the service operator, using the public key from
-<code>Configuration.leaf_public_key</code>, over the following structure:<a href="#section-10-4" class="pilcrow">¶</a></p>
-<div class="lang-tls-presentation sourcecode" id="section-10-5">
+<code>Configuration.leaf_public_key</code>, over the following structure:<a href="#section-11-4" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-11-5">
 <pre>
 struct {
   opaque label&lt;0..2^8-1&gt;;
   uint32 version;
   opaque value&lt;0..2^32-1&gt;;
 } UpdateTBS;
-</pre><a href="#section-10-5" class="pilcrow">¶</a>
+</pre><a href="#section-11-5" class="pilcrow">¶</a>
 </div>
-<p id="section-10-6">The <code>label</code> field contains the label being updated, <code>version</code> contains the new
+<p id="section-11-6">The <code>label</code> field contains the label being updated, <code>version</code> contains the new
 version, and <code>value</code> contains the same contents as <code>UpdateValue.value</code>. Clients
-<span class="bcp14">MUST</span> successfully verify this signature before consuming <code>UpdateValue.value</code>.<a href="#section-10-6" class="pilcrow">¶</a></p>
+<span class="bcp14">MUST</span> successfully verify this signature before consuming <code>UpdateValue.value</code>.<a href="#section-11-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="user-operations">
-<section id="section-11">
+<section id="section-12">
       <h2 id="name-user-operations">
-<a href="#section-11" class="section-number selfRef">11. </a><a href="#name-user-operations" class="section-name selfRef">User Operations</a>
+<a href="#section-12" class="section-number selfRef">12. </a><a href="#name-user-operations" class="section-name selfRef">User Operations</a>
       </h2>
-<p id="section-11-1">The basic user operations are organized as a request-response protocol between a
-user and the Transparency Log operator.<a href="#section-11-1" class="pilcrow">¶</a></p>
-<p id="section-11-2">Users <span class="bcp14">MUST</span> retain the most recent <code>TreeHead</code> they've successfully
+<p id="section-12-1">The basic user operations are organized as a request-response protocol between a
+user and the Transparency Log operator.<a href="#section-12-1" class="pilcrow">¶</a></p>
+<p id="section-12-2">Users <span class="bcp14">MUST</span> retain the most recent <code>TreeHead</code> they've successfully
 verified as part of any query response, and populate the <code>last</code> field of any
 query request with the <code>tree_size</code> from this <code>TreeHead</code>. This ensures that all
-operations performed by the user return consistent results.<a href="#section-11-2" class="pilcrow">¶</a></p>
-<div class="lang-tls-presentation sourcecode" id="section-11-3">
+operations performed by the user return consistent results.<a href="#section-12-2" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-12-3">
 <pre>
 struct {
   TreeHead tree_head;
@@ -2908,21 +2952,21 @@ struct {
       AuditorTreeHead auditor_tree_head;
   };
 } FullTreeHead;
-</pre><a href="#section-11-3" class="pilcrow">¶</a>
+</pre><a href="#section-12-3" class="pilcrow">¶</a>
 </div>
-<p id="section-11-4">If <code>last</code> is present, then the Transparency Log <span class="bcp14">MUST</span> provide a consistency proof
+<p id="section-12-4">If <code>last</code> is present, then the Transparency Log <span class="bcp14">MUST</span> provide a consistency proof
 between the current tree and the tree when it was this size, in the
-<code>consistency</code> field of <code>FullTreeHead</code>.<a href="#section-11-4" class="pilcrow">¶</a></p>
+<code>consistency</code> field of <code>FullTreeHead</code>.<a href="#section-12-4" class="pilcrow">¶</a></p>
 <div id="search">
-<section id="section-11.1">
+<section id="section-12.1">
         <h3 id="name-search">
-<a href="#section-11.1" class="section-number selfRef">11.1. </a><a href="#name-search" class="section-name selfRef">Search</a>
+<a href="#section-12.1" class="section-number selfRef">12.1. </a><a href="#name-search" class="section-name selfRef">Search</a>
         </h3>
-<p id="section-11.1-1">Users initiate a Search operation by submitting a SearchRequest to the
+<p id="section-12.1-1">Users initiate a Search operation by submitting a SearchRequest to the
 Transparency Log containing the label that they're interested in. Users can
 optionally specify a version of the label that they'd like to receive, if not the
-most recent one.<a href="#section-11.1-1" class="pilcrow">¶</a></p>
-<div class="lang-tls-presentation sourcecode" id="section-11.1-2">
+most recent one.<a href="#section-12.1-1" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-12.1-2">
 <pre>
 struct {
   optional&lt;uint32&gt; last;
@@ -2930,10 +2974,10 @@ struct {
   opaque label&lt;0..2^8-1&gt;;
   optional&lt;uint32&gt; version;
 } SearchRequest;
-</pre><a href="#section-11.1-2" class="pilcrow">¶</a>
+</pre><a href="#section-12.1-2" class="pilcrow">¶</a>
 </div>
-<p id="section-11.1-3">In turn, the Transparency Log responds with a SearchResponse structure:<a href="#section-11.1-3" class="pilcrow">¶</a></p>
-<div class="lang-tls-presentation sourcecode" id="section-11.1-4">
+<p id="section-12.1-3">In turn, the Transparency Log responds with a SearchResponse structure:<a href="#section-12.1-3" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-12.1-4">
 <pre>
 struct {
   FullTreeHead full_tree_head;
@@ -2942,37 +2986,37 @@ struct {
   opaque opening&lt;16&gt;;
   UpdateValue value;
 } SearchResponse;
-</pre><a href="#section-11.1-4" class="pilcrow">¶</a>
+</pre><a href="#section-12.1-4" class="pilcrow">¶</a>
 </div>
-<p id="section-11.1-5">Users verify a search response by following these steps:<a href="#section-11.1-5" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-11.1-6">
-<li id="section-11.1-6.1">
-            <p id="section-11.1-6.1.1">Evaluate the search proof in <code>search</code> according to the steps in
-<a href="#proof-combined-tree" class="auto internal xref">Section 9.3</a>. This will produce a verdict as to whether the search
+<p id="section-12.1-5">Users verify a search response by following these steps:<a href="#section-12.1-5" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-12.1-6">
+<li id="section-12.1-6.1">
+            <p id="section-12.1-6.1.1">Evaluate the search proof in <code>search</code> according to the steps in
+<a href="#proof-combined-tree" class="auto internal xref">Section 10.3</a>. This will produce a verdict as to whether the search
 was executed correctly and also a candidate root value for the tree. If it's
-determined that the search was executed incorrectly, abort with an error.<a href="#section-11.1-6.1.1" class="pilcrow">¶</a></p>
+determined that the search was executed incorrectly, abort with an error.<a href="#section-12.1-6.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-11.1-6.2">
-            <p id="section-11.1-6.2.1">With the candidate root value for the tree, verify the given <code>FullTreeHead</code>.<a href="#section-11.1-6.2.1" class="pilcrow">¶</a></p>
+          <li id="section-12.1-6.2">
+            <p id="section-12.1-6.2.1">With the candidate root value for the tree, verify the given <code>FullTreeHead</code>.<a href="#section-12.1-6.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-11.1-6.3">
-            <p id="section-11.1-6.3.1">Verify that the commitment in the terminal search step opens to
-<code>SearchResponse.value</code> with opening <code>SearchResponse.opening</code>.<a href="#section-11.1-6.3.1" class="pilcrow">¶</a></p>
+          <li id="section-12.1-6.3">
+            <p id="section-12.1-6.3.1">Verify that the commitment in the terminal search step opens to
+<code>SearchResponse.value</code> with opening <code>SearchResponse.opening</code>.<a href="#section-12.1-6.3.1" class="pilcrow">¶</a></p>
 </li>
         </ol>
-<p id="section-11.1-7">Depending on the deployment mode of the Transparency Log, the <code>value</code> field may
-or may not require additional verification, specified in <a href="#update-format" class="auto internal xref">Section 10</a>,
-before its contents may be consumed.<a href="#section-11.1-7" class="pilcrow">¶</a></p>
+<p id="section-12.1-7">Depending on the deployment mode of the Transparency Log, the <code>value</code> field may
+or may not require additional verification, specified in <a href="#update-format" class="auto internal xref">Section 11</a>,
+before its contents may be consumed.<a href="#section-12.1-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="update">
-<section id="section-11.2">
+<section id="section-12.2">
         <h3 id="name-update">
-<a href="#section-11.2" class="section-number selfRef">11.2. </a><a href="#name-update" class="section-name selfRef">Update</a>
+<a href="#section-12.2" class="section-number selfRef">12.2. </a><a href="#name-update" class="section-name selfRef">Update</a>
         </h3>
-<p id="section-11.2-1">Users initiate an Update operation by submitting an UpdateRequest to the
-Transparency Log containing the new label and value to store.<a href="#section-11.2-1" class="pilcrow">¶</a></p>
-<div class="lang-tls-presentation sourcecode" id="section-11.2-2">
+<p id="section-12.2-1">Users initiate an Update operation by submitting an UpdateRequest to the
+Transparency Log containing the new label and value to store.<a href="#section-12.2-1" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-12.2-2">
 <pre>
 struct {
   optional&lt;uint32&gt; last;
@@ -2980,13 +3024,13 @@ struct {
   opaque label&lt;0..2^8-1&gt;;
   opaque value&lt;0..2^32-1&gt;;
 } UpdateRequest;
-</pre><a href="#section-11.2-2" class="pilcrow">¶</a>
+</pre><a href="#section-12.2-2" class="pilcrow">¶</a>
 </div>
-<p id="section-11.2-3">If the request passes application-layer policy checks, the Transparency Log adds
+<p id="section-12.2-3">If the request passes application-layer policy checks, the Transparency Log adds
 a new label-version pair to the prefix tree, followed by adding a new entry to
 the log tree with the associated value and updated prefix tree root. It returns
-an UpdateResponse structure:<a href="#section-11.2-3" class="pilcrow">¶</a></p>
-<div class="lang-tls-presentation sourcecode" id="section-11.2-4">
+an UpdateResponse structure:<a href="#section-12.2-3" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-12.2-4">
 <pre>
 struct {
   FullTreeHead full_tree_head;
@@ -2995,22 +3039,22 @@ struct {
   opaque opening&lt;16&gt;;
   UpdatePrefix prefix;
 } UpdateResponse;
-</pre><a href="#section-11.2-4" class="pilcrow">¶</a>
+</pre><a href="#section-12.2-4" class="pilcrow">¶</a>
 </div>
-<p id="section-11.2-5">Users verify the UpdateResponse as if it were a SearchResponse for the most
+<p id="section-12.2-5">Users verify the UpdateResponse as if it were a SearchResponse for the most
 recent version of <code>label</code>. To aid verification, the update response
 provides the <code>UpdatePrefix</code> structure necessary to reconstruct the
-<code>UpdateValue</code>.<a href="#section-11.2-5" class="pilcrow">¶</a></p>
+<code>UpdateValue</code>.<a href="#section-12.2-5" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="monitor">
-<section id="section-11.3">
+<section id="section-12.3">
         <h3 id="name-monitor">
-<a href="#section-11.3" class="section-number selfRef">11.3. </a><a href="#name-monitor" class="section-name selfRef">Monitor</a>
+<a href="#section-12.3" class="section-number selfRef">12.3. </a><a href="#name-monitor" class="section-name selfRef">Monitor</a>
         </h3>
-<p id="section-11.3-1">Users initiate a Monitor operation by submitting a MonitorRequest to the
-Transparency Log containing information about the labels they wish to monitor.<a href="#section-11.3-1" class="pilcrow">¶</a></p>
-<div class="lang-tls-presentation sourcecode" id="section-11.3-2">
+<p id="section-12.3-1">Users initiate a Monitor operation by submitting a MonitorRequest to the
+Transparency Log containing information about the labels they wish to monitor.<a href="#section-12.3-1" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-12.3-2">
 <pre>
 struct {
   opaque label&lt;0..2^8-1&gt;;
@@ -3024,43 +3068,43 @@ struct {
   MonitorLabel owned_labels&lt;0..2^8-1&gt;;
   MonitorLabel contact_labels&lt;0..2^8-1&gt;;
 } MonitorRequest;
-</pre><a href="#section-11.3-2" class="pilcrow">¶</a>
+</pre><a href="#section-12.3-2" class="pilcrow">¶</a>
 </div>
-<p id="section-11.3-3">Users include each of the labels that they own in <code>owned_labels</code>. If the
+<p id="section-12.3-3">Users include each of the labels that they own in <code>owned_labels</code>. If the
 Transparency Log is deployed with Contact Monitoring (or simply if the user
 wants a higher degree of confidence in the log), they also include any labels
-they've looked up in <code>contact_labels</code>.<a href="#section-11.3-3" class="pilcrow">¶</a></p>
-<p id="section-11.3-4">Each <code>MonitorLabel</code> structure contains the label being monitored in <code>label</code>,
+they've looked up in <code>contact_labels</code>.<a href="#section-12.3-3" class="pilcrow">¶</a></p>
+<p id="section-12.3-4">Each <code>MonitorLabel</code> structure contains the label being monitored in <code>label</code>,
 the highest version of the label that the user has observed in <code>highest_version</code>,
 and a list of <code>entries</code> in the log tree corresponding to the keys of the map
-described in <a href="#monitoring-the-tree" class="auto internal xref">Section 5</a>.<a href="#section-11.3-4" class="pilcrow">¶</a></p>
-<p id="section-11.3-5">The Transparency Log verifies the MonitorRequest by following these steps, for
-each <code>MonitorLabel</code> structure:<a href="#section-11.3-5" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-11.3-6">
-<li id="section-11.3-6.1">
-            <p id="section-11.3-6.1.1">Verify that the requested labels in <code>owned_labels</code> and <code>contact_labels</code> are all
-distinct.<a href="#section-11.3-6.1.1" class="pilcrow">¶</a></p>
+described in <a href="#monitoring-the-tree" class="auto internal xref">Section 6</a>.<a href="#section-12.3-4" class="pilcrow">¶</a></p>
+<p id="section-12.3-5">The Transparency Log verifies the MonitorRequest by following these steps, for
+each <code>MonitorLabel</code> structure:<a href="#section-12.3-5" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-12.3-6">
+<li id="section-12.3-6.1">
+            <p id="section-12.3-6.1.1">Verify that the requested labels in <code>owned_labels</code> and <code>contact_labels</code> are all
+distinct.<a href="#section-12.3-6.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-11.3-6.2">
-            <p id="section-11.3-6.2.1">Verify that the user owns every label in <code>owned_labels</code>, and is allowed (or was
+          <li id="section-12.3-6.2">
+            <p id="section-12.3-6.2.1">Verify that the user owns every label in <code>owned_labels</code>, and is allowed (or was
 previously allowed) to lookup every label in <code>contact_labels</code>, based on the
-application's policy.<a href="#section-11.3-6.2.1" class="pilcrow">¶</a></p>
+application's policy.<a href="#section-12.3-6.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-11.3-6.3">
-            <p id="section-11.3-6.3.1">Verify that the <code>highest_version</code> for each label is less than or equal to the
-most recent version of each label.<a href="#section-11.3-6.3.1" class="pilcrow">¶</a></p>
+          <li id="section-12.3-6.3">
+            <p id="section-12.3-6.3.1">Verify that the <code>highest_version</code> for each label is less than or equal to the
+most recent version of each label.<a href="#section-12.3-6.3.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-11.3-6.4">
-            <p id="section-11.3-6.4.1">Verify that each <code>entries</code> array is sorted in ascending order, and that all
-entries are within the bounds of the log.<a href="#section-11.3-6.4.1" class="pilcrow">¶</a></p>
+          <li id="section-12.3-6.4">
+            <p id="section-12.3-6.4.1">Verify that each <code>entries</code> array is sorted in ascending order, and that all
+entries are within the bounds of the log.<a href="#section-12.3-6.4.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-11.3-6.5">
-            <p id="section-11.3-6.5.1">Verify each entry lies on the direct path of different versions of the label.<a href="#section-11.3-6.5.1" class="pilcrow">¶</a></p>
+          <li id="section-12.3-6.5">
+            <p id="section-12.3-6.5.1">Verify each entry lies on the direct path of different versions of the label.<a href="#section-12.3-6.5.1" class="pilcrow">¶</a></p>
 </li>
         </ol>
-<p id="section-11.3-7">If the request is valid, the Transparency Log responds with a MonitorResponse
-structure:<a href="#section-11.3-7" class="pilcrow">¶</a></p>
-<div class="lang-tls-presentation sourcecode" id="section-11.3-8">
+<p id="section-12.3-7">If the request is valid, the Transparency Log responds with a MonitorResponse
+structure:<a href="#section-12.3-7" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-12.3-8">
 <pre>
 struct {
   uint32 version;
@@ -3074,29 +3118,29 @@ struct {
   MonitorProof contact_proofs&lt;0..2^8-1&gt;;
   InclusionProof inclusion;
 } MonitorResponse;
-</pre><a href="#section-11.3-8" class="pilcrow">¶</a>
+</pre><a href="#section-12.3-8" class="pilcrow">¶</a>
 </div>
-<p id="section-11.3-9">The elements of <code>owned_proofs</code> and <code>contact_proofs</code> correspond one-to-one with
+<p id="section-12.3-9">The elements of <code>owned_proofs</code> and <code>contact_proofs</code> correspond one-to-one with
 the elements of <code>owned_labels</code> and <code>contact_labels</code>. Each <code>MonitorProof</code> in
 <code>contact_proofs</code> is meant to convince the user that the label they looked up is
 still properly included in the log and has not been surreptitiously concealed.
 Each <code>MonitorProof</code> in <code>owned_proofs</code> conveys the same guarantee that no past
 lookups have been concealed, and also proves that <code>MonitorProof.version</code> is the
-most recent version of the label.<a href="#section-11.3-9" class="pilcrow">¶</a></p>
-<p id="section-11.3-10">The <code>version</code> field of a <code>MonitorProof</code> contains the version that was used for
+most recent version of the label.<a href="#section-12.3-9" class="pilcrow">¶</a></p>
+<p id="section-12.3-10">The <code>version</code> field of a <code>MonitorProof</code> contains the version that was used for
 computing the binary ladder, and therefore the highest version of the label that
 will be proven to exist. The <code>vrf_proofs</code> field contains VRF proofs for
 different versions of the label, starting at the first version that's
 different between the binary ladders for <code>MonitorLabel.highest_version</code> and
-<code>MonitorProof.version</code>.<a href="#section-11.3-10" class="pilcrow">¶</a></p>
-<p id="section-11.3-11">The <code>steps</code> field of a <code>MonitorProof</code> contains the proofs required to update the
-user's monitoring data following the algorithm in <a href="#monitoring-the-tree" class="auto internal xref">Section 5</a>. That is, each
+<code>MonitorProof.version</code>.<a href="#section-12.3-10" class="pilcrow">¶</a></p>
+<p id="section-12.3-11">The <code>steps</code> field of a <code>MonitorProof</code> contains the proofs required to update the
+user's monitoring data following the algorithm in <a href="#monitoring-the-tree" class="auto internal xref">Section 6</a>. That is, each
 <code>ProofStep</code> of a <code>MonitorProof</code> contains a binary ladder for the version
 <code>MonitorProof.version</code>. The steps are provided in the order that they're
 consumed by the monitoring algorithm. If same proof is consumed by the
 monitoring algorithm multiple times, it is provided in the <code>MonitorProof</code>
-structure only the first time.<a href="#section-11.3-11" class="pilcrow">¶</a></p>
-<p id="section-11.3-12">For <code>MonitorProof</code> structures in <code>owned_labels</code>, it is also important to prove
+structure only the first time.<a href="#section-12.3-11" class="pilcrow">¶</a></p>
+<p id="section-12.3-12">For <code>MonitorProof</code> structures in <code>owned_labels</code>, it is also important to prove
 that <code>MonitorProof.version</code> is the highest version of the label available. This
 means that such a <code>MonitorProof</code> must contains full binary ladders for
 <code>MonitorProof.version</code> along the frontier of the log. As such, any <code>ProofStep</code>
@@ -3105,97 +3149,97 @@ full binary ladder for <code>MonitorProof.version</code> instead of a regular bi
 ladder. For additional entries on the frontier of the log that are to the right
 of the leftmost frontier entry already provided, an additional <code>ProofStep</code> is
 added to <code>MonitorProof</code>. This additional <code>ProofStep</code> contains only the proofs of
-non-inclusion from a full binary ladder.<a href="#section-11.3-12" class="pilcrow">¶</a></p>
-<p id="section-11.3-13">Users verify a MonitorResponse by following these steps:<a href="#section-11.3-13" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-11.3-14">
-<li id="section-11.3-14.1">
-            <p id="section-11.3-14.1.1">Verify that the lengths of <code>owned_proofs</code> and <code>contact_proofs</code> are the same
-as the lengths of <code>owned_labels</code> and <code>contact_labels</code>.<a href="#section-11.3-14.1.1" class="pilcrow">¶</a></p>
+non-inclusion from a full binary ladder.<a href="#section-12.3-12" class="pilcrow">¶</a></p>
+<p id="section-12.3-13">Users verify a MonitorResponse by following these steps:<a href="#section-12.3-13" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-12.3-14">
+<li id="section-12.3-14.1">
+            <p id="section-12.3-14.1.1">Verify that the lengths of <code>owned_proofs</code> and <code>contact_proofs</code> are the same
+as the lengths of <code>owned_labels</code> and <code>contact_labels</code>.<a href="#section-12.3-14.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-11.3-14.2">
-            <p id="section-11.3-14.2.1">For each <code>MonitorProof</code> structure, verify that <code>MonitorProof.version</code> is
+          <li id="section-12.3-14.2">
+            <p id="section-12.3-14.2.1">For each <code>MonitorProof</code> structure, verify that <code>MonitorProof.version</code> is
 greater than or equal to the highest version of the label that's been
-previously observed.<a href="#section-11.3-14.2.1" class="pilcrow">¶</a></p>
+previously observed.<a href="#section-12.3-14.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-11.3-14.3">
-            <p id="section-11.3-14.3.1">For each <code>MonitorProof</code> structure, evalute the monitoring algorithm in
-<a href="#monitoring-the-tree" class="auto internal xref">Section 5</a>. Abort with an error if the monitoring algorithm detects that
+          <li id="section-12.3-14.3">
+            <p id="section-12.3-14.3.1">For each <code>MonitorProof</code> structure, evalute the monitoring algorithm in
+<a href="#monitoring-the-tree" class="auto internal xref">Section 6</a>. Abort with an error if the monitoring algorithm detects that
 the tree is constructed incorrectly, or if there are fewer or more steps
 provided than would be expected (keeping in mind that extra steps may be
 provided along the frontier of the log, if a <code>MonitorProof</code> is a member of
-<code>owned_labels</code>).<a href="#section-11.3-14.3.1" class="pilcrow">¶</a></p>
+<code>owned_labels</code>).<a href="#section-12.3-14.3.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-11.3-14.4">
-            <p id="section-11.3-14.4.1">Construct a candidate root value for the tree by combining the
+          <li id="section-12.3-14.4">
+            <p id="section-12.3-14.4.1">Construct a candidate root value for the tree by combining the
 <code>PrefixProof</code> and commitment of <code>ProofStep</code>, with the provided inclusion
-proof.<a href="#section-11.3-14.4.1" class="pilcrow">¶</a></p>
+proof.<a href="#section-12.3-14.4.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-11.3-14.5">
-            <p id="section-11.3-14.5.1">With the candidate root value, verify the provided <code>FullTreeHead</code>.<a href="#section-11.3-14.5.1" class="pilcrow">¶</a></p>
+          <li id="section-12.3-14.5">
+            <p id="section-12.3-14.5.1">With the candidate root value, verify the provided <code>FullTreeHead</code>.<a href="#section-12.3-14.5.1" class="pilcrow">¶</a></p>
 </li>
         </ol>
-<p id="section-11.3-15">Some information is omitted from MonitorResponse in the interest of efficiency,
+<p id="section-12.3-15">Some information is omitted from MonitorResponse in the interest of efficiency,
 due to the fact that the user would have already seen and verified it as part of
 conducting other queries. In particular, VRF proofs for different versions of
 each label are not provided, given that these can be cached from the
-original Search or Update query.<a href="#section-11.3-15" class="pilcrow">¶</a></p>
+original Search or Update query.<a href="#section-12.3-15" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
 </div>
 <div id="security-considerations">
-<section id="section-12">
+<section id="section-13">
       <h2 id="name-security-considerations">
-<a href="#section-12" class="section-number selfRef">12. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
+<a href="#section-13" class="section-number selfRef">13. </a><a href="#name-security-considerations" class="section-name selfRef">Security Considerations</a>
       </h2>
 </section>
 </div>
 <div id="iana-considerations">
-<section id="section-13">
+<section id="section-14">
       <h2 id="name-iana-considerations">
-<a href="#section-13" class="section-number selfRef">13. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
+<a href="#section-14" class="section-number selfRef">14. </a><a href="#name-iana-considerations" class="section-name selfRef">IANA Considerations</a>
       </h2>
-<p id="section-13-1">This document requests the creation of the following new IANA registries:<a href="#section-13-1" class="pilcrow">¶</a></p>
+<p id="section-14-1">This document requests the creation of the following new IANA registries:<a href="#section-14-1" class="pilcrow">¶</a></p>
 <ul class="normal">
-<li class="normal" id="section-13-2.1">
-          <p id="section-13-2.1.1">KT Ciphersuites (<a href="#kt-ciphersuites" class="auto internal xref">Section 13.1</a>)<a href="#section-13-2.1.1" class="pilcrow">¶</a></p>
+<li class="normal" id="section-14-2.1">
+          <p id="section-14-2.1.1">KT Ciphersuites (<a href="#kt-ciphersuites" class="auto internal xref">Section 14.1</a>)<a href="#section-14-2.1.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
-<p id="section-13-3">All of these registries should be under a heading of "Key Transparency",
+<p id="section-14-3">All of these registries should be under a heading of "Key Transparency",
 and assignments are made via the Specification Required policy <span>[<a href="#RFC8126" class="cite xref">RFC8126</a>]</span>. See
-<a href="#de" class="auto internal xref">Section 13.2</a> for additional information about the KT Designated Experts (DEs).<a href="#section-13-3" class="pilcrow">¶</a></p>
-<p id="section-13-4">RFC EDITOR: Please replace XXXX throughout with the RFC number assigned to
-this document<a href="#section-13-4" class="pilcrow">¶</a></p>
+<a href="#de" class="auto internal xref">Section 14.2</a> for additional information about the KT Designated Experts (DEs).<a href="#section-14-3" class="pilcrow">¶</a></p>
+<p id="section-14-4">RFC EDITOR: Please replace XXXX throughout with the RFC number assigned to
+this document<a href="#section-14-4" class="pilcrow">¶</a></p>
 <div id="kt-ciphersuites">
-<section id="section-13.1">
+<section id="section-14.1">
         <h3 id="name-kt-ciphersuites">
-<a href="#section-13.1" class="section-number selfRef">13.1. </a><a href="#name-kt-ciphersuites" class="section-name selfRef">KT Ciphersuites</a>
+<a href="#section-14.1" class="section-number selfRef">14.1. </a><a href="#name-kt-ciphersuites" class="section-name selfRef">KT Ciphersuites</a>
         </h3>
-<div class="lang-tls-presentation sourcecode" id="section-13.1-1">
+<div class="lang-tls-presentation sourcecode" id="section-14.1-1">
 <pre>
 uint16 CipherSuite;
-</pre><a href="#section-13.1-1" class="pilcrow">¶</a>
+</pre><a href="#section-14.1-1" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
 <div id="de">
-<section id="section-13.2">
+<section id="section-14.2">
         <h3 id="name-kt-designated-expert-pool">
-<a href="#section-13.2" class="section-number selfRef">13.2. </a><a href="#name-kt-designated-expert-pool" class="section-name selfRef">KT Designated Expert Pool</a>
+<a href="#section-14.2" class="section-number selfRef">14.2. </a><a href="#name-kt-designated-expert-pool" class="section-name selfRef">KT Designated Expert Pool</a>
         </h3>
 </section>
 </div>
 </section>
 </div>
 <div id="sec-combined-references">
-<section id="section-14">
+<section id="section-15">
       <h2 id="name-references">
-<a href="#section-14" class="section-number selfRef">14. </a><a href="#name-references" class="section-name selfRef">References</a>
+<a href="#section-15" class="section-number selfRef">15. </a><a href="#name-references" class="section-name selfRef">References</a>
       </h2>
 <div id="sec-normative-references">
-<section id="section-14.1">
+<section id="section-15.1">
         <h3 id="name-normative-references">
-<a href="#section-14.1" class="section-number selfRef">14.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
+<a href="#section-15.1" class="section-number selfRef">15.1. </a><a href="#name-normative-references" class="section-name selfRef">Normative References</a>
         </h3>
 <dl class="references">
 <dt id="I-D.ietf-keytrans-architecture">[I-D.ietf-keytrans-architecture]</dt>
@@ -3234,9 +3278,9 @@ uint16 CipherSuite;
 </section>
 </div>
 <div id="sec-informative-references">
-<section id="section-14.2">
+<section id="section-15.2">
         <h3 id="name-informative-references">
-<a href="#section-14.2" class="section-number selfRef">14.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
+<a href="#section-15.2" class="section-number selfRef">15.2. </a><a href="#name-informative-references" class="section-name selfRef">Informative References</a>
         </h3>
 <dl class="references">
 <dt id="CONIKS">[CONIKS]</dt>
