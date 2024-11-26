@@ -1050,7 +1050,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">McMillion &amp; Linker</td>
-<td class="center">Expires 26 May 2025</td>
+<td class="center">Expires 30 May 2025</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1063,12 +1063,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-keytrans-mcmillion-protocol-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2024-11-22" class="published">22 November 2024</time>
+<time datetime="2024-11-26" class="published">26 November 2024</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2025-05-26">26 May 2025</time></dd>
+<dd class="expires"><time datetime="2025-05-30">30 May 2025</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1121,7 +1121,7 @@ timely manner.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 26 May 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 30 May 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1207,6 +1207,11 @@ timely manner.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.4">
                 <p id="section-toc.1-1.6.2.4.1"><a href="#section-6.4" class="auto internal xref">6.4</a>.  <a href="#name-algorithm-2" class="internal xref">Algorithm</a></p>
+<ul class="compact toc ulBare ulEmpty">
+<li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.4.2.1">
+                    <p id="section-toc.1-1.6.2.4.2.1.1"><a href="#section-6.4.1" class="auto internal xref">6.4.1</a>.  <a href="#name-owner-algorithm" class="internal xref">Owner Algorithm</a></p>
+</li>
+                </ul>
 </li>
             </ul>
 </li>
@@ -2187,7 +2192,7 @@ created. The goal of monitoring a label is to efficiently ensure that, when
 these new parent nodes are created, they're created correctly such that searches
 for the same versions continue converging to the same entries in the log.<a href="#section-6-1" class="pilcrow">¶</a></p>
 <p id="section-6-2">Monitoring is performed both by the users that own a label (meaning they are the
-authoritative source for the label's value) and the users that lookup a label.
+authoritative source for the label's content) and the users that lookup a label.
 Owners monitor their labels to ensure that past (expected) versions of a label
 are still correctly stored in the log and that no new (unexpected) versions have
 been added. Users that looked up a label may sometimes need to monitor it
@@ -2201,7 +2206,7 @@ Transparency Log.<a href="#section-6-2" class="pilcrow">¶</a></p>
 <p id="section-6.1-1">Label owners <span class="bcp14">MUST</span> monitor their labels regularly, ensuring that past versions of
 the label are still correctly represented in the log and that any new versions
 of the label are permissible (alerting the user if not). Service Providers
-define a duration in seconds, referred to as the <strong>Reasonable Monitoring
+define a duration, referred to as the <strong>Reasonable Monitoring
 Window</strong> (RMW), which is the frequency with which the Transparency Log generally
 expects label owners to perform monitoring. The log entry maximum lifetime, if
 defined, <span class="bcp14">MUST</span> be greater than the RMW.<a href="#section-6.1-1" class="pilcrow">¶</a></p>
@@ -2327,43 +2332,72 @@ been shown different versions of the same label.<a href="#section-6.4-1" class="
 follow these steps, for each entry in the map:<a href="#section-6.4-2" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-6.4-3">
 <li id="section-6.4-3.1">
-            <p id="section-6.4-3.1.1">Compute the entry's direct path (in terms of the Implicit Binary Search Tree)
-based on the current tree size.<a href="#section-6.4-3.1.1" class="pilcrow">¶</a></p>
+            <p id="section-6.4-3.1.1">Compute the log entry's direct path (in terms of the Implicit Binary Search
+Tree) based on the current tree size. Remove all entries that are to the left
+of the log entry. If there are any distinguished log entries remaining,
+terminate the list just after the first distinguished log entry.<a href="#section-6.4-3.1.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.4-3.2">
-            <p id="section-6.4-3.2.1">If there are no entries in the direct path that are to the right of the
-current entry, then skip updating this entry (there's no new information to
-update it with).<a href="#section-6.4-3.2.1" class="pilcrow">¶</a></p>
+            <p id="section-6.4-3.2.1">If the computed list is empty, skip updating this entry; there's no new
+information to update it with.<a href="#section-6.4-3.2.1" class="pilcrow">¶</a></p>
 </li>
           <li id="section-6.4-3.3">
-            <p id="section-6.4-3.3.1">For each entry in the direct path that's to the right of the current entry,
-from low to high:<a href="#section-6.4-3.3.1" class="pilcrow">¶</a></p>
+            <p id="section-6.4-3.3.1">For each log entry in the computed list, from low to high:<a href="#section-6.4-3.3.1" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-6.4-3.3.2">
 <li id="section-6.4-3.3.2.1">
-                <p id="section-6.4-3.3.2.1.1">Receive and verify a binary ladder from that log entry, for the version
+                <p id="section-6.4-3.3.2.1.1">Receive and verify a binary ladder from that log entry for the version
 currently in the map. This proves that, at the indicated log entry, the
 highest version present is greater than or equal to the
 previously-observed version.<a href="#section-6.4-3.3.2.1.1" class="pilcrow">¶</a></p>
 </li>
               <li id="section-6.4-3.3.2.2">
-                <p id="section-6.4-3.3.2.2.1">If the above check was successful, remove the current position-version
-pair from the map and replace it with a position-version pair
-corresponding to the entry in the log that was just checked.<a href="#section-6.4-3.3.2.2.1" class="pilcrow">¶</a></p>
+                <p id="section-6.4-3.3.2.2.1">If the above check fails, return an error to the user. Otherwise, remove
+the current position-version pair from the map.<a href="#section-6.4-3.3.2.2.1" class="pilcrow">¶</a></p>
+</li>
+              <li id="section-6.4-3.3.2.3">
+                <p id="section-6.4-3.3.2.3.1">If the log entry that we received the binary ladder for is not
+distinguished, replace the position-version pair that was just removed
+with a new one for the higher log entry.<a href="#section-6.4-3.3.2.3.1" class="pilcrow">¶</a></p>
 </li>
             </ol>
 </li>
         </ol>
 <p id="section-6.4-4">This algorithm progressively moves up the tree as new intermediate/root nodes
-are established and verifies that they're constructed correctly. Note that users
-can often execute this process with the output of Search or Update operations
-for a label without waiting to make explicit Monitor queries.<a href="#section-6.4-4" class="pilcrow">¶</a></p>
+are established and verifies that they're constructed correctly. Once a
+distinguished log entry is reached and successfully verified, the descendent
+entries are no longer necessary and removed from the map. Note that users can
+often execute this process with the output of Search or Update operations for a
+label without waiting to make explicit Monitor queries.<a href="#section-6.4-4" class="pilcrow">¶</a></p>
 <p id="section-6.4-5">It is also worth noting that the work required to monitor several versions of
-the same label scales sublinearly, due to the fact that the direct paths of the
+the same label scales sublinearly due to the fact that the direct paths of the
 different versions will often intersect. Intersections reduce the total number
 of entries in the map and therefore the amount of work that will be needed to
 monitor the label from then on.<a href="#section-6.4-5" class="pilcrow">¶</a></p>
-<p id="section-6.4-6">TODO mention frontier checks when monitoring owned labels
-TODO multiple monitoring passes<a href="#section-6.4-6" class="pilcrow">¶</a></p>
+<div id="owner-algorithm">
+<section id="section-6.4.1">
+          <h4 id="name-owner-algorithm">
+<a href="#section-6.4.1" class="section-number selfRef">6.4.1. </a><a href="#name-owner-algorithm" class="section-name selfRef">Owner Algorithm</a>
+          </h4>
+<p id="section-6.4.1-1">If the user owns the label being monitored, they will additionally need to
+retain the rightmost distinguished log entry where they've verified that the
+most recent version of the label is correct. Users advertise this log entry's
+position in their monitor request and the Transparency Log provides a
+non-truncated (search-style) binary ladder demonstrating the most recent version
+of the label in (a potentially limited number of) subsequent distinguished log
+entries. The user inspects each of these for unexpected changes; if there are
+none, the user updates their retained state.<a href="#section-6.4.1-1" class="pilcrow">¶</a></p>
+<p id="section-6.4.1-2">Users <span class="bcp14">MUST</span> verify that they receive a binary ladder for the distinguished log
+entry immediately following the one they've advertised, and the distinguished
+log entry immediately following that one, and so on. The Transparency Log <span class="bcp14">MAY</span>
+limit the number of distinguished log entries it provides binary ladders for in
+a single response.<a href="#section-6.4.1-2" class="pilcrow">¶</a></p>
+<p id="section-6.4.1-3">If the user is monitoring the label for the first time since it was created (or
+for the first time since they took ownership of it), they advertise no log entry
+to the Transparency Log and initialize their state by setting it to be the
+distinguished log entry that terminates monitoring in step 3. The Transparency
+Log provides binary ladders for additional subsequent distinguised log entries.<a href="#section-6.4.1-3" class="pilcrow">¶</a></p>
+</section>
+</div>
 </section>
 </div>
 </section>

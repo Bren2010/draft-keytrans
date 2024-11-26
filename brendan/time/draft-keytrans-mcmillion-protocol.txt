@@ -5,7 +5,7 @@
 KEYTRANS Working Group                                      B. McMillion
 Internet-Draft                                                          
 Intended status: Standards Track                               F. Linker
-Expires: 26 May 2025                                    22 November 2024
+Expires: 30 May 2025                                    26 November 2024
 
 
                        Key Transparency Protocol
@@ -49,7 +49,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 26 May 2025.
+   This Internet-Draft will expire on 30 May 2025.
 
 Copyright Notice
 
@@ -85,6 +85,7 @@ Table of Contents
      6.2.  Distinguished Log Entries
      6.3.  Binary Ladder
      6.4.  Algorithm
+       6.4.1.  Owner Algorithm
    7.  Updating Views of the Tree
    8.  Ciphersuites
    9.  Cryptographic Computations
@@ -770,7 +771,7 @@ Log tree:       o                                o
    entries in the log.
 
    Monitoring is performed both by the users that own a label (meaning
-   they are the authoritative source for the label's value) and the
+   they are the authoritative source for the label's content) and the
    users that lookup a label.  Owners monitor their labels to ensure
    that past (expected) versions of a label are still correctly stored
    in the log and that no new (unexpected) versions have been added.
@@ -783,11 +784,11 @@ Log tree:       o                                o
    Label owners MUST monitor their labels regularly, ensuring that past
    versions of the label are still correctly represented in the log and
    that any new versions of the label are permissible (alerting the user
-   if not).  Service Providers define a duration in seconds, referred to
-   as the *Reasonable Monitoring Window* (RMW), which is the frequency
-   with which the Transparency Log generally expects label owners to
-   perform monitoring.  The log entry maximum lifetime, if defined, MUST
-   be greater than the RMW.
+   if not).  Service Providers define a duration, referred to as the
+   *Reasonable Monitoring Window* (RMW), which is the frequency with
+   which the Transparency Log generally expects label owners to perform
+   monitoring.  The log entry maximum lifetime, if defined, MUST be
+   greater than the RMW.
 
    *Distinguished* log entries are chosen such that there is roughly one
    per every interval of the RMW.  If a user looks up a label and finds
@@ -898,41 +899,70 @@ Log tree:       o                                o
    To update this map, users receive the most recent tree head from the
    server and follow these steps, for each entry in the map:
 
-   1.  Compute the entry's direct path (in terms of the Implicit Binary
-       Search Tree) based on the current tree size.
+   1.  Compute the log entry's direct path (in terms of the Implicit
+       Binary Search Tree) based on the current tree size.  Remove all
+       entries that are to the left of the log entry.  If there are any
+       distinguished log entries remaining, terminate the list just
+       after the first distinguished log entry.
 
-   2.  If there are no entries in the direct path that are to the right
-       of the current entry, then skip updating this entry (there's no
-       new information to update it with).
+   2.  If the computed list is empty, skip updating this entry; there's
+       no new information to update it with.
 
-   3.  For each entry in the direct path that's to the right of the
-       current entry, from low to high:
+   3.  For each log entry in the computed list, from low to high:
 
-       1.  Receive and verify a binary ladder from that log entry, for
+       1.  Receive and verify a binary ladder from that log entry for
            the version currently in the map.  This proves that, at the
            indicated log entry, the highest version present is greater
            than or equal to the previously-observed version.
 
-       2.  If the above check was successful, remove the current
-           position-version pair from the map and replace it with a
-           position-version pair corresponding to the entry in the log
-           that was just checked.
+       2.  If the above check fails, return an error to the user.
+           Otherwise, remove the current position-version pair from the
+           map.
+
+       3.  If the log entry that we received the binary ladder for is
+           not distinguished, replace the position-version pair that was
+           just removed with a new one for the higher log entry.
 
    This algorithm progressively moves up the tree as new intermediate/
    root nodes are established and verifies that they're constructed
-   correctly.  Note that users can often execute this process with the
-   output of Search or Update operations for a label without waiting to
-   make explicit Monitor queries.
+   correctly.  Once a distinguished log entry is reached and
+   successfully verified, the descendent entries are no longer necessary
+   and removed from the map.  Note that users can often execute this
+   process with the output of Search or Update operations for a label
+   without waiting to make explicit Monitor queries.
 
    It is also worth noting that the work required to monitor several
-   versions of the same label scales sublinearly, due to the fact that
+   versions of the same label scales sublinearly due to the fact that
    the direct paths of the different versions will often intersect.
    Intersections reduce the total number of entries in the map and
    therefore the amount of work that will be needed to monitor the label
    from then on.
 
-   TODO mention frontier checks when monitoring owned labels TODO
-   multiple monitoring passes
+6.4.1.  Owner Algorithm
+
+   If the user owns the label being monitored, they will additionally
+   need to retain the rightmost distinguished log entry where they've
+   verified that the most recent version of the label is correct.  Users
+   advertise this log entry's position in their monitor request and the
+   Transparency Log provides a non-truncated (search-style) binary
+   ladder demonstrating the most recent version of the label in (a
+   potentially limited number of) subsequent distinguished log entries.
+   The user inspects each of these for unexpected changes; if there are
+   none, the user updates their retained state.
+
+   Users MUST verify that they receive a binary ladder for the
+   distinguished log entry immediately following the one they've
+   advertised, and the distinguished log entry immediately following
+   that one, and so on.  The Transparency Log MAY limit the number of
+   distinguished log entries it provides binary ladders for in a single
+   response.
+
+   If the user is monitoring the label for the first time since it was
+   created (or for the first time since they took ownership of it), they
+   advertise no log entry to the Transparency Log and initialize their
+   state by setting it to be the distinguished log entry that terminates
+   monitoring in step 3.  The Transparency Log provides binary ladders
+   for additional subsequent distinguised log entries.
 
 7.  Updating Views of the Tree
 
