@@ -953,9 +953,11 @@ Log tree:       o                                o
    Users MUST verify that they receive a binary ladder for the
    distinguished log entry immediately following the one they've
    advertised, and the distinguished log entry immediately following
-   that one, and so on.  The Transparency Log MAY limit the number of
-   distinguished log entries it provides binary ladders for in a single
-   response.
+   that one, and so on.  The Transparency Log will provide whichever
+   intermediate timestamps are necessary to demonstrate that this is the
+   case.  To avoid overloading, the Transparency Log MAY limit the
+   number of distinguished log entries it provides binary ladders for in
+   a single response.
 
    If the user is monitoring the label for the first time since it was
    created (or for the first time since they took ownership of it), they
