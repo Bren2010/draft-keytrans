@@ -5,7 +5,7 @@
 KEYTRANS Working Group                                      B. McMillion
 Internet-Draft                                                          
 Intended status: Standards Track                               F. Linker
-Expires: 30 May 2025                                    26 November 2024
+Expires: 4 June 2025                                     1 December 2024
 
 
                        Key Transparency Protocol
@@ -49,7 +49,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 30 May 2025.
+   This Internet-Draft will expire on 4 June 2025.
 
 Copyright Notice
 
@@ -89,29 +89,29 @@ Table of Contents
    7.  Updating Views of the Tree
    8.  Ciphersuites
    9.  Cryptographic Computations
-     9.1.  Verifiable Random Function
-     9.2.  Commitment
-     9.3.  Prefix Tree
-     9.4.  Log Tree
-     9.5.  Tree Head Signature
+     9.1.  Tree Head Signature
+     9.2.  Update Format
+     9.3.  Commitment
+     9.4.  Verifiable Random Function
+     9.5.  Prefix Tree
+     9.6.  Log Tree
    10. Tree Proofs
      10.1.  Log Tree
      10.2.  Prefix Tree
      10.3.  Combined Tree
        10.3.1.  Proofs for Contact Monitoring
        10.3.2.  Proofs for Third-Party Auditing
-   11. Update Format
-   12. User Operations
-     12.1.  Search
-     12.2.  Update
-     12.3.  Monitor
-   13. Security Considerations
-   14. IANA Considerations
-     14.1.  KT Ciphersuites
-     14.2.  KT Designated Expert Pool
-   15. References
-     15.1.  Normative References
-     15.2.  Informative References
+   11. User Operations
+     11.1.  Search
+     11.2.  Update
+     11.3.  Monitor
+   12. Security Considerations
+   13. IANA Considerations
+     13.1.  KT Ciphersuites
+     13.2.  KT Designated Expert Pool
+   14. References
+     14.1.  Normative References
+     14.2.  Informative References
    Acknowledgments
    Authors' Addresses
 
@@ -1077,13 +1077,17 @@ Log tree:       o                                o
 
    Each Transparency Log uses a single fixed ciphersuite, chosen when
    the log is initially created, that specifies the following primitives
-   to be used for cryptographic computations:
+   and parameters to be used for cryptographic computations:
 
    *  A hash algorithm
 
    *  A signature algorithm
 
    *  A Verifiable Random Function (VRF) algorithm
+
+   *  Nc: The size in bytes of commitment openings
+
+   *  Kc: A fixed string of bytes used in the computation of commitments
 
    The hash algorithm is used for computing the intermediate and root
    values of hash trees.  The signature algorithm is used for signatures
@@ -1092,130 +1096,11 @@ Log tree:       o                                o
    of the VRF algorithms from [RFC9381] must be used.
 
    Ciphersuites are represented with the CipherSuite type.  The
-   ciphersuites are defined in Section 14.1.
+   ciphersuites are defined in Section 13.1.
 
 9.  Cryptographic Computations
 
-9.1.  Verifiable Random Function
-
-   Each label-version pair created in a log will have a unique
-   representation in the prefix tree.  This is computed by providing the
-   combined label and version as inputs to the VRF:
-
-   struct {
-     opaque label<0..2^8-1>;
-     uint32 version;
-   } VrfInput;
-
-   The VRF's output evaluated on VrfInput is the concrete value inserted
-   into the prefix tree.
-
-9.2.  Commitment
-
-   As discussed in Section 3.4, commitments are stored in the leaves of
-   the log tree and correspond to updates.  Commitments are computed
-   with HMAC [RFC2104], using the hash function specified by the
-   ciphersuite.  To produce a new commitment, the application generates
-   a random 16 byte value called opening and computes:
-
-   commitment = HMAC(fixedKey, CommitmentValue)
-
-   where fixedKey is the 16 byte hex-decoded value:
-
-   d821f8790d97709796b4d7903357c3f5
-
-   and CommitmentValue is specified as:
-
-   struct {
-     opaque opening<16>;
-     opaque label<0..2^8-1>;
-     UpdateValue update;
-   } CommitmentValue;
-
-   This fixed key allows the HMAC function, and thereby the commitment
-   scheme, to be modeled as a random oracle.  The label field of
-   CommitmentValue contains the label being updated and the update field
-   contains the new value for the label.
-
-   The output value commitment may be published, while opening should be
-   kept private until the commitment is meant to be revealed.
-
-9.3.  Prefix Tree
-
-   The leaf nodes of a prefix tree are serialized as:
-
-   struct {
-       opaque vrf_output<VRF.Nh>;
-       uint64 update_index;
-   } PrefixLeaf;
-
-   where vrf_output is the VRF output for the label-version pair, VRF.Nh
-   is the output size of the ciphersuite VRF in bytes, and update_index
-   is the index of the log tree's leaf committing to the respective
-   value, i.e., the log tree's tree_size just after the respective
-   label-version pair was inserted minus one.
-
-   The parent nodes of a prefix tree are serialized as:
-
-   struct {
-     opaque value<Hash.Nh>;
-   } PrefixParent;
-
-   where Hash.Nh is the output length of the ciphersuite hash function.
-   The value of a parent node is computed by hashing together the values
-   of its left and right children:
-
-   parent.value = Hash(0x01 ||
-                      nodeValue(parent.leftChild) ||
-                      nodeValue(parent.rightChild))
-
-   nodeValue(node):
-     if node.type == emptyNode:
-       return 0 // all-zero vector of length Hash.Nh
-     else if node.type == leafNode:
-       return Hash(0x00 || node.vrf_output || node.update_index)
-     else if node.type == parentNode:
-       return node.value
-
-   where Hash denotes the ciphersuite hash function.
-
-9.4.  Log Tree
-
-   The leaf and parent nodes of a log tree are serialized as:
-
-   struct {
-     opaque commitment<Hash.Nh>;
-     opaque prefix_tree<Hash.Nh>;
-   } LogLeaf;
-
-   struct {
-     opaque value<Hash.Nh>;
-   } LogParent;
-
-   The commitment field contains the output of evaluating HMAC on
-   CommitmentValue, as described in Section 9.2.  The prefix_tree field
-   contains the root hash of the prefix tree, after inserting a new
-   label-version pair for the label in CommitmentValue.
-
-   The value of a parent node is computed by hashing together the values
-   of its left and right children:
-
-   parent.value = Hash(hashContent(parent.leftChild) ||
-                       hashContent(parent.rightChild))
-
-   hashContent(node):
-     if node.type == leafNode:
-       return 0x00 || nodeValue(node)
-     else if node.type == parentNode:
-       return 0x01 || nodeValue(node)
-
-   nodeValue(node):
-     if node.type == leafNode:
-       return Hash(node.commitment || node.prefix_tree)
-     else if node.type == parentNode:
-       return node.value
-
-9.5.  Tree Head Signature
+9.1.  Tree Head Signature
 
    The head of a Transparency Log, which represents the log's most
    recent state, is represented as:
@@ -1225,13 +1110,13 @@ Log tree:       o                                o
      opaque signature<0..2^16-1>;
    } TreeHead;
 
-   where tree_size counts the number of entries in the log tree.  If the
-   Transparency Log is deployed with Third-party Management then the
+   where tree_size counts the number of leaves of the log tree.  If the
+   Transparency Log is deployed with Third-party Management, then the
    public key used to verify the signature belongs to the third-party
    manager; otherwise the public key used belongs to the service
    operator.
 
-   The signature itself is computed over a TreeHeadTBS structure, which
+   The signature itself is computed over a TreeHeadTBS structure which
    incorporates the log's current state as well as long-term log
    configuration:
 
@@ -1264,6 +1149,156 @@ Log tree:       o                                o
      opaque root<Hash.Nh>;
    } TreeHeadTBS;
 
+9.2.  Update Format
+
+   The updates committed to by a combined tree structure contain the new
+   value of a label, along with additional information depending on the
+   deployment mode of the Transparency Log. They are serialized as
+   follows:
+
+   struct {
+     select (Configuration.mode) {
+       case thirdPartyManagement:
+         opaque signature<0..2^16-1>;
+     };
+   } UpdatePrefix;
+
+   struct {
+     UpdatePrefix prefix;
+     opaque value<0..2^32-1>;
+   } UpdateValue;
+
+   The value field contains the new value associated with the label.
+
+   In the event that third-party management is used, the prefix field
+   contains a signature from the service operator, using the public key
+   from Configuration.leaf_public_key, over the following structure:
+
+   struct {
+     opaque label<0..2^8-1>;
+     uint32 version;
+     opaque value<0..2^32-1>;
+   } UpdateTBS;
+
+   The label field contains the label being updated, version contains
+   the new version, and value contains the same contents as
+   UpdateValue.value.  Clients MUST successfully verify this signature
+   before consuming UpdateValue.value.
+
+9.3.  Commitment
+
+   As discussed in Section 3.4, commitments are stored in the leaves of
+   the log tree rather than raw UpdateValue structures.  Commitments are
+   computed with HMAC [RFC2104], using the hash function specified by
+   the ciphersuite.  To produce a new commitment, the application
+   generates a random Nc-byte value called opening and computes:
+
+   commitment = HMAC(Kc, CommitmentValue)
+
+   where Kc is defined by the ciphersuite and CommitmentValue is
+   specified as:
+
+   struct {
+     opaque opening<Nc>;
+     opaque label<0..2^8-1>;
+     UpdateValue update;
+   } CommitmentValue;
+
+   The label field of CommitmentValue contains the label being updated
+   and the update field contains the new value for the label.  The
+   output value commitment may be published, while opening should be
+   kept private until the commitment is meant to be revealed.
+
+   The Transparency Log SHOULD generate opening in a way such that it
+   can later be deleted and not feasibly recovered.
+
+9.4.  Verifiable Random Function
+
+   Each label-version pair created will have a unique representation in
+   the prefix tree.  This is computed by providing the combined label
+   and version as inputs to the VRF:
+
+   struct {
+     opaque label<0..2^8-1>;
+     uint32 version;
+   } VrfInput;
+
+   The VRF's output evaluated on VrfInput is the concrete value inserted
+   into the prefix tree.
+
+9.5.  Prefix Tree
+
+   The leaf nodes of a prefix tree are serialized as:
+
+   struct {
+       opaque vrf_output<VRF.Nh>;
+       opaque commitment<Hash.Nh>;
+   } PrefixLeaf;
+
+   where vrf_output is the VRF output for the label-version pair, VRF.Nh
+   is the output size of the ciphersuite VRF in bytes, commitment is the
+   commitment to the corresponding UpdateValue structure, and Hash.Nh is
+   the output size of the ciphersuite hash function in bytes.
+
+   The parent nodes of a prefix tree are serialized as:
+
+   struct {
+     opaque value<Hash.Nh>;
+   } PrefixParent;
+
+   The value of a parent node is computed by hashing together the values
+   of its left and right children:
+
+   parent.value = Hash(0x01 ||
+                      nodeValue(parent.leftChild) ||
+                      nodeValue(parent.rightChild))
+
+   nodeValue(node):
+     if node.type == emptyNode:
+       return 0 // all-zero vector of length Hash.Nh
+     else if node.type == leafNode:
+       return Hash(0x00 || node.vrf_output || node.commitment)
+     else if node.type == parentNode:
+       return node.value
+
+   where Hash denotes the ciphersuite hash function.
+
+9.6.  Log Tree
+
+   The leaf and parent nodes of a log tree are serialized as:
+
+   struct {
+     uint64 timestamp;
+     opaque prefix_tree<Hash.Nh>;
+   } LogLeaf;
+
+   struct {
+     opaque value<Hash.Nh>;
+   } LogParent;
+
+   The timestamp field contains the timestamp that the leaf was created
+   in milliseconds since the Unix epoch.  The prefix_tree field contains
+   the new root hash of the prefix tree after inserting any new desired
+   entries.
+
+   The value of a parent node is computed by hashing together the values
+   of its left and right children:
+
+   parent.value = Hash(hashContent(parent.leftChild) ||
+                       hashContent(parent.rightChild))
+
+   hashContent(node):
+     if node.type == leafNode:
+       return 0x00 || nodeValue(node)
+     else if node.type == parentNode:
+       return 0x01 || nodeValue(node)
+
+   nodeValue(node):
+     if node.type == leafNode:
+       return Hash(node.timestamp || node.prefix_tree)
+     else if node.type == parentNode:
+       return node.value
+
 10.  Tree Proofs
 
 10.1.  Log Tree
@@ -1282,7 +1317,7 @@ Log tree:       o                                o
 
    Each NodeValue is a uniform size, computed by passing the relevant
    LogLeaf or LogParent structures through the nodeValue function in
-   Section 9.4.  The contents of the elements array is kept in left-to-
+   Section 9.6.  The contents of the elements array is kept in left-to-
    right order: if a node is present in the root's left subtree, its
    value must be listed before any values provided from nodes that are
    in the root's right subtree, and so on recursively.
@@ -1457,43 +1492,7 @@ Log tree:       o                                o
    root hash, and the leaf committing to the requested value will be at
    the index identified in the most recent prefix tree.
 
-11.  Update Format
-
-   The updates committed to by a combined tree structure contain the new
-   value of a label, along with additional information depending on the
-   deployment mode of the Transparency Log. They are serialized as
-   follows:
-
-   struct {
-     select (Configuration.mode) {
-       case thirdPartyManagement:
-         opaque signature<0..2^16-1>;
-     };
-   } UpdatePrefix;
-
-   struct {
-     UpdatePrefix prefix;
-     opaque value<0..2^32-1>;
-   } UpdateValue;
-
-   The value field contains the new value associated with the label.
-
-   In the event that third-party management is used, the prefix field
-   contains a signature from the service operator, using the public key
-   from Configuration.leaf_public_key, over the following structure:
-
-   struct {
-     opaque label<0..2^8-1>;
-     uint32 version;
-     opaque value<0..2^32-1>;
-   } UpdateTBS;
-
-   The label field contains the label being updated, version contains
-   the new version, and value contains the same contents as
-   UpdateValue.value.  Clients MUST successfully verify this signature
-   before consuming UpdateValue.value.
-
-12.  User Operations
+11.  User Operations
 
    The basic user operations are organized as a request-response
    protocol between a user and the Transparency Log operator.
@@ -1517,7 +1516,7 @@ Log tree:       o                                o
    consistency proof between the current tree and the tree when it was
    this size, in the consistency field of FullTreeHead.
 
-12.1.  Search
+11.1.  Search
 
    Users initiate a Search operation by submitting a SearchRequest to
    the Transparency Log containing the label that they're interested in.
@@ -1558,9 +1557,9 @@ Log tree:       o                                o
 
    Depending on the deployment mode of the Transparency Log, the value
    field may or may not require additional verification, specified in
-   Section 11, before its contents may be consumed.
+   Section 9.2, before its contents may be consumed.
 
-12.2.  Update
+11.2.  Update
 
    Users initiate an Update operation by submitting an UpdateRequest to
    the Transparency Log containing the new label and value to store.
@@ -1591,7 +1590,7 @@ Log tree:       o                                o
    response provides the UpdatePrefix structure necessary to reconstruct
    the UpdateValue.
 
-12.3.  Monitor
+11.3.  Monitor
 
    Users initiate a Monitor operation by submitting a MonitorRequest to
    the Transparency Log containing information about the labels they
@@ -1720,32 +1719,32 @@ Log tree:       o                                o
    proofs for different versions of each label are not provided, given
    that these can be cached from the original Search or Update query.
 
-13.  Security Considerations
+12.  Security Considerations
 
-14.  IANA Considerations
+13.  IANA Considerations
 
    This document requests the creation of the following new IANA
    registries:
 
-   *  KT Ciphersuites (Section 14.1)
+   *  KT Ciphersuites (Section 13.1)
 
    All of these registries should be under a heading of "Key
    Transparency", and assignments are made via the Specification
-   Required policy [RFC8126].  See Section 14.2 for additional
+   Required policy [RFC8126].  See Section 13.2 for additional
    information about the KT Designated Experts (DEs).
 
    RFC EDITOR: Please replace XXXX throughout with the RFC number
    assigned to this document
 
-14.1.  KT Ciphersuites
+13.1.  KT Ciphersuites
 
    uint16 CipherSuite;
 
-14.2.  KT Designated Expert Pool
+13.2.  KT Designated Expert Pool
 
-15.  References
+14.  References
 
-15.1.  Normative References
+14.1.  Normative References
 
    [I-D.ietf-keytrans-architecture]
               McMillion, B., "Key Transparency Architecture", Work in
@@ -1786,7 +1785,7 @@ Log tree:       o                                o
               DOI 10.17487/RFC9381, August 2023,
               <https://www.rfc-editor.org/rfc/rfc9381>.
 
-15.2.  Informative References
+14.2.  Informative References
 
    [CONIKS]   Melara, M. S., Blankstein, A., Bonneau, J., Felten, E. W.,
               and M. J. Freedman, "CONIKS: Bringing Key Transparency to
