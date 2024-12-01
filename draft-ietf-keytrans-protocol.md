@@ -937,12 +937,14 @@ frontier timestamps for future queries.
 # Ciphersuites
 
 Each Transparency Log uses a single fixed ciphersuite, chosen when the log is
-initially created, that specifies the following primitives to be used for
+initially created, that specifies the following primitives and parameters to be used for
 cryptographic computations:
 
 * A hash algorithm
 * A signature algorithm
 * A Verifiable Random Function (VRF) algorithm
+* `Nc`: The size in bytes of commitment openings
+* `Kc`: A fixed string of bytes used in the computation of commitments
 
 The hash algorithm is used for computing the intermediate and root values of
 hash trees. The signature algorithm is used for signatures from both the service
@@ -956,144 +958,6 @@ defined in {{kt-ciphersuites}}.
 
 # Cryptographic Computations
 
-## Verifiable Random Function
-
-Each label-version pair created in a log will have a unique
-representation in the prefix tree. This is computed by providing the combined
-label and version as inputs to the VRF:
-
-~~~ tls-presentation
-struct {
-  opaque label<0..2^8-1>;
-  uint32 version;
-} VrfInput;
-~~~
-
-The VRF's output evaluated on `VrfInput` is the concrete value inserted into the
-prefix tree.
-
-## Commitment
-
-As discussed in {{combined-tree}}, commitments are stored in the leaves of the
-log tree and correspond to updates. Commitments are computed
-with HMAC {{!RFC2104}}, using the hash function specified by the ciphersuite. To
-produce a new commitment, the application generates a random 16 byte value
-called `opening` and computes:
-<!-- TODO Opening size should be determined by ciphersuite -->
-
-~~~ pseudocode
-commitment = HMAC(fixedKey, CommitmentValue)
-~~~
-
-where `fixedKey` is the 16 byte hex-decoded value:
-
-~~~
-d821f8790d97709796b4d7903357c3f5
-~~~
-<!-- TODO This is weird but nobody has ever said anything. Keep it? Do better? -->
-
-and CommitmentValue is specified as:
-
-~~~ tls-presentation
-struct {
-  opaque opening<16>;
-  opaque label<0..2^8-1>;
-  UpdateValue update;
-} CommitmentValue;
-~~~
-
-This fixed key allows the HMAC function, and thereby the commitment scheme, to
-be modeled as a random oracle. The `label` field of CommitmentValue
-contains the label being updated
-and the `update` field contains the new value for the label.
-
-The output value `commitment` may be published, while `opening` should be kept
-private until the commitment is meant to be revealed.
-
-## Prefix Tree
-
-The leaf nodes of a prefix tree are serialized as:
-
-~~~ tls
-struct {
-    opaque vrf_output<VRF.Nh>;
-    uint64 update_index;
-} PrefixLeaf;
-~~~
-
-where `vrf_output` is the VRF output for the label-version pair, `VRF.Nh` is the
-output size of the ciphersuite VRF in bytes, and `update_index` is the index of
-the log tree's leaf committing to the respective value, i.e., the log tree's
-`tree_size` just after the respective label-version pair was inserted minus one.
-
-The parent nodes of a prefix tree are serialized as:
-
-~~~ tls
-struct {
-  opaque value<Hash.Nh>;
-} PrefixParent;
-~~~
-
-where `Hash.Nh` is the output length of the ciphersuite hash function. The value
-of a parent node is computed by hashing together the values of its left and
-right children:
-
-~~~ pseudocode
-parent.value = Hash(0x01 ||
-                   nodeValue(parent.leftChild) ||
-                   nodeValue(parent.rightChild))
-
-nodeValue(node):
-  if node.type == emptyNode:
-    return 0 // all-zero vector of length Hash.Nh
-  else if node.type == leafNode:
-    return Hash(0x00 || node.vrf_output || node.update_index)
-  else if node.type == parentNode:
-    return node.value
-~~~
-
-where `Hash` denotes the ciphersuite hash function.
-
-## Log Tree {#crypto-log-tree}
-
-The leaf and parent nodes of a log tree are serialized as:
-
-~~~ tls-presentation
-struct {
-  opaque commitment<Hash.Nh>;
-  opaque prefix_tree<Hash.Nh>;
-} LogLeaf;
-
-struct {
-  opaque value<Hash.Nh>;
-} LogParent;
-~~~
-
-The `commitment` field contains the output of evaluating HMAC on
-`CommitmentValue`, as described in {{commitment}}. The `prefix_tree` field
-contains the root hash of the prefix tree, after inserting a new label-version
-pair for the `label` in `CommitmentValue`.
-
-The value of a parent node is computed by hashing together the values of its
-left and right children:
-
-~~~ pseudocode
-parent.value = Hash(hashContent(parent.leftChild) ||
-                    hashContent(parent.rightChild))
-
-hashContent(node):
-  if node.type == leafNode:
-    return 0x00 || nodeValue(node)
-  else if node.type == parentNode:
-    return 0x01 || nodeValue(node)
-
-nodeValue(node):
-  if node.type == leafNode:
-    return Hash(node.commitment || node.prefix_tree)
-  else if node.type == parentNode:
-    return node.value
-~~~
-
 ## Tree Head Signature
 
 The head of a Transparency Log, which represents the log's most recent state, is
@@ -1106,12 +970,12 @@ struct {
 } TreeHead;
 ~~~
 
-where `tree_size` counts the number of entries in the log tree. If the
-Transparency Log is deployed with Third-party Management then the public key
+where `tree_size` counts the number of leaves of the log tree. If the
+Transparency Log is deployed with Third-party Management, then the public key
 used to verify the signature belongs to the third-party manager; otherwise the
 public key used belongs to the service operator.
 
-The signature itself is computed over a `TreeHeadTBS` structure, which
+The signature itself is computed over a `TreeHeadTBS` structure which
 incorporates the log's current state as well as long-term log configuration:
 
 ~~~ tls-presentation
@@ -1143,6 +1007,172 @@ struct {
   uint64 tree_size;
   opaque root<Hash.Nh>;
 } TreeHeadTBS;
+~~~
+
+## Update Format
+
+The updates committed to by a combined tree structure contain the new value of a
+label, along with additional information depending on the deployment mode
+of the Transparency Log. They are serialized as follows:
+
+~~~ tls-presentation
+struct {
+  select (Configuration.mode) {
+    case thirdPartyManagement:
+      opaque signature<0..2^16-1>;
+  };
+} UpdatePrefix;
+
+struct {
+  UpdatePrefix prefix;
+  opaque value<0..2^32-1>;
+} UpdateValue;
+~~~
+
+The `value` field contains the new value associated with the label.
+
+In the event that third-party management is used, the `prefix` field contains a
+signature from the service operator, using the public key from
+`Configuration.leaf_public_key`, over the following structure:
+
+~~~ tls-presentation
+struct {
+  opaque label<0..2^8-1>;
+  uint32 version;
+  opaque value<0..2^32-1>;
+} UpdateTBS;
+~~~
+
+The `label` field contains the label being updated, `version` contains the new
+version, and `value` contains the same contents as `UpdateValue.value`. Clients
+MUST successfully verify this signature before consuming `UpdateValue.value`.
+
+## Commitment
+
+As discussed in {{combined-tree}}, commitments are stored in the leaves of the
+log tree rather than raw `UpdateValue` structures. Commitments are computed
+with HMAC {{!RFC2104}}, using the hash function specified by the ciphersuite. To
+produce a new commitment, the application generates a random `Nc`-byte value
+called `opening` and computes:
+
+~~~ pseudocode
+commitment = HMAC(Kc, CommitmentValue)
+~~~
+
+where `Kc` is defined by the ciphersuite and CommitmentValue is specified as:
+
+~~~ tls-presentation
+struct {
+  opaque opening<Nc>;
+  opaque label<0..2^8-1>;
+  UpdateValue update;
+} CommitmentValue;
+~~~
+
+The `label` field of CommitmentValue contains the label being updated and the
+`update` field contains the new value for the label. The output value
+`commitment` may be published, while `opening` should be kept private until the
+commitment is meant to be revealed.
+
+The Transparency Log SHOULD generate `opening` in a way such that it can later
+be deleted and not feasibly recovered.
+
+## Verifiable Random Function
+
+Each label-version pair created will have a unique
+representation in the prefix tree. This is computed by providing the combined
+label and version as inputs to the VRF:
+
+~~~ tls-presentation
+struct {
+  opaque label<0..2^8-1>;
+  uint32 version;
+} VrfInput;
+~~~
+
+The VRF's output evaluated on `VrfInput` is the concrete value inserted into the
+prefix tree.
+
+## Prefix Tree
+
+The leaf nodes of a prefix tree are serialized as:
+
+~~~ tls
+struct {
+    opaque vrf_output<VRF.Nh>;
+    opaque commitment<Hash.Nh>;
+} PrefixLeaf;
+~~~
+
+where `vrf_output` is the VRF output for the label-version pair, `VRF.Nh` is the
+output size of the ciphersuite VRF in bytes, `commitment` is the commitment to
+the corresponding `UpdateValue` structure, and `Hash.Nh` is the output size of
+the ciphersuite hash function in bytes.
+
+The parent nodes of a prefix tree are serialized as:
+
+~~~ tls
+struct {
+  opaque value<Hash.Nh>;
+} PrefixParent;
+~~~
+
+The value of a parent node is computed by hashing together the values of its
+left and right children:
+
+~~~ pseudocode
+parent.value = Hash(0x01 ||
+                   nodeValue(parent.leftChild) ||
+                   nodeValue(parent.rightChild))
+
+nodeValue(node):
+  if node.type == emptyNode:
+    return 0 // all-zero vector of length Hash.Nh
+  else if node.type == leafNode:
+    return Hash(0x00 || node.vrf_output || node.commitment)
+  else if node.type == parentNode:
+    return node.value
+~~~
+
+where `Hash` denotes the ciphersuite hash function.
+
+## Log Tree {#crypto-log-tree}
+
+The leaf and parent nodes of a log tree are serialized as:
+
+~~~ tls-presentation
+struct {
+  uint64 timestamp;
+  opaque prefix_tree<Hash.Nh>;
+} LogLeaf;
+
+struct {
+  opaque value<Hash.Nh>;
+} LogParent;
+~~~
+
+The `timestamp` field contains the timestamp that the leaf was created in
+milliseconds since the Unix epoch. The `prefix_tree` field contains the new root
+hash of the prefix tree after inserting any new desired entries.
+
+The value of a parent node is computed by hashing together the values of its
+left and right children:
+
+~~~ pseudocode
+parent.value = Hash(hashContent(parent.leftChild) ||
+                    hashContent(parent.rightChild))
+
+hashContent(node):
+  if node.type == leafNode:
+    return 0x00 || nodeValue(node)
+  else if node.type == parentNode:
+    return 0x01 || nodeValue(node)
+
+nodeValue(node):
+  if node.type == leafNode:
+    return Hash(node.timestamp || node.prefix_tree)
+  else if node.type == parentNode:
+    return node.value
 ~~~
 
 
@@ -1339,44 +1369,6 @@ commits to respective value for the request label-version pair. The most recent
 leaf is needed to obtain the prefix tree's root hash, and the leaf committing to
 the requested value will be at the index identified in the most recent prefix
 tree.
-
-# Update Format
-
-The updates committed to by a combined tree structure contain the new value of a
-label, along with additional information depending on the deployment mode
-of the Transparency Log. They are serialized as follows:
-
-~~~ tls-presentation
-struct {
-  select (Configuration.mode) {
-    case thirdPartyManagement:
-      opaque signature<0..2^16-1>;
-  };
-} UpdatePrefix;
-
-struct {
-  UpdatePrefix prefix;
-  opaque value<0..2^32-1>;
-} UpdateValue;
-~~~
-
-The `value` field contains the new value associated with the label.
-
-In the event that third-party management is used, the `prefix` field contains a
-signature from the service operator, using the public key from
-`Configuration.leaf_public_key`, over the following structure:
-
-~~~ tls-presentation
-struct {
-  opaque label<0..2^8-1>;
-  uint32 version;
-  opaque value<0..2^32-1>;
-} UpdateTBS;
-~~~
-
-The `label` field contains the label being updated, `version` contains the new
-version, and `value` contains the same contents as `UpdateValue.value`. Clients
-MUST successfully verify this signature before consuming `UpdateValue.value`.
 
 
 # User Operations
