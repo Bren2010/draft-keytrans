@@ -153,6 +153,9 @@ concatenation of that node's parent along with the parent's direct path. The
 *copath* of a node is the node's sibling concatenated with the list of siblings
 of all the nodes in its direct path, excluding the root.
 
+The *size* of a tree or subtree is defined as the number of leaf nodes it
+contains.
+
 ## Log Tree
 
 Log trees are used for storing information in the chronological order that it
@@ -281,15 +284,16 @@ hash when also considering the hash of the node [X]."}
 
 ## Prefix Tree
 
-Prefix trees are used for storing key-value pairs in a way that provides the
-ability to efficiently prove that a search key's value was looked up correctly.
+Prefix trees store a mapping between search keys and their corresponding values,
+with the ability to efficiently prove that a search key's value was looked up
+correctly.
 
-Each leaf node in a prefix tree represents a specific key-value pair, while each parent
-node represents some prefix which all search keys in the subtree headed by that node
-have in common. The subtree headed by a parent's left child contains all search keys
-that share its prefix followed by an additional 0 bit, while the subtree headed
-by a parent's right child contains all search keys that share its prefix followed by
-an additional 1 bit.
+Each leaf node in a prefix tree represents a specific mapping from search key to
+value, while each parent node represents some prefix which all search keys in
+the subtree headed by that node have in common. The subtree headed by a parent's
+left child contains all search keys that share its prefix followed by an
+additional 0 bit, while the subtree headed by a parent's right child contains
+all search keys that share its prefix followed by an additional 1 bit.
 
 The root node, in particular, represents the empty string as a prefix. The
 root's left child contains all search keys that begin with a 0 bit, while the right
@@ -366,7 +370,7 @@ correct. However, it's not possible to efficiently prove that a new version of a
 prefix tree contains the same data as a previous version with only new values
 added.
 
-In the combined tree structure, which is based on {{Merkle2}}, a prefix tree
+In the combined tree structure, based on {{Merkle2}}, a prefix tree
 contains a mapping where each label-version pair has a search key, and the
 search key's value is a cryptographic commitment to the label's new contents. A
 log tree contains a record of each version of the prefix tree and
@@ -432,9 +436,7 @@ Index:  0  1  2  3  4  5  6  7  8  9 10 11 12 13
 ~~~
 {: title="A binary tree constructed from 14 entries in a log" }
 
-Following the structure of this binary tree when executing searches makes
-auditing the Transparency Log much more efficient because users can easily
-reason about which nodes will be accessed when conducting a search. As such,
+Following the structure of this binary tree when executing searches means that
 only nodes along a specific search path need to be checked for correctness.
 
 The following Python code demonstrates the computations used for following this
@@ -591,7 +593,10 @@ recurses to left or right children, each time starting back at step 1.
    right child always exists, as the rightmost log entry cannot exceed its
    maximum lifetime by definition.
 3. Obtain a truncated binary ladder from the current log entry for the target
-   version.
+   version. Verify that the binary ladder terminates in a way that is consistent
+   with previously-inspected log entries. Specifically, verify that it indicates
+   a maximum version greater than or equal to any log entries to the left, and
+   less than or equal to any log entries to the right.
 4. If the binary ladder stops short of proving the target version is present,
    recurse to the log entry's right child. Otherwise, check if the log entry has
    surpassed its maximum lifetime. If so, abort the search with an error
@@ -1093,6 +1098,45 @@ struct {
 The VRF's output evaluated on `VrfInput` is the concrete value inserted into the
 prefix tree.
 
+## Log Tree {#crypto-log-tree}
+
+The leaf and parent nodes of a log tree are serialized as:
+
+~~~ tls-presentation
+struct {
+  uint64 timestamp;
+  opaque prefix_tree<Hash.Nh>;
+} LogLeaf;
+
+struct {
+  opaque value<Hash.Nh>;
+} LogParent;
+~~~
+
+The `timestamp` field contains the timestamp that the leaf was created in
+milliseconds since the Unix epoch. The `prefix_tree` field contains the new root
+hash of the prefix tree after inserting any new desired entries.
+
+The value of a parent node is computed by hashing together the values of its
+left and right children:
+
+~~~ pseudocode
+parent.value = Hash(hashContent(parent.leftChild) ||
+                    hashContent(parent.rightChild))
+
+hashContent(node):
+  if node.type == leafNode:
+    return 0x00 || nodeValue(node)
+  else if node.type == parentNode:
+    return 0x01 || nodeValue(node)
+
+nodeValue(node):
+  if node.type == leafNode:
+    return Hash(node.timestamp || node.prefix_tree)
+  else if node.type == parentNode:
+    return node.value
+~~~
+
 ## Prefix Tree
 
 The leaf nodes of a prefix tree are serialized as:
@@ -1135,45 +1179,6 @@ nodeValue(node):
 ~~~
 
 where `Hash` denotes the ciphersuite hash function.
-
-## Log Tree {#crypto-log-tree}
-
-The leaf and parent nodes of a log tree are serialized as:
-
-~~~ tls-presentation
-struct {
-  uint64 timestamp;
-  opaque prefix_tree<Hash.Nh>;
-} LogLeaf;
-
-struct {
-  opaque value<Hash.Nh>;
-} LogParent;
-~~~
-
-The `timestamp` field contains the timestamp that the leaf was created in
-milliseconds since the Unix epoch. The `prefix_tree` field contains the new root
-hash of the prefix tree after inserting any new desired entries.
-
-The value of a parent node is computed by hashing together the values of its
-left and right children:
-
-~~~ pseudocode
-parent.value = Hash(hashContent(parent.leftChild) ||
-                    hashContent(parent.rightChild))
-
-hashContent(node):
-  if node.type == leafNode:
-    return 0x00 || nodeValue(node)
-  else if node.type == parentNode:
-    return 0x01 || nodeValue(node)
-
-nodeValue(node):
-  if node.type == leafNode:
-    return Hash(node.timestamp || node.prefix_tree)
-  else if node.type == parentNode:
-    return node.value
-~~~
 
 
 # Tree Proofs
