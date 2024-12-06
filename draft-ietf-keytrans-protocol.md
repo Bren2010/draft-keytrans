@@ -759,7 +759,7 @@ distinguished log entries such as the rightmost one. Note that step 2 is
 specifically "less than" and not "less than or equal to"; this ensures correct
 behavior when the RMW is zero.
 
-## Binary Ladder
+## Lower-Bound Binary Ladder
 
 Similar to the algorithm for searching the tree, the algorithm for monitoring
 the tree requires a way to prove that the highest version of a label stored in a
@@ -1181,9 +1181,10 @@ nodeValue(node):
 ## Log Tree
 
 An inclusion proof for a single leaf in a log tree is given by providing the
-copath values of a leaf. Similarly, a bulk inclusion proof for any number of
+copath values of a leaf. Similarly, a bulk inclusion proof for many
 leaves is given by providing the fewest node values that can be hashed together
-with the specified leaves to produce the root value. Such a proof is encoded as:
+with the specified leaves, and any intermediate values retained by the verifier,
+to produce the root value. Such a proof is encoded as:
 
 ~~~ tls-presentation
 opaque NodeValue<Hash.Nh>;
@@ -1200,23 +1201,15 @@ left-to-right order: if a node is present in the root's left subtree, its value
 must be listed before any values provided from nodes that are in the root's
 right subtree, and so on recursively.
 
-Consistency proofs are encoded similarly:
-
-~~~ tls-presentation
-struct {
-  NodeValue elements<0..2^8-1>;
-} ConsistencyProof;
-~~~
-
-Again, each `NodeValue` is computed by passing the relevant `LogLeaf` or
-`LogParent` structure through the `nodeValue` function. The nodes chosen
-correspond to those output by the algorithm in Section 2.1.2 of {{!RFC6962}}.
+Additionally, each `NodeValue` corresponds to a full subtree of the log tree. If
+an intermediate node's value needs to be provided to satisfy the verifier, but
+the node represents a non-full subtree, the values of the node's descendant full
+subtrees are provided instead.
 
 ## Prefix Tree
 
-A proof from a prefix tree authenticates that a set of values are either members
-of, or are not members of, the total set of values represented by the prefix
-tree. Such a proof is encoded as:
+A proof from a prefix tree authenticates that a search was done correctly for a
+given search key. Such a proof is encoded as:
 
 ~~~ tls
 enum {
@@ -1229,8 +1222,6 @@ enum {
 struct {
   PrefixSearchResultType result_type;
   select (PrefixSearchResult.result_type) {
-    case inclusion:
-      uint64 update_index;
     case nonInclusionLeaf:
       PrefixLeaf leaf;
   };
@@ -1244,13 +1235,13 @@ struct {
 ~~~
 
 The `results` field contains the search result for each individual value. It is
-sorted lexicographically by corresponding value. The `result_type` field of each
+sorted lexicographically by VRF output. The `result_type` field of each
 `PrefixSearchResult` struct indicates what the terminal node of the search for
 that value was:
 
 - `inclusion` for a leaf node matching the requested value.
 - `nonInclusionLeaf` for a leaf node not matching the requested value. In this
-  case, the terminal node's value is provided given that it can not be inferred.
+  case, the terminal node's value is provided since it can not be inferred.
 - `nonInclusionParent` for a parent node that lacks the desired child.
 
 The `depth` field indicates the depth of the terminal node of the search, and is
@@ -1270,71 +1261,72 @@ result equals the root value of the prefix tree.
 
 ## Combined Tree {#proof-combined-tree}
 
-### Proofs for Contact Monitoring
+### Fixed-Version
 
-A proof from a combined log and prefix tree follows the execution of a binary
-search through the leaves of the log tree, as described in {{combined-tree}}. It
-is serialized as follows:
+Searching the combined tree for a specific version of a label follows the
+execution of a binary search through the leaves of the log tree, as described in
+{{fixed-version-searches}}. It is serialized as follows:
 
 ~~~ tls-presentation
 
 struct {
   opaque proof<VRF.Np>;
-} VRFProof;
+  opaque commitment<Hash.Nh>;
+} BinaryLadderStep;
 
 struct {
+  uint64 timestamp;
   PrefixProof prefix_proof;
-  opaque commitment<Hash.Nh>;
 } ProofStep;
 
 struct {
-  optional<uint32> version;
-  VRFProof vrf_proofs<0..2^8-1>;
+  BinaryLadderStep binary_ladder<0..2^8-1>;
   ProofStep steps<0..2^8-1>;
   InclusionProof inclusion;
 } SearchProof;
 ~~~
 
-If searching for the most recent version of a label, the most recent version is
-provided in `version`. If searching for a specific version, this field is
-omitted.
-
-Each element of `vrf_proofs` contains the output of evaluating the VRF on a
-different version of the label. The versions chosen correspond either to
-the binary ladder described in {{binary-ladder}} (when searching for a specific
-version of a label), or to the full binary ladder described in
-TODO (when searching for the most recent version of a label).
-The proofs are sorted from lowest version to highest version.
+Each element of `binary_ladder` corresponds to the steps of the binary ladder
+described in {{binary-ladder}}. The `proof` field contains the contains the
+output of evaluating the VRF on a specified version of the label, and
+`commitment` contains the commitment to the `UpdateValue` of the label-version
+pair. The elements of `binary_ladder` are in the same order as they were
+computed in {{binary-ladder}}.
 
 Each `ProofStep` structure in `steps` is one log entry that was inspected as
 part of the binary search. The first step corresponds to the "middle" leaf of
 the log tree (calculated with the `root` function in
 {{implicit-binary-search-tree}}). From there, each subsequent step moves left or
-right in the tree, according to the procedure discussed in {{binary-ladder}} and
-TODO.
+right in the tree according to the procedure discussed in
+{{fixed-version-searches}}.
 
-The `prefix_proof` field of a `ProofStep` is the output of executing a binary
-ladder, excluding any ladder steps for which a proof of inclusion is expected,
+The `timestamp` field of a `ProofStep` contains the log entry's timestamp, and
+the `prefix_proof` field contains the output of executing a binary ladder in the
+version of the prefix tree stored in the log entry. The binary ladder is
+truncated, meaning that it stops after the first proof of inclusion for a
+version greater than or equal to the target version, or the first proof of
+non-inclusion for a version less than the target version.
+
+Furthermore, for  any ladder steps for which a proof of inclusion is expected
 and a proof of inclusion was already provided in a previous `ProofStep` for a
-log entry to the left of the current one.
+log entry to the left of the current one, these ladder steps are omitted from
+`prefix_proof`.
 
-The `commitment` field of a `ProofStep` contains the commitment to the update at
-that leaf. The `inclusion` field of `SearchProof` contains a batch inclusion
+Finally, the `inclusion` field of `SearchProof` contains a batch inclusion
 proof for all of the leaves accessed by the binary search.
 
-The proof can be verified by checking that:
+The proof can be verified by the following steps:
 
-1. The elements of `steps` represent a monotonic series over the leaves of the
-   log, and
-2. The `steps` array has the expected number of entries (no more or less than
-   are necessary to execute the binary search).
-<!-- TODO Specify this verification in MUCH more detail -->
-
-Once the validity of the search steps has been established, the verifier can
-compute the root of each prefix tree represented by a `prefix_proof` and combine
-it with the corresponding `commitment` to obtain the value of each leaf. These
-leaf values can then be combined with the proof in `inclusion` to check that the
-output matches the root of the log tree.
+1. Verify that the `binary_ladder` array has the expected number of entries and
+   compute the VRF output for each label-version pair in the ladder.
+2. Follow the algorithm in {{fixed-version-searches}}.
+3. Verify that the `steps` array has the exact number of entries necessary to
+   execute the binary search (no more or less).
+4. Compute the root of each prefix tree represented by a `prefix_proof` and
+   combine it with the corresponding `timestamp` to obtain the value of each
+   leaf.
+5. Combine the leaf values with the proof in `inclusion` to compute a candidate
+   value for the root of the log tree. Verify the root is correct.
 
 ### Proofs for Third-Party Auditing
 
