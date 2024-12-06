@@ -16,10 +16,10 @@ for distributing sensitive cryptographic information, such as public keys, in a
 way that reliably either prevents interference or detects that it occurred in a
 timely manner. 
     " name="description">
-<meta content="xml2rfc 3.24.0" name="generator">
+<meta content="xml2rfc 3.25.0" name="generator">
 <meta content="draft-keytrans-mcmillion-protocol-latest" name="ietf.draft">
 <!-- Generator version information:
-  xml2rfc 3.24.0
+  xml2rfc 3.25.0
     Python 3.12.7
     ConfigArgParse 1.7
     google-i18n-address 3.1.1
@@ -1050,7 +1050,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">McMillion &amp; Linker</td>
-<td class="center">Expires 4 June 2025</td>
+<td class="center">Expires 9 June 2025</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1063,12 +1063,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-keytrans-mcmillion-protocol-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2024-12-01" class="published">1 December 2024</time>
+<time datetime="2024-12-06" class="published">6 December 2024</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2025-06-04">4 June 2025</time></dd>
+<dd class="expires"><time datetime="2025-06-09">9 June 2025</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1121,7 +1121,7 @@ timely manner.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 4 June 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 9 June 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1203,7 +1203,7 @@ timely manner.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
                 <p id="section-toc.1-1.6.2.2.1"><a href="#section-6.2" class="auto internal xref">6.2</a>.  <a href="#name-distinguished-log-entries" class="internal xref">Distinguished Log Entries</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.3">
-                <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="auto internal xref">6.3</a>.  <a href="#name-binary-ladder-2" class="internal xref">Binary Ladder</a></p>
+                <p id="section-toc.1-1.6.2.3.1"><a href="#section-6.3" class="auto internal xref">6.3</a>.  <a href="#name-lower-bound-binary-ladder" class="internal xref">Lower-Bound Binary Ladder</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.6.2.4">
                 <p id="section-toc.1-1.6.2.4.1"><a href="#section-6.4" class="auto internal xref">6.4</a>.  <a href="#name-algorithm-2" class="internal xref">Algorithm</a></p>
@@ -1257,7 +1257,7 @@ timely manner.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
                 <p id="section-toc.1-1.10.2.3.1"><a href="#section-10.3" class="auto internal xref">10.3</a>.  <a href="#name-combined-tree-2" class="internal xref">Combined Tree</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.3.2.1">
-                    <p id="section-toc.1-1.10.2.3.2.1.1"><a href="#section-10.3.1" class="auto internal xref">10.3.1</a>.  <a href="#name-proofs-for-contact-monitori" class="internal xref">Proofs for Contact Monitoring</a></p>
+                    <p id="section-toc.1-1.10.2.3.2.1.1"><a href="#section-10.3.1" class="auto internal xref">10.3.1</a>.  <a href="#name-fixed-version" class="internal xref">Fixed-Version</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.3.2.2">
                     <p id="section-toc.1-1.10.2.3.2.2.1"><a href="#section-10.3.2" class="auto internal xref">10.3.2</a>.  <a href="#name-proofs-for-third-party-audi" class="internal xref">Proofs for Third-Party Auditing</a></p>
@@ -2289,10 +2289,10 @@ specifically "less than" and not "less than or equal to"; this ensures correct
 behavior when the RMW is zero.<a href="#section-6.2-5" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="binary-ladder-1">
+<div id="lower-bound-binary-ladder">
 <section id="section-6.3">
-        <h3 id="name-binary-ladder-2">
-<a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-binary-ladder-2" class="section-name selfRef">Binary Ladder</a>
+        <h3 id="name-lower-bound-binary-ladder">
+<a href="#section-6.3" class="section-number selfRef">6.3. </a><a href="#name-lower-bound-binary-ladder" class="section-name selfRef">Lower-Bound Binary Ladder</a>
         </h3>
 <p id="section-6.3-1">Similar to the algorithm for searching the tree, the algorithm for monitoring
 the tree requires a way to prove that the highest version of a label stored in a
@@ -2796,9 +2796,10 @@ nodeValue(node):
 <a href="#section-10.1" class="section-number selfRef">10.1. </a><a href="#name-log-tree-3" class="section-name selfRef">Log Tree</a>
         </h3>
 <p id="section-10.1-1">An inclusion proof for a single leaf in a log tree is given by providing the
-copath values of a leaf. Similarly, a bulk inclusion proof for any number of
+copath values of a leaf. Similarly, a bulk inclusion proof for many
 leaves is given by providing the fewest node values that can be hashed together
-with the specified leaves to produce the root value. Such a proof is encoded as:<a href="#section-10.1-1" class="pilcrow">¶</a></p>
+with the specified leaves, and any intermediate values retained by the verifier,
+to produce the root value. Such a proof is encoded as:<a href="#section-10.1-1" class="pilcrow">¶</a></p>
 <div class="lang-tls-presentation sourcecode" id="section-10.1-2">
 <pre>
 opaque NodeValue&lt;Hash.Nh&gt;;
@@ -2814,17 +2815,10 @@ or <code>LogParent</code> structures through the <code>nodeValue</code> function
 left-to-right order: if a node is present in the root's left subtree, its value
 must be listed before any values provided from nodes that are in the root's
 right subtree, and so on recursively.<a href="#section-10.1-3" class="pilcrow">¶</a></p>
-<p id="section-10.1-4">Consistency proofs are encoded similarly:<a href="#section-10.1-4" class="pilcrow">¶</a></p>
-<div class="lang-tls-presentation sourcecode" id="section-10.1-5">
-<pre>
-struct {
-  NodeValue elements&lt;0..2^8-1&gt;;
-} ConsistencyProof;
-</pre><a href="#section-10.1-5" class="pilcrow">¶</a>
-</div>
-<p id="section-10.1-6">Again, each <code>NodeValue</code> is computed by passing the relevant <code>LogLeaf</code> or
-<code>LogParent</code> structure through the <code>nodeValue</code> function. The nodes chosen
-correspond to those output by the algorithm in Section 2.1.2 of <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span>.<a href="#section-10.1-6" class="pilcrow">¶</a></p>
+<p id="section-10.1-4">Additionally, each <code>NodeValue</code> corresponds to a full subtree of the log tree. If
+an intermediate node's value needs to be provided to satisfy the verifier, but
+the node represents a non-full subtree, the values of the node's descendant full
+subtrees are provided instead.<a href="#section-10.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="prefix-tree-2">
@@ -2832,9 +2826,8 @@ correspond to those output by the algorithm in Section 2.1.2 of <span>[<a href="
         <h3 id="name-prefix-tree-3">
 <a href="#section-10.2" class="section-number selfRef">10.2. </a><a href="#name-prefix-tree-3" class="section-name selfRef">Prefix Tree</a>
         </h3>
-<p id="section-10.2-1">A proof from a prefix tree authenticates that a set of values are either members
-of, or are not members of, the total set of values represented by the prefix
-tree. Such a proof is encoded as:<a href="#section-10.2-1" class="pilcrow">¶</a></p>
+<p id="section-10.2-1">A proof from a prefix tree authenticates that a search was done correctly for a
+given search key. Such a proof is encoded as:<a href="#section-10.2-1" class="pilcrow">¶</a></p>
 <div class="lang-tls sourcecode" id="section-10.2-2">
 <pre>
 enum {
@@ -2847,8 +2840,6 @@ enum {
 struct {
   PrefixSearchResultType result_type;
   select (PrefixSearchResult.result_type) {
-    case inclusion:
-      uint64 update_index;
     case nonInclusionLeaf:
       PrefixLeaf leaf;
   };
@@ -2862,7 +2853,7 @@ struct {
 </pre><a href="#section-10.2-2" class="pilcrow">¶</a>
 </div>
 <p id="section-10.2-3">The <code>results</code> field contains the search result for each individual value. It is
-sorted lexicographically by corresponding value. The <code>result_type</code> field of each
+sorted lexicographically by VRF output. The <code>result_type</code> field of each
 <code>PrefixSearchResult</code> struct indicates what the terminal node of the search for
 that value was:<a href="#section-10.2-3" class="pilcrow">¶</a></p>
 <ul class="normal">
@@ -2871,7 +2862,7 @@ that value was:<a href="#section-10.2-3" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-10.2-4.2">
             <p id="section-10.2-4.2.1"><code>nonInclusionLeaf</code> for a leaf node not matching the requested value. In this
-case, the terminal node's value is provided given that it can not be inferred.<a href="#section-10.2-4.2.1" class="pilcrow">¶</a></p>
+case, the terminal node's value is provided since it can not be inferred.<a href="#section-10.2-4.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-10.2-4.3">
             <p id="section-10.2-4.3.1"><code>nonInclusionParent</code> for a parent node that lacks the desired child.<a href="#section-10.2-4.3.1" class="pilcrow">¶</a></p>
@@ -2896,71 +2887,80 @@ result equals the root value of the prefix tree.<a href="#section-10.2-7" class=
         <h3 id="name-combined-tree-2">
 <a href="#section-10.3" class="section-number selfRef">10.3. </a><a href="#name-combined-tree-2" class="section-name selfRef">Combined Tree</a>
         </h3>
-<div id="proofs-for-contact-monitoring">
+<div id="fixed-version">
 <section id="section-10.3.1">
-          <h4 id="name-proofs-for-contact-monitori">
-<a href="#section-10.3.1" class="section-number selfRef">10.3.1. </a><a href="#name-proofs-for-contact-monitori" class="section-name selfRef">Proofs for Contact Monitoring</a>
+          <h4 id="name-fixed-version">
+<a href="#section-10.3.1" class="section-number selfRef">10.3.1. </a><a href="#name-fixed-version" class="section-name selfRef">Fixed-Version</a>
           </h4>
-<p id="section-10.3.1-1">A proof from a combined log and prefix tree follows the execution of a binary
-search through the leaves of the log tree, as described in <a href="#combined-tree" class="auto internal xref">Section 3.4</a>. It
-is serialized as follows:<a href="#section-10.3.1-1" class="pilcrow">¶</a></p>
+<p id="section-10.3.1-1">Searching the combined tree for a specific version of a label follows the
+execution of a binary search through the leaves of the log tree, as described in
+<a href="#fixed-version-searches" class="auto internal xref">Section 4</a>. It is serialized as follows:<a href="#section-10.3.1-1" class="pilcrow">¶</a></p>
 <div class="lang-tls-presentation sourcecode" id="section-10.3.1-2">
 <pre>
 struct {
   opaque proof&lt;VRF.Np&gt;;
-} VRFProof;
+  opaque commitment&lt;Hash.Nh&gt;;
+} BinaryLadderStep;
 
 struct {
+  uint64 timestamp;
   PrefixProof prefix_proof;
-  opaque commitment&lt;Hash.Nh&gt;;
 } ProofStep;
 
 struct {
-  optional&lt;uint32&gt; version;
-  VRFProof vrf_proofs&lt;0..2^8-1&gt;;
+  BinaryLadderStep binary_ladder&lt;0..2^8-1&gt;;
   ProofStep steps&lt;0..2^8-1&gt;;
   InclusionProof inclusion;
 } SearchProof;
 </pre><a href="#section-10.3.1-2" class="pilcrow">¶</a>
 </div>
-<p id="section-10.3.1-3">If searching for the most recent version of a label, the most recent version is
-provided in <code>version</code>. If searching for a specific version, this field is
-omitted.<a href="#section-10.3.1-3" class="pilcrow">¶</a></p>
-<p id="section-10.3.1-4">Each element of <code>vrf_proofs</code> contains the output of evaluating the VRF on a
-different version of the label. The versions chosen correspond either to
-the binary ladder described in <a href="#binary-ladder" class="auto internal xref">Section 4.2</a> (when searching for a specific
-version of a label), or to the full binary ladder described in
-TODO (when searching for the most recent version of a label).
-The proofs are sorted from lowest version to highest version.<a href="#section-10.3.1-4" class="pilcrow">¶</a></p>
-<p id="section-10.3.1-5">Each <code>ProofStep</code> structure in <code>steps</code> is one log entry that was inspected as
+<p id="section-10.3.1-3">Each element of <code>binary_ladder</code> corresponds to the steps of the binary ladder
+described in <a href="#binary-ladder" class="auto internal xref">Section 4.2</a>. The <code>proof</code> field contains the contains the
+output of evaluating the VRF on a specified version of the label, and
+<code>commitment</code> contains the commitment to the <code>UpdateValue</code> of the label-version
+pair. The elements of <code>binary_ladder</code> are in the same order as they were
+computed in <a href="#binary-ladder" class="auto internal xref">Section 4.2</a>.<a href="#section-10.3.1-3" class="pilcrow">¶</a></p>
+<p id="section-10.3.1-4">Each <code>ProofStep</code> structure in <code>steps</code> is one log entry that was inspected as
 part of the binary search. The first step corresponds to the "middle" leaf of
 the log tree (calculated with the <code>root</code> function in
 <a href="#implicit-binary-search-tree" class="auto internal xref">Section 4.1</a>). From there, each subsequent step moves left or
-right in the tree, according to the procedure discussed in <a href="#binary-ladder" class="auto internal xref">Section 4.2</a> and
-TODO.<a href="#section-10.3.1-5" class="pilcrow">¶</a></p>
-<p id="section-10.3.1-6">The <code>prefix_proof</code> field of a <code>ProofStep</code> is the output of executing a binary
-ladder, excluding any ladder steps for which a proof of inclusion is expected,
+right in the tree according to the procedure discussed in
+<a href="#fixed-version-searches" class="auto internal xref">Section 4</a>.<a href="#section-10.3.1-4" class="pilcrow">¶</a></p>
+<p id="section-10.3.1-5">The <code>timestamp</code> field of a <code>ProofStep</code> contains the log entry's timestamp, and
+the <code>prefix_proof</code> field contains the output of executing a binary ladder in the
+version of the prefix tree stored in the log entry. The binary ladder is
+truncated, meaning that it stops after the first proof of inclusion for a
+version greater than or equal to the target version, or the first proof of
+non-inclusion for a version less than the target version.<a href="#section-10.3.1-5" class="pilcrow">¶</a></p>
+<p id="section-10.3.1-6">Furthermore, for  any ladder steps for which a proof of inclusion is expected
 and a proof of inclusion was already provided in a previous <code>ProofStep</code> for a
-log entry to the left of the current one.<a href="#section-10.3.1-6" class="pilcrow">¶</a></p>
-<p id="section-10.3.1-7">The <code>commitment</code> field of a <code>ProofStep</code> contains the commitment to the update at
-that leaf. The <code>inclusion</code> field of <code>SearchProof</code> contains a batch inclusion
+log entry to the left of the current one, these ladder steps are omitted from
+<code>prefix_proof</code>.<a href="#section-10.3.1-6" class="pilcrow">¶</a></p>
+<p id="section-10.3.1-7">Finally, the <code>inclusion</code> field of <code>SearchProof</code> contains a batch inclusion
 proof for all of the leaves accessed by the binary search.<a href="#section-10.3.1-7" class="pilcrow">¶</a></p>
-<p id="section-10.3.1-8">The proof can be verified by checking that:<a href="#section-10.3.1-8" class="pilcrow">¶</a></p>
+<p id="section-10.3.1-8">The proof can be verified by the following steps:<a href="#section-10.3.1-8" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-10.3.1-9">
 <li id="section-10.3.1-9.1">
-              <p id="section-10.3.1-9.1.1">The elements of <code>steps</code> represent a monotonic series over the leaves of the
-log, and<a href="#section-10.3.1-9.1.1" class="pilcrow">¶</a></p>
+              <p id="section-10.3.1-9.1.1">Verify that the <code>binary_ladder</code> array has the expected number of entries and
+compute the VRF output for each label-version pair in the ladder.<a href="#section-10.3.1-9.1.1" class="pilcrow">¶</a></p>
 </li>
             <li id="section-10.3.1-9.2">
-              <p id="section-10.3.1-9.2.1">The <code>steps</code> array has the expected number of entries (no more or less than
-are necessary to execute the binary search).<a href="#section-10.3.1-9.2.1" class="pilcrow">¶</a></p>
+              <p id="section-10.3.1-9.2.1">Follow the algorithm in <a href="#fixed-version-searches" class="auto internal xref">Section 4</a>.<a href="#section-10.3.1-9.2.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-10.3.1-9.3">
+              <p id="section-10.3.1-9.3.1">Verify that the <code>steps</code> array has the exact number of entries necessary to
+execute the binary search (no more or less).<a href="#section-10.3.1-9.3.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-10.3.1-9.4">
+              <p id="section-10.3.1-9.4.1">Compute the root of each prefix tree represented by a <code>prefix_proof</code> and
+combine it with the corresponding <code>timestamp</code> to obtain the value of each
+leaf.<a href="#section-10.3.1-9.4.1" class="pilcrow">¶</a></p>
+</li>
+            <li id="section-10.3.1-9.5">
+              <p id="section-10.3.1-9.5.1">Combine the leaf values with the proof in <code>inclusion</code> to compute a candidate
+value for the root of the log tree. Verify the root is correct.<a href="#section-10.3.1-9.5.1" class="pilcrow">¶</a></p>
 </li>
           </ol>
-<p id="section-10.3.1-10">Once the validity of the search steps has been established, the verifier can
-compute the root of each prefix tree represented by a <code>prefix_proof</code> and combine
-it with the corresponding <code>commitment</code> to obtain the value of each leaf. These
-leaf values can then be combined with the proof in <code>inclusion</code> to check that the
-output matches the root of the log tree.<a href="#section-10.3.1-10" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="proofs-for-third-party-auditing">
@@ -3324,10 +3324,6 @@ uint16 CipherSuite;
 <dt id="RFC2119">[RFC2119]</dt>
         <dd>
 <span class="refAuthor">Bradner, S.</span>, <span class="refTitle">"Key words for use in RFCs to Indicate Requirement Levels"</span>, <span class="seriesInfo">BCP 14</span>, <span class="seriesInfo">RFC 2119</span>, <span class="seriesInfo">DOI 10.17487/RFC2119</span>, <time datetime="1997-03" class="refDate">March 1997</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc2119">https://www.rfc-editor.org/rfc/rfc2119</a>&gt;</span>. </dd>
-<dd class="break"></dd>
-<dt id="RFC6962">[RFC6962]</dt>
-        <dd>
-<span class="refAuthor">Laurie, B.</span>, <span class="refAuthor">Langley, A.</span>, and <span class="refAuthor">E. Kasper</span>, <span class="refTitle">"Certificate Transparency"</span>, <span class="seriesInfo">RFC 6962</span>, <span class="seriesInfo">DOI 10.17487/RFC6962</span>, <time datetime="2013-06" class="refDate">June 2013</time>, <span>&lt;<a href="https://www.rfc-editor.org/rfc/rfc6962">https://www.rfc-editor.org/rfc/rfc6962</a>&gt;</span>. </dd>
 <dd class="break"></dd>
 <dt id="RFC8126">[RFC8126]</dt>
         <dd>
