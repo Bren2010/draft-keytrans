@@ -843,7 +843,7 @@ monitor the label from then on.
 If the user owns the label being monitored, they will additionally need to
 retain the rightmost distinguished log entry where they've verified that the
 most recent version of the label is correct. Users advertise this log entry's
-position in their monitor request and the Transparency Log provides a
+position in their Monitor request and the Transparency Log provides a
 non-truncated binary ladder, described in {{binary-ladder}}, demonstrating the
 greatest version of the label in a number of subsequent distinguished log
 entries. The user inspects each of these for unexpected changes; if there are
@@ -876,7 +876,7 @@ are consistent with respect to a few important properties:
   same log entries as B (with some new ones potentially added).
 - If the rightmost log entry of the tree with root hash A has timestamp
   T_a, and the rightmost log entry of the tree with root hash B has timestamp
-  T_b, then T_a is greater than T_b.
+  T_b, then T_a is greater than or equal to T_b.
   - Furthermore, all log entries between the rightmost log entry of A and the
     rightmost log entry of B have monotonically increasing timestamps.
 
@@ -892,11 +892,11 @@ certain labels, or which portions of the tree to skip when searching.
 To address this, users retain select information about the last tree head
 they've observed:
 
-1. The "size" of the log tree (the number of log entries it contains).
-2. The root hashes of the "full subtrees" of the log tree (those subtrees which
-   are the largest powers of two possible). This allows the Transparency Log to
-   provide more space-efficient consistency and inclusion proofs than if just
-   the root hash was retained.
+1. The "size" of the log tree, defined as the number of log entries it contains.
+2. The root hashes of the "full subtrees" of the log tree. The full subtrees are
+   those which are the largest powers of two possible. This allows the
+   Transparency Log to provide more space-efficient consistency and inclusion
+   proofs than if just the root hash was retained.
 3. The timestamps of the log entries along the frontier. As will be described
    below, this will be used to ensure that subsequent log entry timestamps are
    correct.
@@ -910,7 +910,7 @@ Proving the latter two properties, that newly added log entries have
 monotonically increasing timestamps, is done as follows:
 
 - Starting with the log entry that was advertised by the user, compute its
-  direct path (in terms of the implicit binary search tree) in the new tree.
+  direct path in the new tree in terms of the implicit binary search tree.
   Provide the log entry timestamp and prefix tree root hash for each element
   of the direct path that's to the right of the advertised log entry.
 - Exactly one of these log entries will lie on the new tree's frontier. From
@@ -939,17 +939,11 @@ the tree is acceptable, and how far ahead of the current time a view of the tree
 may claim to be. Users verify that the rightmost log entry's timestamp falls
 within this range according to their local clock.
 
-Only once the user successfully verifies that the log entries' timestamps are
-monotonic, that it correctly computed the new root hash, and that the rightmost
-log entry's timestamp is in an acceptable range, can they update their stored
-state to replace the previous tree head with the new one.
-
 For users which have never interacted with the Transparency Log before and don't
 have a previous tree head to advertise, the Transparency Log simply provides the
 timestamps and prefix tree root hashes of the log entries on the frontier, along
-with an inclusion proof. The user verifies that the timestamps are monotonic. If
-this is successful, the user retains the log tree's full subtrees and the
-frontier timestamps for future queries.
+with an inclusion proof. Same as above, the user verifies that the timestamps
+are monotonic.
 
 
 # Ciphersuites
@@ -1018,6 +1012,11 @@ struct {
     case thirdPartyAuditing:
       opaque auditor_public_key<0..2^16-1>;
   };
+
+  uint64 max_ahead;
+  unit64 max_behind;
+  uint64 reasonable_monitoring_window;
+  optional<uint64> maximum_lifetime;
 } Configuration;
 
 struct {
@@ -1027,11 +1026,21 @@ struct {
 } TreeHeadTBS;
 ~~~
 
+The `max_ahead` and `max_behind` fields contain the maximum amount of time in
+milliseconds that a tree head may be ahead of or behind the user's local clock
+without being rejected. The `reasonable_monitoring_window` contains the
+Reasonable Monitoring Window, defined in {{reasonable-monitoring-window}}, in
+milliseconds. If the Transparency Log has chosen to define a maximum lifetime
+for log entries, per {{maximum-lifetime}}, this duration in milliseconds is
+stored in the `maximum_lifetime` field.
+
+Finally, `Hash.Nh` is the output size of the ciphersuite hash function in bytes.
+
 ## Update Format
 
-The updates committed to by a combined tree structure contain the new value of a
-label, along with additional information depending on the deployment mode
-of the Transparency Log. They are serialized as follows:
+The updates committed to by the prefix tree contain the new value of a label,
+along with additional information depending on the deployment mode of the
+Transparency Log. They are serialized as follows:
 
 ~~~ tls-presentation
 struct {
@@ -1068,7 +1077,7 @@ MUST successfully verify this signature before consuming `UpdateValue.value`.
 ## Commitment
 
 As discussed in {{combined-tree}}, commitments are stored in the leaves of the
-log tree rather than raw `UpdateValue` structures. Commitments are computed
+prefix tree rather than raw `UpdateValue` structures. Commitments are computed
 with HMAC {{!RFC2104}}, using the hash function specified by the ciphersuite. To
 produce a new commitment, the application generates a random `Nc`-byte value
 called `opening` and computes:
@@ -1089,11 +1098,13 @@ struct {
 
 The `label` field of CommitmentValue contains the label being updated and the
 `update` field contains the new value for the label. The output value
-`commitment` may be published, while `opening` should be kept private until the
-commitment is meant to be revealed.
+`commitment` may be published, while `opening` should only be revealed to users
+that are authorized to receive the label's contents.
 
-The Transparency Log SHOULD generate `opening` in a way such that it can later
-be deleted and not feasibly recovered.
+The Transparency Log MAY generate `opening` in a programmatic way. However, it
+SHOULD ensure that `opening` can later be deleted and not feasibly recovered.
+This preserves the Transparency Log's ability to delete certain information in
+compliance with privacy laws.
 
 ## Verifiable Random Function
 
@@ -1150,6 +1161,8 @@ nodeValue(node):
     return node.value
 ~~~
 
+where `Hash` denotes the ciphersuite hash function.
+
 ## Prefix Tree
 
 The leaf nodes of a prefix tree are serialized as:
@@ -1162,9 +1175,8 @@ struct {
 ~~~
 
 where `vrf_output` is the VRF output for the label-version pair, `VRF.Nh` is the
-output size of the ciphersuite VRF in bytes, `commitment` is the commitment to
-the corresponding `UpdateValue` structure, and `Hash.Nh` is the output size of
-the ciphersuite hash function in bytes.
+output size of the ciphersuite VRF in bytes, and `commitment` is the commitment
+to the corresponding `UpdateValue` structure.
 
 The parent nodes of a prefix tree are serialized as:
 
@@ -1190,8 +1202,6 @@ nodeValue(node):
   else if node.type == parentNode:
     return node.value
 ~~~
-
-where `Hash` denotes the ciphersuite hash function.
 
 
 # Tree Proofs
