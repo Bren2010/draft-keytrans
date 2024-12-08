@@ -965,11 +965,11 @@ Log tree:       o                                o
    need to retain the rightmost distinguished log entry where they've
    verified that the most recent version of the label is correct.  Users
    advertise this log entry's position in their monitor request and the
-   Transparency Log provides a non-truncated (search-style) binary
-   ladder demonstrating the most recent version of the label in (a
-   potentially limited number of) subsequent distinguished log entries.
-   The user inspects each of these for unexpected changes; if there are
-   none, the user updates their retained state.
+   Transparency Log provides a non-truncated binary ladder, described in
+   Section 4.2, demonstrating the greatest version of the label in a
+   number of subsequent distinguished log entries.  The user inspects
+   each of these for unexpected changes; if there are none, the user
+   updates their retained state.
 
    Users MUST verify that they receive a binary ladder for the
    distinguished log entry immediately following the one they've
@@ -984,8 +984,8 @@ Log tree:       o                                o
    created (or for the first time since they took ownership of it), they
    advertise no log entry to the Transparency Log and initialize their
    state by setting it to be the distinguished log entry that terminates
-   monitoring in step 3.  The Transparency Log provides binary ladders
-   for additional subsequent distinguised log entries.
+   monitoring in step 4 above.  The Transparency Log provides binary
+   ladders for additional subsequent distinguised log entries.
 
 7.  Updating Views of the Tree
 
