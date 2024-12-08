@@ -571,7 +571,7 @@ tree), it continues.
 
 This allows the Transparency Log to prune data which is sufficiently old, as
 only a small amount of the log tree and prefix tree outside of the maximum
-lifetime need to be retained. In particular, only a logarithmic number of log
+lifetime need to be retained. Specifically, only a logarithmic number of log
 entries that have passed their maximum lifetime will still be needed by users;
 the rest can be discarded. Pruning is explained in more detail in TODO.
 
@@ -646,7 +646,8 @@ Transparency Log consists of:
 - A batch inclusion proof for all inspected log entries.
 
 Ultimately, users verify that the search was done correctly by using this
-information to recompute the log tree's root hash.
+information to recompute the log tree's root hash. If this verification is
+successful, users move on to opening the target label-version pair's commitment.
 
 
 # Greatest-Version Searches
@@ -671,10 +672,12 @@ child, the right child's right child, and so on until reaching the last log
 entry. From each of these log entries, the user also receives a non-truncated
 binary ladder identifying the greatest version of the label that each contains.
 
-If any of the frontier log entries have a different greatest version than the
-starting log entry, the user verifies that they represent a monotonic series of
-version increases. Assuming they do, the user is provided with the value for the
-greatest version identified.
+As in the previous section, users verify that the log entry timestamps and the
+greatest versions identified in each log entry each represent a
+monotonically-increasing series. Users verify that the search was done correctly
+by recomputing the log tree's root hash. If this verification is successful,
+users move on to opening the commimtent for whichever label-version pair was
+identified as the greatest.
 
 
 # Monitoring the Tree
@@ -705,20 +708,21 @@ expects label owners to perform monitoring. The log entry maximum lifetime, if
 defined, MUST be greater than the RMW.
 
 **Distinguished** log entries are chosen such that there is roughly one per
-every interval of the RMW. If a user looks up a label and finds that the first
-log entry containing their desired label-version pair is to the right of the
-rightmost distinguished log entry, they MUST regularly monitor the label-version
-pair until its monitoring path intersects a distinguished log entry. That is,
-until a new distinguished log entry is established to its right and the two log
-entries are verified to be consistent. The purpose of this monitoring is to
-ensure that the label-version pair is not removed or obscured by the
-Transparency Log before the label owner has had an opportunity to detect it.
+every interval of the RMW. If a user looks up a label, either through a
+fixed-version or greatest-version search, and finds that the first log entry
+containing their desired label-version pair is to the right of the rightmost
+distinguished log entry, they MUST regularly monitor the label-version pair
+until its monitoring path intersects a distinguished log entry. That is, until a
+new distinguished log entry is established to its right and the two log entries
+are verified to be consistent. The purpose of this monitoring is to ensure that
+the label-version pair is not removed or obscured by the Transparency Log before
+the label owner has had an opportunity to detect it.
 
 However, if a user looks up a label and finds that the first log entry
-containing the label-version pair is to the left of any distinguished log entry,
-they are not required to monitor it afterwards or otherwise retain any state
-from the query (beyond the tree head, discussed in
-{{updating-views-of-the-tree}}).
+containing the label-version pair is either a distinguished log entry or to the
+left of any distinguished log entry, they are not required to monitor it
+afterwards. The only state that would be retained from the query would be the
+tree head, as discussed in {{updating-views-of-the-tree}}.
 
 "Regular" monitoring SHOULD be performed at least as frequently as the RMW and
 MUST (if at all possible) happen more frequently than the log entry maximum
@@ -726,25 +730,8 @@ lifetime.
 
 ## Distinguished Log Entries
 
-The process for choosing distinguished log entries is required to meet a number
-of criteria:
-
-- Regularly Spaced: Having irregularly-spaced distinguished log entries risks
-  either overwhelming label owners with a large number of them, or delaying
-  consensus between users by having arbitrarily few. Distinguished log entries
-  must reliably occur at roughly the same interval as the Reasonable Monitoring
-  Window regardless of variations in the tree's growth rate or other factors.
-- Stable: Once a log entry is chosen to be distinguished, it may never stop
-  being distinguished. This ensures that if a user that looked up a label checks
-  consistency with a distinguished log entry, that log entry will not later lose
-  its distinguished status and potentially avoid inspection by the label owner.
-- Verifiable: All users in the system must be capable of interacting with the
-  Transparency Log and determining for themselves which log entries are
-  distinguished and which aren't. This prevents misbehavior by the Transparency
-  Log.
-
-To satisfy these criteria, distinguished log entries are chosen according to the
-following recursive algorithm:
+Distinguished log entries are chosen according to the following recursive
+algorithm:
 
 1. Take as input: a log entry, the timestamp of a log entry to its left, and the
    timestamp of a log entry to its right.
@@ -759,10 +746,24 @@ following recursive algorithm:
    by executing this algorithm with: the given log entry's right child, the
    timestamp of the given log entry, and the given right timestamp.
 
-The recursive nature of the algorithm allows users to easily compute specific
-distinguished log entries such as the rightmost one. Note that step 2 is
-specifically "less than" and not "less than or equal to"; this ensures correct
-behavior when the RMW is zero.
+While the algorithm is recursive, it is initiated with these parameters: the
+root node in the implicit binary search tree, the timestamp of the leftmost log
+entry (regardless of its expiration status), and the timestamp of the rightmost
+log entry. Note that step 2 is specifically "less than" and not "less than or
+equal to"; this ensures correct behavior when the RMW is zero.
+
+This process for choosing distinguished log entries ensures that they are
+**regularly spaced**. Having irregularly-spaced distinguished log entries risks
+either overwhelming label owners with a large number of them, or delaying
+consensus between users by having arbitrarily few. Distinguished log entries
+must reliably occur at roughly the same interval as the Reasonable Monitoring
+Window regardless of variations in the tree's growth rate or other factors.
+
+This process also ensures that distinguished log entries are **stable**. Once a
+log entry is chosen to be distinguished, it will never stop being distinguished.
+This is important because it means that, if a user looks up a label and checks
+consistency with some distinguished log entry, this log entry can't later avoid
+inspection by the label owner by losing its distinguished status.
 
 ## Lower-Bound Binary Ladder
 
@@ -790,36 +791,47 @@ position in the log to a version counter. The version counter is the highest
 version of the label that's been proven to exist at that log position. Users
 initially populate this map by setting the position of the first log entry to
 contain the label-version pair they've looked up to map to that version. A map
-may track several different versions of a label simultaneously, if a user has
+may track several different versions of a label simultaneously if a user has
 been shown different versions of the same label.
 
 To update this map, users receive the most recent tree head from the server and
-follow these steps, for each entry in the map:
+follow these steps for each entry in the map, from rightmost to leftmost log
+entry:
 
-1. Compute the log entry's direct path (in terms of the Implicit Binary Search
-   Tree) based on the current tree size. Remove all entries that are to the left
-   of the log entry. If there are any distinguished log entries remaining,
+1. Determine if the log entry has been declared distinguished. If so, leave
+   the position-version pair in the map and move on to the next map entry.
+2. Compute the log entry's direct path, in terms of the implicit binary search
+   tree, based on the current tree size. Remove all entries that are to the left
+   of the log entry. If any of the remaining log entries are distinguished,
    terminate the list just after the first distinguished log entry.
-2. If the computed list is empty, skip updating this entry; there's no new
-   information to update it with.
-3. For each log entry in the computed list, from low to high:
-   1. Receive and verify a binary ladder from that log entry for the version
+3. If the computed list is empty, leave the position-version pair in the map
+   and move on to the next map entry.
+4. For each log entry in the computed list, from left to right:
+   1. Check if this log entry already has an entry in the map with a greater
+      version. If so, this version of the label no longer needs to be monitored.
+      Remove the current position-version pair (the one with the lesser version)
+      from the map and move on to the next map entry.
+   2. Receive and verify a lower-bound binary ladder, described in
+      {{lower-bound-binary-ladder}}, from this log entry for the version
       currently in the map. This proves that, at the indicated log entry, the
       highest version present is greater than or equal to the
       previously-observed version.
-   2. If the above check fails, return an error to the user. Otherwise, remove
-      the current position-version pair from the map.
-   3. If the log entry that we received the binary ladder for is not
-      distinguished, replace the position-version pair that was just removed
-      with a new one for the higher log entry.
+   3. If the above check fails, return an error to the user. Otherwise, remove
+      the current position-version pair from the map and replace it with a new
+      one, with the position of the log entry the binary ladder came from.
 
-This algorithm progressively moves up the tree as new intermediate/root nodes
-are established and verifies that they're constructed correctly. Once a
-distinguished log entry is reached and successfully verified, the descendent
-entries are no longer necessary and removed from the map. Note that users can
-often execute this process with the output of Search or Update operations for a
-label without waiting to make explicit Monitor queries.
+Once the map entries are updated according to this process, the final step of
+monitoring is to remove all mappings where the position corresponds to a
+distinguished log entry.
 
+In summary, monitoring works by progressively moving up the tree as new
+intermediate/root nodes are established and verifying that they're constructed
+correctly. Once a distinguished log entry is reached and successfully verified,
+monitoring is no longer necessary and the relevant entry is removed from the
+map.
+
+Note that users can often execute this process with the output of Search or
+Update operations for a label without waiting to make explicit Monitor queries.
 It is also worth noting that the work required to monitor several versions of
 the same label scales sublinearly due to the fact that the direct paths of the
 different versions will often intersect. Intersections reduce the total number
@@ -1281,7 +1293,7 @@ struct {
 
 struct {
   uint64 timestamp;
-  PrefixProof prefix_proof;
+  PrefixProof prefix_proof; // TODO: May just need to provide root hash
 } ProofStep;
 
 struct {
@@ -1372,6 +1384,10 @@ tree.
 
 The basic user operations are organized as a request-response protocol between a
 user and the Transparency Log operator.
+
+Modifications to a user's state MUST only be persisted once the query response
+has been fully verified. Equivalently, queries that fail to verify MUST NOT
+modify the user's protocol state.
 
 Users MUST retain the most recent `TreeHead` they've successfully
 verified as part of any query response, and populate the `last` field of any
