@@ -2390,7 +2390,7 @@ monitor the label from then on.<a href="#section-6.4-6" class="pilcrow">¶</a></
 <p id="section-6.4.1-1">If the user owns the label being monitored, they will additionally need to
 retain the rightmost distinguished log entry where they've verified that the
 most recent version of the label is correct. Users advertise this log entry's
-position in their monitor request and the Transparency Log provides a
+position in their Monitor request and the Transparency Log provides a
 non-truncated binary ladder, described in <a href="#binary-ladder" class="auto internal xref">Section 4.2</a>, demonstrating the
 greatest version of the label in a number of subsequent distinguished log
 entries. The user inspects each of these for unexpected changes; if there are
@@ -2431,7 +2431,7 @@ same log entries as B (with some new ones potentially added).<a href="#section-7
         <li class="normal" id="section-7-2.2">
           <p id="section-7-2.2.1">If the rightmost log entry of the tree with root hash A has timestamp
 T_a, and the rightmost log entry of the tree with root hash B has timestamp
-T_b, then T_a is greater than T_b.<a href="#section-7-2.2.1" class="pilcrow">¶</a></p>
+T_b, then T_a is greater than or equal to T_b.<a href="#section-7-2.2.1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-7-2.2.2.1">
               <p id="section-7-2.2.2.1.1">Furthermore, all log entries between the rightmost log entry of A and the
@@ -2452,13 +2452,13 @@ certain labels, or which portions of the tree to skip when searching.<a href="#s
 they've observed:<a href="#section-7-4" class="pilcrow">¶</a></p>
 <ol start="1" type="1" class="normal type-1" id="section-7-5">
 <li id="section-7-5.1">
-          <p id="section-7-5.1.1">The "size" of the log tree (the number of log entries it contains).<a href="#section-7-5.1.1" class="pilcrow">¶</a></p>
+          <p id="section-7-5.1.1">The "size" of the log tree, defined as the number of log entries it contains.<a href="#section-7-5.1.1" class="pilcrow">¶</a></p>
 </li>
         <li id="section-7-5.2">
-          <p id="section-7-5.2.1">The root hashes of the "full subtrees" of the log tree (those subtrees which
-are the largest powers of two possible). This allows the Transparency Log to
-provide more space-efficient consistency and inclusion proofs than if just
-the root hash was retained.<a href="#section-7-5.2.1" class="pilcrow">¶</a></p>
+          <p id="section-7-5.2.1">The root hashes of the "full subtrees" of the log tree. The full subtrees are
+those which are the largest powers of two possible. This allows the
+Transparency Log to provide more space-efficient consistency and inclusion
+proofs than if just the root hash was retained.<a href="#section-7-5.2.1" class="pilcrow">¶</a></p>
 </li>
         <li id="section-7-5.3">
           <p id="section-7-5.3.1">The timestamps of the log entries along the frontier. As will be described
@@ -2475,7 +2475,7 @@ monotonically increasing timestamps, is done as follows:<a href="#section-7-7" c
 <ul class="normal">
 <li class="normal" id="section-7-8.1">
           <p id="section-7-8.1.1">Starting with the log entry that was advertised by the user, compute its
-direct path (in terms of the implicit binary search tree) in the new tree.
+direct path in the new tree in terms of the implicit binary search tree.
 Provide the log entry timestamp and prefix tree root hash for each element
 of the direct path that's to the right of the advertised log entry.<a href="#section-7-8.1.1" class="pilcrow">¶</a></p>
 </li>
@@ -2504,16 +2504,11 @@ the user.<a href="#section-7-10" class="pilcrow">¶</a></p>
 the tree is acceptable, and how far ahead of the current time a view of the tree
 may claim to be. Users verify that the rightmost log entry's timestamp falls
 within this range according to their local clock.<a href="#section-7-11" class="pilcrow">¶</a></p>
-<p id="section-7-12">Only once the user successfully verifies that the log entries' timestamps are
-monotonic, that it correctly computed the new root hash, and that the rightmost
-log entry's timestamp is in an acceptable range, can they update their stored
-state to replace the previous tree head with the new one.<a href="#section-7-12" class="pilcrow">¶</a></p>
-<p id="section-7-13">For users which have never interacted with the Transparency Log before and don't
+<p id="section-7-12">For users which have never interacted with the Transparency Log before and don't
 have a previous tree head to advertise, the Transparency Log simply provides the
 timestamps and prefix tree root hashes of the log entries on the frontier, along
-with an inclusion proof. The user verifies that the timestamps are monotonic. If
-this is successful, the user retains the log tree's full subtrees and the
-frontier timestamps for future queries.<a href="#section-7-13" class="pilcrow">¶</a></p>
+with an inclusion proof. Same as above, the user verifies that the timestamps
+are monotonic.<a href="#section-7-12" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="ciphersuites">
@@ -2599,6 +2594,11 @@ struct {
     case thirdPartyAuditing:
       opaque auditor_public_key&lt;0..2^16-1&gt;;
   };
+
+  uint64 max_ahead;
+  unit64 max_behind;
+  uint64 reasonable_monitoring_window;
+  optional&lt;uint64&gt; maximum_lifetime;
 } Configuration;
 
 struct {
@@ -2608,6 +2608,14 @@ struct {
 } TreeHeadTBS;
 </pre><a href="#section-9.1-5" class="pilcrow">¶</a>
 </div>
+<p id="section-9.1-6">The <code>max_ahead</code> and <code>max_behind</code> fields contain the maximum amount of time in
+milliseconds that a tree head may be ahead of or behind the user's local clock
+without being rejected. The <code>reasonable_monitoring_window</code> contains the
+Reasonable Monitoring Window, defined in <a href="#reasonable-monitoring-window" class="auto internal xref">Section 6.1</a>, in
+milliseconds. If the Transparency Log has chosen to define a maximum lifetime
+for log entries, per <a href="#maximum-lifetime" class="auto internal xref">Section 4.3</a>, this duration in milliseconds is
+stored in the <code>maximum_lifetime</code> field.<a href="#section-9.1-6" class="pilcrow">¶</a></p>
+<p id="section-9.1-7">Finally, <code>Hash.Nh</code> is the output size of the ciphersuite hash function in bytes.<a href="#section-9.1-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="update-format">
@@ -2615,9 +2623,9 @@ struct {
         <h3 id="name-update-format">
 <a href="#section-9.2" class="section-number selfRef">9.2. </a><a href="#name-update-format" class="section-name selfRef">Update Format</a>
         </h3>
-<p id="section-9.2-1">The updates committed to by a combined tree structure contain the new value of a
-label, along with additional information depending on the deployment mode
-of the Transparency Log. They are serialized as follows:<a href="#section-9.2-1" class="pilcrow">¶</a></p>
+<p id="section-9.2-1">The updates committed to by the prefix tree contain the new value of a label,
+along with additional information depending on the deployment mode of the
+Transparency Log. They are serialized as follows:<a href="#section-9.2-1" class="pilcrow">¶</a></p>
 <div class="lang-tls-presentation sourcecode" id="section-9.2-2">
 <pre>
 struct {
@@ -2657,7 +2665,7 @@ version, and <code>value</code> contains the same contents as <code>UpdateValue.
 <a href="#section-9.3" class="section-number selfRef">9.3. </a><a href="#name-commitment" class="section-name selfRef">Commitment</a>
         </h3>
 <p id="section-9.3-1">As discussed in <a href="#combined-tree" class="auto internal xref">Section 3.4</a>, commitments are stored in the leaves of the
-log tree rather than raw <code>UpdateValue</code> structures. Commitments are computed
+prefix tree rather than raw <code>UpdateValue</code> structures. Commitments are computed
 with HMAC <span>[<a href="#RFC2104" class="cite xref">RFC2104</a>]</span>, using the hash function specified by the ciphersuite. To
 produce a new commitment, the application generates a random <code>Nc</code>-byte value
 called <code>opening</code> and computes:<a href="#section-9.3-1" class="pilcrow">¶</a></p>
@@ -2678,10 +2686,12 @@ struct {
 </div>
 <p id="section-9.3-5">The <code>label</code> field of CommitmentValue contains the label being updated and the
 <code>update</code> field contains the new value for the label. The output value
-<code>commitment</code> may be published, while <code>opening</code> should be kept private until the
-commitment is meant to be revealed.<a href="#section-9.3-5" class="pilcrow">¶</a></p>
-<p id="section-9.3-6">The Transparency Log <span class="bcp14">SHOULD</span> generate <code>opening</code> in a way such that it can later
-be deleted and not feasibly recovered.<a href="#section-9.3-6" class="pilcrow">¶</a></p>
+<code>commitment</code> may be published, while <code>opening</code> should only be revealed to users
+that are authorized to receive the label's contents.<a href="#section-9.3-5" class="pilcrow">¶</a></p>
+<p id="section-9.3-6">The Transparency Log <span class="bcp14">MAY</span> generate <code>opening</code> in a programmatic way. However, it
+<span class="bcp14">SHOULD</span> ensure that <code>opening</code> can later be deleted and not feasibly recovered.
+This preserves the Transparency Log's ability to delete certain information in
+compliance with privacy laws.<a href="#section-9.3-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="verifiable-random-function">
@@ -2745,6 +2755,7 @@ nodeValue(node):
     return node.value
 </pre><a href="#section-9.5-5" class="pilcrow">¶</a>
 </div>
+<p id="section-9.5-6">where <code>Hash</code> denotes the ciphersuite hash function.<a href="#section-9.5-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="prefix-tree-1">
@@ -2762,9 +2773,8 @@ struct {
 </pre><a href="#section-9.6-2" class="pilcrow">¶</a>
 </div>
 <p id="section-9.6-3">where <code>vrf_output</code> is the VRF output for the label-version pair, <code>VRF.Nh</code> is the
-output size of the ciphersuite VRF in bytes, <code>commitment</code> is the commitment to
-the corresponding <code>UpdateValue</code> structure, and <code>Hash.Nh</code> is the output size of
-the ciphersuite hash function in bytes.<a href="#section-9.6-3" class="pilcrow">¶</a></p>
+output size of the ciphersuite VRF in bytes, and <code>commitment</code> is the commitment
+to the corresponding <code>UpdateValue</code> structure.<a href="#section-9.6-3" class="pilcrow">¶</a></p>
 <p id="section-9.6-4">The parent nodes of a prefix tree are serialized as:<a href="#section-9.6-4" class="pilcrow">¶</a></p>
 <div class="lang-tls sourcecode" id="section-9.6-5">
 <pre>
@@ -2790,7 +2800,6 @@ nodeValue(node):
     return node.value
 </pre><a href="#section-9.6-7" class="pilcrow">¶</a>
 </div>
-<p id="section-9.6-8">where <code>Hash</code> denotes the ciphersuite hash function.<a href="#section-9.6-8" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
