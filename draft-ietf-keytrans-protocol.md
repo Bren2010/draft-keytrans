@@ -844,8 +844,8 @@ If the user owns the label being monitored, they will additionally need to
 retain the rightmost distinguished log entry where they've verified that the
 most recent version of the label is correct. Users advertise this log entry's
 position in their monitor request and the Transparency Log provides a
-non-truncated (search-style) binary ladder demonstrating the most recent version
-of the label in (a potentially limited number of) subsequent distinguished log
+non-truncated binary ladder, described in {{binary-ladder}}, demonstrating the
+greatest version of the label in a number of subsequent distinguished log
 entries. The user inspects each of these for unexpected changes; if there are
 none, the user updates their retained state.
 
@@ -859,8 +859,9 @@ distinguished log entries it provides binary ladders for in a single response.
 If the user is monitoring the label for the first time since it was created (or
 for the first time since they took ownership of it), they advertise no log entry
 to the Transparency Log and initialize their state by setting it to be the
-distinguished log entry that terminates monitoring in step 3. The Transparency
-Log provides binary ladders for additional subsequent distinguised log entries.
+distinguished log entry that terminates monitoring in step 4 above. The
+Transparency Log provides binary ladders for additional subsequent distinguised
+log entries.
 
 
 # Updating Views of the Tree
