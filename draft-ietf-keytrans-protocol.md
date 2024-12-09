@@ -230,8 +230,8 @@ value.
 
 However, the protocol described in this document generally doesn't provide pure
 inclusion or consistency proofs to verifiers. Instead, it relies on the more
-general idea of providing the minimum set of intermediate node values that are
-necessary to allow a verifier to compute one or more root values from
+general idea of providing the smallest number of intermediate node values that are
+necessary to allow a verifier to compute the tree's root hash from
 intermediate and leaf values that they already have. The verifier may already have
 intermediate and leaf values because they were provided by the Transparency Log as
 part of its response to the current query, or because they were retained from
@@ -1208,11 +1208,10 @@ nodeValue(node):
 
 ## Log Tree
 
-An inclusion proof for a single leaf in a log tree is given by providing the
-copath values of a leaf. Similarly, a bulk inclusion proof for many
-leaves is given by providing the fewest node values that can be hashed together
-with the specified leaves, and any intermediate values retained by the verifier,
-to produce the root value. Such a proof is encoded as:
+The inclusion of some leaf in a tree head, or consistency between two tree
+heads, is proven by providing the smallest set of intermediate nodes from the
+log tree that allows the user to compute the tree's root hash from the leaf or
+other intermediate node values they already have. Such a proof is encoded as:
 
 ~~~ tls-presentation
 opaque NodeValue<Hash.Nh>;
@@ -1263,9 +1262,9 @@ struct {
 ~~~
 
 The `results` field contains the search result for each individual value. It is
-sorted lexicographically by VRF output. The `result_type` field of each
-`PrefixSearchResult` struct indicates what the terminal node of the search for
-that value was:
+sorted lexicographically by search key (which is always a VRF output in this
+protocol). The `result_type` field of each `PrefixSearchResult` struct indicates
+what the terminal node of the search for that value was:
 
 - `inclusion` for a leaf node matching the requested value.
 - `nonInclusionLeaf` for a leaf node not matching the requested value. In this
@@ -1284,8 +1283,8 @@ that a node is not present, an all-zero byte string of length `Hash.Nh` is
 listed instead.
 
 The proof is verified by hashing together the provided elements, in the
-left/right arrangement dictated by the tree structure, and checking that the
-result equals the root value of the prefix tree.
+left/right arrangement dictated by the bits of the search keys, and checking
+that the result equals the root value of the prefix tree.
 
 ## Combined Tree {#proof-combined-tree}
 
