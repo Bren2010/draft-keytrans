@@ -99,8 +99,9 @@ Table of Contents
      10.1.  Log Tree
      10.2.  Prefix Tree
      10.3.  Combined Tree
-       10.3.1.  Fixed-Version
-       10.3.2.  Proofs for Third-Party Auditing
+       10.3.1.  Updating View
+       10.3.2.  Fixed-Version Search
+       10.3.3.  Greatest-Version Search
    11. User Operations
      11.1.  Search
      11.2.  Update
@@ -712,30 +713,9 @@ Log tree:       o                                o
    added and then enforce that binary searches for that version will
    always converge back to that same log entry.
 
-   To allow users to execute this algorithm, the concrete data provided
-   by the Transparency Log consists of:
-
-   *  For each version of the label looked up in a binary ladder: the
-      commitment corresponding to the label's value at that version.
-
-   *  For each log entry inspected by the search:
-
-      -  The log entry's timestamp
-
-      -  If a binary ladder is required: a batch search proof in the log
-         entry's prefix tree for all of the different label-version
-         pairs that constitute the binary ladder (potentially including
-         the label-version pair needed by step 6).
-
-      -  If a binary ladder is not required: the log entry's prefix tree
-         root hash.
-
-   *  A batch inclusion proof for all inspected log entries.
-
-   Ultimately, users verify that the search was done correctly by using
-   this information to recompute the log tree's root hash.  If this
-   verification is successful, users move on to opening the target
-   label-version pair's commitment.
+   Once users successfully complete the search and the specified
+   verification, they move on to opening the target label-version pair's
+   commitment.
 
 5.  Greatest-Version Searches
 
@@ -763,11 +743,9 @@ Log tree:       o                                o
 
    As in the previous section, users verify that the log entry
    timestamps and the greatest versions identified in each log entry
-   each represent a monotonically-increasing series.  Users verify that
-   the search was done correctly by recomputing the log tree's root
-   hash.  If this verification is successful, users move on to opening
-   the commimtent for whichever label-version pair was identified as the
-   greatest.
+   each represent a monotonically-increasing series.  If this
+   verification is successful, users move on to opening the commimtent
+   for whichever label-version pair was identified as the greatest.
 
 6.  Monitoring the Tree
 
@@ -1451,118 +1429,79 @@ Log tree:       o                                o
    timestamp was provided in timestamps but a search proof was not
    provided in prefix_proofs.
 
-   If a log entry is referenced multiple times, it is only added to the
-   CombinedTreeProof the first time.  Additionally, when a user
+   If a log entry's timestamp is referenced multiple times, it is only
+   added to the timestamps the first time.  Additionally, when a user
    advertises a previously-observed tree size in their request, log
    entry timestamps which the user is expected to have retained are
    excluded from timestamps.
+
+   The prefix_proofs array differs from the timestamps array in two
+   important ways.  First, it is possible for the same log entry to have
+   multiple entries in prefix_proofs if it is referenced multiple times.
+   Users MUST verify that all PrefixProof structures corresponding to
+   the same log entry compute the same prefix tree root hash.  Second,
+   while every log entry with a timestamp in timestamps will also be
+   referenced in either prefix_proofs or prefix_roots, the inverse is
+   not true.  There may be elements of prefix_proofs or prefix_roots
+   that correspond to log entries that are not in timestamps if the user
+   is expected to have retained the log entry's timestamp.
 
    Users processing a CombinedTreeProof MUST verify that each field
    contains exactly the expected number of entries -- no more and no
    less.
 
-10.3.1.  Fixed-Version
+10.3.1.  Updating View
 
-   Searching the combined tree for a specific version of a label follows
-   the execution of a binary search through the leaves of the log tree,
-   as described in Section 4.  It is serialized as follows:
+   For a user to update their view of the tree, the following is
+   provided:
 
-   struct {
-     opaque proof<VRF.Np>;
-     opaque commitment<Hash.Nh>;
-   } BinaryLadderStep;
+   *  If the user has not previously observed a tree head, the timestamp
+      of each log entry along the frontier.
 
-   struct {
-     uint64 timestamp;
-     PrefixProof prefix_proof; // TODO: May just need to provide root hash
-   } ProofStep;
+   *  If the user has previously observed a tree head, the timestamps of
+      each log entry from the list computed in Section 7.
 
-   struct {
-     BinaryLadderStep binary_ladder<0..2^8-1>;
-     ProofStep steps<0..2^8-1>;
-     InclusionProof inclusion;
-   } SearchProof;
+   Users verify that the timestamps represent a monotonic series, and
+   that the rightmost timestamp is within the bounds defined by
+   max_ahead and max_behind.
 
-   Each element of binary_ladder corresponds to the steps of the binary
-   ladder described in Section 4.2.  The proof field contains the
-   contains the output of evaluating the VRF on a specified version of
-   the label, and commitment contains the commitment to the UpdateValue
-   of the label-version pair.  The elements of binary_ladder are in the
-   same order as they were computed in Section 4.2.
+10.3.2.  Fixed-Version Search
 
-   Each ProofStep structure in steps is one log entry that was inspected
-   as part of the binary search.  The first step corresponds to the
-   "middle" leaf of the log tree (calculated with the root function in
-   Section 4.1).  From there, each subsequent step moves left or right
-   in the tree according to the procedure discussed in Section 4.
+   For a user to search the combined tree for a specific version of a
+   label, the following is provided:
 
-   The timestamp field of a ProofStep contains the log entry's
-   timestamp, and the prefix_proof field contains the output of
-   executing a binary ladder in the version of the prefix tree stored in
-   the log entry.  The binary ladder is truncated, meaning that it stops
-   after the first proof of inclusion for a version greater than or
-   equal to the target version, or the first proof of non-inclusion for
-   a version less than the target version.
+   *  For each log entry touched by the algorithm in Section 4.4:
 
-   Furthermore, for any ladder steps for which a proof of inclusion is
-   expected and a proof of inclusion was already provided in a previous
-   ProofStep for a log entry to the left of the current one, these
-   ladder steps are omitted from prefix_proof.
+      -  The log entry's timestamp.
 
-   Finally, the inclusion field of SearchProof contains a batch
-   inclusion proof for all of the leaves accessed by the binary search.
+      -  If the log entry has surpassed its maximum lifetime and is on
+         the frontier, the right child's timestamp.
 
-   The proof can be verified by the following steps:
+      -  If it is not the case that the log entry has surpassed its
+         maximum lifetime, is on the frontier, and the log entry's right
+         child has also surpassed its maximum lifetime, then a
+         PrefixProof corresponding to a binary ladder in the log entry's
+         prefix tree is provided.
 
-   1.  Verify that the binary_ladder array has the expected number of
-       entries and compute the VRF output for each label-version pair in
-       the ladder.
+   *  If the PrefixProof from the first log entry to contain the label-
+      version pair didn't touch the target version, provide a second
+      PrefixProof from this log entry specifically looking up the target
+      version.
 
-   2.  Follow the algorithm in Section 4.
+   Users verify the output as specified in Section 4.4.
 
-   3.  Verify that the steps array has the exact number of entries
-       necessary to execute the binary search (no more or less).
+10.3.3.  Greatest-Version Search
 
-   4.  Compute the root of each prefix tree represented by a
-       prefix_proof and combine it with the corresponding timestamp to
-       obtain the value of each leaf.
+   For a user to search the combined tree for the greatest version of a
+   label, the following is provided:
 
-   5.  Combine the leaf values with the proof in inclusion to compute a
-       candidate value for the root of the log tree.  Verify the root is
-       correct.
+   *  For each log entry along the frontier, starting from the log entry
+      identified in Section 5: a PrefixProof corresponding to a non-
+      truncated binary ladder.
 
-10.3.2.  Proofs for Third-Party Auditing
-
-   In third-party auditing, clients can rely on the assumption that the
-   prefix tree is monitored to be append-only.  Therefore, they need not
-   execute the binary ladder but the proof can directly jump to the
-   index identified by the prefix tree leaf.
-
-   struct {
-     optional<uint32> version;
-     VRFProof vrf_proofs<0..2^8-1>;
-     PrefixProof prefix_proof;
-     InclusionProof inclusion;
-   } SearchProofCompact;
-
-   The semantics of the version field do not change.
-
-   Similarly to SearchProof, vrf_proofs contains the output of
-   evaluating the VRF on a different version of the label.  Either one
-   version will be included (when requesting a specific version) or the
-   versions to verify the full binary ladder (when requesting the latest
-   version).
-
-   prefix_proof contains the proof to either verify the inclusion of the
-   label-version pair (when requesting a specific version) or to verify
-   the full binary ladder (when requesting the latest version).  Both
-   types of proofs are for the most recent prefix tree.
-
-   inclusion contains a batch inclusion of the most recent leaf and the
-   leaf that commits to respective value for the request label-version
-   pair.  The most recent leaf is needed to obtain the prefix tree's
-   root hash, and the leaf committing to the requested value will be at
-   the index identified in the most recent prefix tree.
+   Note that the log entry timestamps are already provided as part of
+   updating the user's view of the tree, and that no additional
+   timestamps are necessary to identify the starting log entry.
 
 11.  User Operations
 
