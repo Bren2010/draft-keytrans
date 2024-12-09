@@ -2905,6 +2905,41 @@ that the result equals the root value of the prefix tree.<a href="#section-10.2-
         <h3 id="name-combined-tree-2">
 <a href="#section-10.3" class="section-number selfRef">10.3. </a><a href="#name-combined-tree-2" class="section-name selfRef">Combined Tree</a>
         </h3>
+<p id="section-10.3-1">As users execute the algorithms for searching, monitoring, or updating their
+view of the tree, they inspect a series of leaves in the log tree. For some of
+these leaves, only the timestamp of the log entry is needed. For other leaves,
+both the timestamp and a <code>PrefixProof</code> from the log entry's prefix tree are
+needed.<a href="#section-10.3-1" class="pilcrow">¶</a></p>
+<p id="section-10.3-2">The general pattern used for constructing proofs for these algorithms is to
+output the timestamp or <code>PrefixProof</code> from each log entry in the order that it's
+consumed by the algorithm the user is running. For the purpose of this protocol,
+the user always executes the algorithm to update its view of the tree, described
+in <a href="#updating-views-of-the-tree" class="auto internal xref">Section 7</a>, followed immediately by one of the algorithms
+to search or monitor the current tree.<a href="#section-10.3-2" class="pilcrow">¶</a></p>
+<p id="section-10.3-3">Proofs are encoded as follows:<a href="#section-10.3-3" class="pilcrow">¶</a></p>
+<div class="lang-tls sourcecode" id="section-10.3-4">
+<pre>
+struct {
+  uint64 timestamps&lt;0..2^8-1&gt;;
+  PrefixProof prefix_proofs&lt;0..2^8-1&gt;;
+  NodeValue prefix_roots&lt;0..2^8-1&gt;;
+} CombinedTreeProof;
+</pre><a href="#section-10.3-4" class="pilcrow">¶</a>
+</div>
+<p id="section-10.3-5">The elements of the <code>timestamps</code> field are the timestamps of log entries, and
+the elements of the <code>prefix_proofs</code> field are search proofs from the prefix
+trees at particular log entries. There is no explicit indication as to which log
+entry the elements correspond to, as they are provided in the order that they're
+meant to be consumed. The elements of the <code>prefix_roots</code> field contain, in
+left-to-right order, the prefix tree root hashes for any log entries whose
+timestamp was provided in <code>timestamps</code> but a search proof was not provided in
+<code>prefix_proofs</code>.<a href="#section-10.3-5" class="pilcrow">¶</a></p>
+<p id="section-10.3-6">If a log entry is referenced multiple times, it is only added to the
+<code>CombinedTreeProof</code> the first time. Additionally, when a user advertises a
+previously-observed tree size in their request, log entry timestamps which the
+user is expected to have retained are excluded from <code>timestamps</code>.<a href="#section-10.3-6" class="pilcrow">¶</a></p>
+<p id="section-10.3-7">Users processing a <code>CombinedTreeProof</code> <span class="bcp14">MUST</span> verify that each field contains
+exactly the expected number of entries -- no more and no less.<a href="#section-10.3-7" class="pilcrow">¶</a></p>
 <div id="fixed-version">
 <section id="section-10.3.1">
           <h4 id="name-fixed-version">

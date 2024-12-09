@@ -1419,6 +1419,48 @@ Log tree:       o                                o
 
 10.3.  Combined Tree
 
+   As users execute the algorithms for searching, monitoring, or
+   updating their view of the tree, they inspect a series of leaves in
+   the log tree.  For some of these leaves, only the timestamp of the
+   log entry is needed.  For other leaves, both the timestamp and a
+   PrefixProof from the log entry's prefix tree are needed.
+
+   The general pattern used for constructing proofs for these algorithms
+   is to output the timestamp or PrefixProof from each log entry in the
+   order that it's consumed by the algorithm the user is running.  For
+   the purpose of this protocol, the user always executes the algorithm
+   to update its view of the tree, described in Section 7, followed
+   immediately by one of the algorithms to search or monitor the current
+   tree.
+
+   Proofs are encoded as follows:
+
+   struct {
+     uint64 timestamps<0..2^8-1>;
+     PrefixProof prefix_proofs<0..2^8-1>;
+     NodeValue prefix_roots<0..2^8-1>;
+   } CombinedTreeProof;
+
+   The elements of the timestamps field are the timestamps of log
+   entries, and the elements of the prefix_proofs field are search
+   proofs from the prefix trees at particular log entries.  There is no
+   explicit indication as to which log entry the elements correspond to,
+   as they are provided in the order that they're meant to be consumed.
+   The elements of the prefix_roots field contain, in left-to-right
+   order, the prefix tree root hashes for any log entries whose
+   timestamp was provided in timestamps but a search proof was not
+   provided in prefix_proofs.
+
+   If a log entry is referenced multiple times, it is only added to the
+   CombinedTreeProof the first time.  Additionally, when a user
+   advertises a previously-observed tree size in their request, log
+   entry timestamps which the user is expected to have retained are
+   excluded from timestamps.
+
+   Users processing a CombinedTreeProof MUST verify that each field
+   contains exactly the expected number of entries -- no more and no
+   less.
+
 10.3.1.  Fixed-Version
 
    Searching the combined tree for a specific version of a label follows
