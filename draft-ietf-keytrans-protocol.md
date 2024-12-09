@@ -575,7 +575,7 @@ lifetime need to be retained. Specifically, only a logarithmic number of log
 entries that have passed their maximum lifetime will still be needed by users;
 the rest can be discarded. Pruning is explained in more detail in TODO.
 
-## Algorithm
+## Algorithm {#fixed-version-algorithm}
 
 The algorithm for performing a fixed-version search (a search for a specific
 version of a label) is described below as a recursive algorithm. It starts with
@@ -631,23 +631,8 @@ created correctly in the one epoch where it was first added and then enforce
 that binary searches for that version will always converge back to that same log
 entry.
 
-To allow users to execute this algorithm, the concrete data provided by the
-Transparency Log consists of:
-
-- For each version of the label looked up in a binary ladder: the commitment
-  corresponding to the label's value at that version.
-- For each log entry inspected by the search:
-  - The log entry's timestamp
-  - If a binary ladder is required: a batch search proof in the log entry's
-    prefix tree for all of the different label-version pairs that constitute the
-    binary ladder (potentially including the label-version pair needed by step
-    6).
-  - If a binary ladder is not required: the log entry's prefix tree root hash.
-- A batch inclusion proof for all inspected log entries.
-
-Ultimately, users verify that the search was done correctly by using this
-information to recompute the log tree's root hash. If this verification is
-successful, users move on to opening the target label-version pair's commitment.
+Once users successfully complete the search and the specified verification, they
+move on to opening the target label-version pair's commitment.
 
 
 # Greatest-Version Searches
@@ -674,10 +659,9 @@ binary ladder identifying the greatest version of the label that each contains.
 
 As in the previous section, users verify that the log entry timestamps and the
 greatest versions identified in each log entry each represent a
-monotonically-increasing series. Users verify that the search was done correctly
-by recomputing the log tree's root hash. If this verification is successful,
-users move on to opening the commimtent for whichever label-version pair was
-identified as the greatest.
+monotonically-increasing series. If this verification is successful, users move
+on to opening the commimtent for whichever label-version pair was identified as
+the greatest.
 
 
 # Monitoring the Tree
@@ -1320,14 +1304,70 @@ left-to-right order, the prefix tree root hashes for any log entries whose
 timestamp was provided in `timestamps` but a search proof was not provided in
 `prefix_proofs`.
 
-If a log entry is referenced multiple times, it is only added to the
-`CombinedTreeProof` the first time. Additionally, when a user advertises a
+If a log entry's timestamp is referenced multiple times, it is only added to the
+`timestamps` the first time. Additionally, when a user advertises a
 previously-observed tree size in their request, log entry timestamps which the
 user is expected to have retained are excluded from `timestamps`.
+
+The `prefix_proofs` array differs from the `timestamps` array in two important
+ways. First, it is possible for the same log entry to have multiple entries in
+`prefix_proofs` if it is referenced multiple times. Users MUST verify that all
+`PrefixProof` structures corresponding to the same log entry compute the same
+prefix tree root hash. Second, while every log entry with a timestamp in
+`timestamps` will also be referenced in either `prefix_proofs` or
+`prefix_roots`, the inverse is not true. There may be elements of
+`prefix_proofs` or `prefix_roots` that correspond to log entries that are not in
+`timestamps` if the user is expected to have retained the log entry's timestamp.
 
 Users processing a `CombinedTreeProof` MUST verify that each field contains
 exactly the expected number of entries -- no more and no less.
 
+### Updating View
+
+For a user to update their view of the tree, the following is provided:
+
+- If the user has not previously observed a tree head, the timestamp of each log
+  entry along the frontier.
+- If the user has previously observed a tree head, the timestamps of each log
+  entry from the list computed in {{updating-views-of-the-tree}}.
+
+Users verify that the timestamps represent a monotonic series, and that the
+rightmost timestamp is within the bounds defined by `max_ahead` and
+`max_behind`.
+
+### Fixed-Version Search
+
+For a user to search the combined tree for a specific version of a label, the
+following is provided:
+
+- For each log entry touched by the algorithm in {{fixed-version-algorithm}}:
+  - The log entry's timestamp.
+  - If the log entry has surpassed its maximum lifetime and is on the frontier,
+    the right child's timestamp.
+  - If it is not the case that the log entry has surpassed its maximum lifetime,
+    is on the frontier, and the log entry's right child has also surpassed its
+    maximum lifetime, then a `PrefixProof` corresponding to a binary ladder in
+    the log entry's prefix tree is provided.
+- If the `PrefixProof` from the first log entry to contain the label-version
+  pair didn't touch the target version, provide a second `PrefixProof` from this
+  log entry specifically looking up the target version.
+
+Users verify the output as specified in {{fixed-version-algorithm}}.
+
+### Greatest-Version Search
+
+For a user to search the combined tree for the greatest version of a label, the
+following is provided:
+
+- For each log entry along the frontier, starting from the log entry identified
+  in {{greatest-version-searches}}: a `PrefixProof` corresponding to a
+  non-truncated binary ladder.
+
+Note that the log entry timestamps are already provided as part of updating the
+user's view of the tree, and that no additional timestamps are necessary to
+identify the starting log entry.
+
+<!--
 ### Fixed-Version
 
 Searching the combined tree for a specific version of a label follows the
@@ -1428,6 +1468,8 @@ commits to respective value for the request label-version pair. The most recent
 leaf is needed to obtain the prefix tree's root hash, and the leaf committing to
 the requested value will be at the index identified in the most recent prefix
 tree.
+
+-->
 
 
 # User Operations
