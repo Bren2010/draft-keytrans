@@ -5,7 +5,7 @@
 KEYTRANS Working Group                                      B. McMillion
 Internet-Draft                                                          
 Intended status: Standards Track                               F. Linker
-Expires: 11 June 2025                                    8 December 2024
+Expires: 12 June 2025                                    9 December 2024
 
 
                        Key Transparency Protocol
@@ -49,7 +49,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 11 June 2025.
+   This Internet-Draft will expire on 12 June 2025.
 
 Copyright Notice
 
@@ -275,11 +275,11 @@ Table of Contents
 
    However, the protocol described in this document generally doesn't
    provide pure inclusion or consistency proofs to verifiers.  Instead,
-   it relies on the more general idea of providing the minimum set of
-   intermediate node values that are necessary to allow a verifier to
-   compute one or more root values from intermediate and leaf values
-   that they already have.  The verifier may already have intermediate
-   and leaf values because they were provided by the Transparency Log as
+   it relies on the more general idea of providing the smallest number
+   of intermediate node values that are necessary to allow a verifier to
+   compute the tree's root hash from intermediate and leaf values that
+   they already have.  The verifier may already have intermediate and
+   leaf values because they were provided by the Transparency Log as
    part of its response to the current query, or because they were
    retained from responses to previous queries.  This pattern of
    providing proofs ensures that there is minimal on-the-wire
@@ -1337,12 +1337,11 @@ Log tree:       o                                o
 
 10.1.  Log Tree
 
-   An inclusion proof for a single leaf in a log tree is given by
-   providing the copath values of a leaf.  Similarly, a bulk inclusion
-   proof for many leaves is given by providing the fewest node values
-   that can be hashed together with the specified leaves, and any
-   intermediate values retained by the verifier, to produce the root
-   value.  Such a proof is encoded as:
+   The inclusion of some leaf in a tree head, or consistency between two
+   tree heads, is proven by providing the smallest set of intermediate
+   nodes from the log tree that allows the user to compute the tree's
+   root hash from the leaf or other intermediate node values they
+   already have.  Such a proof is encoded as:
 
    opaque NodeValue<Hash.Nh>;
 
@@ -1389,9 +1388,10 @@ Log tree:       o                                o
    } PrefixProof;
 
    The results field contains the search result for each individual
-   value.  It is sorted lexicographically by VRF output.  The
-   result_type field of each PrefixSearchResult struct indicates what
-   the terminal node of the search for that value was:
+   value.  It is sorted lexicographically by search key (which is always
+   a VRF output in this protocol).  The result_type field of each
+   PrefixSearchResult struct indicates what the terminal node of the
+   search for that value was:
 
    *  inclusion for a leaf node matching the requested value.
 
@@ -1413,8 +1413,9 @@ Log tree:       o                                o
    present, an all-zero byte string of length Hash.Nh is listed instead.
 
    The proof is verified by hashing together the provided elements, in
-   the left/right arrangement dictated by the tree structure, and
-   checking that the result equals the root value of the prefix tree.
+   the left/right arrangement dictated by the bits of the search keys,
+   and checking that the result equals the root value of the prefix
+   tree.
 
 10.3.  Combined Tree
 
