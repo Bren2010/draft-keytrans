@@ -17,7 +17,7 @@
 /versioned/
 Gemfile.lock
 archive.json
-draft-keytrans-mcmillion-protocol.xml
+draft-ietf-keytrans-protocol.xml
 package-lock.json
 report.xml
 !requirements.txt
