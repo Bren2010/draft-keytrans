@@ -2,14 +2,20 @@
 title: "Key Transparency Protocol"
 category: std
 
-docname: draft-keytrans-mcmillion-protocol-latest
+docname: draft-ietf-keytrans-protocol-latest
 submissiontype: IETF
 v: 3
 area: SEC
 workgroup: KEYTRANS Working Group
+keyword:
+  - key transparency
 venue:
-  github: "Bren2010/draft-keytrans"
-  latest: "https://Bren2010.github.io/draft-keytrans/draft-keytrans-mcmillion-protocol.html"
+  group: "Key Transparency"
+  type: "Working Group"
+  mail: "keytrans@ietf.org"
+  arch: "https://mailarchive.ietf.org/arch/browse/keytrans/"
+  github: "ietf-wg-keytrans/draft-protocol"
+  latest: "https://ietf-wg-keytrans.github.io/draft-protocol/draft-ietf-keytrans-protocol.html"
 
 author:
  -
