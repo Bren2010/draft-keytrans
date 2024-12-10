@@ -540,7 +540,11 @@ figcaption, caption {
   }
   pre, svg {
     display: inline-block;
-    overflow-x: auto;
+    /* In the horizontal direction, sometimes people make over-sized figures.
+       Scrollbars for those is therefore necessary: auto adds them as necessary..
+       In the vertical direction, the line-height can combine with the font
+       asender/descender height to produce scrollbars: hidden avoids that. */
+    overflow: auto hidden;
   }
   pre {
     max-width: 100%;
@@ -1050,7 +1054,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">McMillion &amp; Linker</td>
-<td class="center">Expires 12 June 2025</td>
+<td class="center">Expires 13 June 2025</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1063,12 +1067,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-keytrans-mcmillion-protocol-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2024-12-09" class="published">9 December 2024</time>
+<time datetime="2024-12-10" class="published">10 December 2024</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2025-06-12">12 June 2025</time></dd>
+<dd class="expires"><time datetime="2025-06-13">13 June 2025</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1121,7 +1125,7 @@ timely manner.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 12 June 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 13 June 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1265,6 +1269,9 @@ timely manner.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.3.2.3">
                     <p id="section-toc.1-1.10.2.3.2.3.1"><a href="#section-10.3.3" class="auto internal xref">10.3.3</a>.  <a href="#name-greatest-version-search" class="internal xref">Greatest-Version Search</a></p>
 </li>
+                  <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.3.2.4">
+                    <p id="section-toc.1-1.10.2.3.2.4.1"><a href="#section-10.3.4" class="auto internal xref">10.3.4</a>.  <a href="#name-monitor" class="internal xref">Monitor</a></p>
+</li>
                 </ul>
 </li>
             </ul>
@@ -1279,7 +1286,7 @@ timely manner.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
                 <p id="section-toc.1-1.11.2.2.1"><a href="#section-11.2" class="auto internal xref">11.2</a>.  <a href="#name-update" class="internal xref">Update</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.11.2.3">
-                <p id="section-toc.1-1.11.2.3.1"><a href="#section-11.3" class="auto internal xref">11.3</a>.  <a href="#name-monitor" class="internal xref">Monitor</a></p>
+                <p id="section-toc.1-1.11.2.3.1"><a href="#section-11.3" class="auto internal xref">11.3</a>.  <a href="#name-monitor-2" class="internal xref">Monitor</a></p>
 </li>
             </ul>
 </li>
@@ -2995,6 +3002,15 @@ non-truncated binary ladder.<a href="#section-10.3.3-2.1.1" class="pilcrow">¶</
 <p id="section-10.3.3-3">Note that the log entry timestamps are already provided as part of updating the
 user's view of the tree, and that no additional timestamps are necessary to
 identify the starting log entry.<a href="#section-10.3.3-3" class="pilcrow">¶</a></p>
+<p id="section-10.3.3-4">TODO Add back reduced binary ladder<a href="#section-10.3.3-4" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="monitor">
+<section id="section-10.3.4">
+          <h4 id="name-monitor">
+<a href="#section-10.3.4" class="section-number selfRef">10.3.4. </a><a href="#name-monitor" class="section-name selfRef">Monitor</a>
+          </h4>
+<p id="section-10.3.4-1">For a user to monitor a label in the combined tree, the following is provided:<a href="#section-10.3.4-1" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -3008,28 +3024,24 @@ identify the starting log entry.<a href="#section-10.3.3-3" class="pilcrow">¶</
       </h2>
 <p id="section-11-1">The basic user operations are organized as a request-response protocol between a
 user and the Transparency Log operator.<a href="#section-11-1" class="pilcrow">¶</a></p>
-<p id="section-11-2">Modifications to a user's state <span class="bcp14">MUST</span> only be persisted once the query response
-has been fully verified. Equivalently, queries that fail to verify <span class="bcp14">MUST NOT</span>
-modify the user's protocol state.<a href="#section-11-2" class="pilcrow">¶</a></p>
-<p id="section-11-3">Users <span class="bcp14">MUST</span> retain the most recent <code>TreeHead</code> they've successfully
+<p id="section-11-2">Users <span class="bcp14">MUST</span> retain the most recent <code>TreeHead</code> they've successfully
 verified as part of any query response, and populate the <code>last</code> field of any
 query request with the <code>tree_size</code> from this <code>TreeHead</code>. This ensures that all
-operations performed by the user return consistent results.<a href="#section-11-3" class="pilcrow">¶</a></p>
-<div class="lang-tls-presentation sourcecode" id="section-11-4">
+operations performed by the user return consistent results.<a href="#section-11-2" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-11-3">
 <pre>
 struct {
   TreeHead tree_head;
-  optional&lt;ConsistencyProof&gt; consistency;
   select (Configuration.mode) {
     case thirdPartyAuditing:
       AuditorTreeHead auditor_tree_head;
   };
 } FullTreeHead;
-</pre><a href="#section-11-4" class="pilcrow">¶</a>
+</pre><a href="#section-11-3" class="pilcrow">¶</a>
 </div>
-<p id="section-11-5">If <code>last</code> is present, then the Transparency Log <span class="bcp14">MUST</span> provide a consistency proof
-between the current tree and the tree when it was this size, in the
-<code>consistency</code> field of <code>FullTreeHead</code>.<a href="#section-11-5" class="pilcrow">¶</a></p>
+<p id="section-11-4">Modifications to a user's state <span class="bcp14">MUST</span> only be persisted once the query response
+has been fully verified. Queries that fail full verification <span class="bcp14">MUST NOT</span> modify the
+user's protocol state in any way.<a href="#section-11-4" class="pilcrow">¶</a></p>
 <div id="search">
 <section id="section-11.1">
         <h3 id="name-search">
@@ -3053,33 +3065,62 @@ struct {
 <div class="lang-tls-presentation sourcecode" id="section-11.1-4">
 <pre>
 struct {
+  opaque proof&lt;VRF.Np&gt;;
+  opaque commitment&lt;Hash.Nh&gt;;
+} BinaryLadderStep;
+
+struct {
   FullTreeHead full_tree_head;
 
-  SearchProof search;
+  BinaryLadderStep binary_ladder&lt;0..2^8-1&gt;;
+  CombinedTreeProof search;
+  InclusionProof inclusion;
+
   opaque opening&lt;16&gt;;
   UpdateValue value;
 } SearchResponse;
 </pre><a href="#section-11.1-4" class="pilcrow">¶</a>
 </div>
-<p id="section-11.1-5">Users verify a search response by following these steps:<a href="#section-11.1-5" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-11.1-6">
-<li id="section-11.1-6.1">
-            <p id="section-11.1-6.1.1">Evaluate the search proof in <code>search</code> according to the steps in
-<a href="#proof-combined-tree" class="auto internal xref">Section 10.3</a>. This will produce a verdict as to whether the search
-was executed correctly and also a candidate root value for the tree. If it's
-determined that the search was executed incorrectly, abort with an error.<a href="#section-11.1-6.1.1" class="pilcrow">¶</a></p>
+<p id="section-11.1-5">Each <code>BinaryLadderStep</code> structure contains information related to one version of
+the label that's in the binary ladder. The <code>proof</code> field contains the VRF
+proof, and <code>commitment</code> contains the commitment to the label's value at that
+version. The <code>binary_ladder</code> field contains these structures in the same order
+that the versions are output by the algorithm in <a href="#binary-ladder" class="auto internal xref">Section 4.2</a>.<a href="#section-11.1-5" class="pilcrow">¶</a></p>
+<p id="section-11.1-6">The <code>search</code> field contains the output of updating the user's view of the tree
+to match <code>FullTreeHead.tree_head.size</code> followed by either a fixed-version or
+greatest-version search for the requested label, depending on whether <code>version</code>
+was provided in <code>SearchRequest</code> or not.<a href="#section-11.1-6" class="pilcrow">¶</a></p>
+<p id="section-11.1-7">The <code>inclusion</code> field contains a proof of inclusion for all of the log tree
+leaves where either a search proof was provided in
+<code>CombinedTreeProof.prefix_proofs</code> or the prefix tree root hash was provided
+directly in <code>CombinedTreeProof.prefix_roots</code>. If the user advertised a
+previously-observed tree size in <code>last</code>, the proof in <code>inclusion</code> also functions
+as a proof of consistency.<a href="#section-11.1-7" class="pilcrow">¶</a></p>
+<p id="section-11.1-8">Users verify a search response by following these steps:<a href="#section-11.1-8" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-11.1-9">
+<li id="section-11.1-9.1">
+            <p id="section-11.1-9.1.1">Compute the VRF output for each version of the label from the proofs in
+<code>binary_ladder</code>.<a href="#section-11.1-9.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-11.1-6.2">
-            <p id="section-11.1-6.2.1">With the candidate root value for the tree, verify the given <code>FullTreeHead</code>.<a href="#section-11.1-6.2.1" class="pilcrow">¶</a></p>
+          <li id="section-11.1-9.2">
+            <p id="section-11.1-9.2.1">Verify the proof in <code>search</code> as described in <a href="#proof-combined-tree" class="auto internal xref">Section 10.3</a>.<a href="#section-11.1-9.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-11.1-6.3">
-            <p id="section-11.1-6.3.1">Verify that the commitment in the terminal search step opens to
-<code>SearchResponse.value</code> with opening <code>SearchResponse.opening</code>.<a href="#section-11.1-6.3.1" class="pilcrow">¶</a></p>
+          <li id="section-11.1-9.3">
+            <p id="section-11.1-9.3.1">Compute a candidate root value for the tree from the proof in <code>inclusion</code>,
+the hashes of log entries used in <code>search</code>, and any previously-retained full
+subtrees of the log tree.<a href="#section-11.1-9.3.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-11.1-9.4">
+            <p id="section-11.1-9.4.1">With the candidate root value for the tree, verify <code>FullTreeHead</code>.<a href="#section-11.1-9.4.1" class="pilcrow">¶</a></p>
+</li>
+          <li id="section-11.1-9.5">
+            <p id="section-11.1-9.5.1">Verify that the commitment to the target version of the label opens to
+<code>SearchResponse.value</code> with opening <code>SearchResponse.opening</code>.<a href="#section-11.1-9.5.1" class="pilcrow">¶</a></p>
 </li>
         </ol>
-<p id="section-11.1-7">Depending on the deployment mode of the Transparency Log, the <code>value</code> field may
+<p id="section-11.1-10">Depending on the deployment mode of the Transparency Log, the <code>value</code> field may
 or may not require additional verification, specified in <a href="#update-format" class="auto internal xref">Section 9.2</a>,
-before its contents may be consumed.<a href="#section-11.1-7" class="pilcrow">¶</a></p>
+before its contents may be consumed.<a href="#section-11.1-10" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="update">
@@ -3101,14 +3142,17 @@ struct {
 </div>
 <p id="section-11.2-3">If the request passes application-layer policy checks, the Transparency Log adds
 a new label-version pair to the prefix tree, followed by adding a new entry to
-the log tree with the associated value and updated prefix tree root. It returns
+the log tree with an updated timestamp and prefix tree root. It returns
 an UpdateResponse structure:<a href="#section-11.2-3" class="pilcrow">¶</a></p>
 <div class="lang-tls-presentation sourcecode" id="section-11.2-4">
 <pre>
 struct {
   FullTreeHead full_tree_head;
 
-  SearchProof search;
+  BinaryLadderStep binary_ladder&lt;0..2^8-1&gt;;
+  CombinedTreeProof search;
+  InclusionProof inclusion;
+
   opaque opening&lt;16&gt;;
   UpdatePrefix prefix;
 } UpdateResponse;
@@ -3120,10 +3164,10 @@ provides the <code>UpdatePrefix</code> structure necessary to reconstruct the
 <code>UpdateValue</code>.<a href="#section-11.2-5" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="monitor">
+<div id="monitor-1">
 <section id="section-11.3">
-        <h3 id="name-monitor">
-<a href="#section-11.3" class="section-number selfRef">11.3. </a><a href="#name-monitor" class="section-name selfRef">Monitor</a>
+        <h3 id="name-monitor-2">
+<a href="#section-11.3" class="section-number selfRef">11.3. </a><a href="#name-monitor-2" class="section-name selfRef">Monitor</a>
         </h3>
 <p id="section-11.3-1">Users initiate a Monitor operation by submitting a MonitorRequest to the
 Transparency Log containing information about the labels they wish to monitor.<a href="#section-11.3-1" class="pilcrow">¶</a></p>
