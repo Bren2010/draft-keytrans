@@ -1367,6 +1367,12 @@ Note that the log entry timestamps are already provided as part of updating the
 user's view of the tree, and that no additional timestamps are necessary to
 identify the starting log entry.
 
+TODO Add back reduced binary ladder
+
+### Monitor
+
+For a user to monitor a label in the combined tree, the following is provided:
+
 <!--
 ### Fixed-Version
 
@@ -1477,10 +1483,6 @@ tree.
 The basic user operations are organized as a request-response protocol between a
 user and the Transparency Log operator.
 
-Modifications to a user's state MUST only be persisted once the query response
-has been fully verified. Equivalently, queries that fail to verify MUST NOT
-modify the user's protocol state.
-
 Users MUST retain the most recent `TreeHead` they've successfully
 verified as part of any query response, and populate the `last` field of any
 query request with the `tree_size` from this `TreeHead`. This ensures that all
@@ -1489,7 +1491,6 @@ operations performed by the user return consistent results.
 ~~~ tls-presentation
 struct {
   TreeHead tree_head;
-  optional<ConsistencyProof> consistency;
   select (Configuration.mode) {
     case thirdPartyAuditing:
       AuditorTreeHead auditor_tree_head;
@@ -1497,9 +1498,9 @@ struct {
 } FullTreeHead;
 ~~~
 
-If `last` is present, then the Transparency Log MUST provide a consistency proof
-between the current tree and the tree when it was this size, in the
-`consistency` field of `FullTreeHead`.
+Modifications to a user's state MUST only be persisted once the query response
+has been fully verified. Queries that fail full verification MUST NOT modify the
+user's protocol state in any way.
 
 ## Search
 
@@ -1523,22 +1524,50 @@ In turn, the Transparency Log responds with a SearchResponse structure:
 
 ~~~ tls-presentation
 struct {
+  opaque proof<VRF.Np>;
+  opaque commitment<Hash.Nh>;
+} BinaryLadderStep;
+
+struct {
   FullTreeHead full_tree_head;
 
-  SearchProof search;
+  BinaryLadderStep binary_ladder<0..2^8-1>;
+  CombinedTreeProof search;
+  InclusionProof inclusion;
+
   opaque opening<16>;
   UpdateValue value;
 } SearchResponse;
 ~~~
 
+Each `BinaryLadderStep` structure contains information related to one version of
+the label that's in the binary ladder. The `proof` field contains the VRF
+proof, and `commitment` contains the commitment to the label's value at that
+version. The `binary_ladder` field contains these structures in the same order
+that the versions are output by the algorithm in {{binary-ladder}}.
+
+The `search` field contains the output of updating the user's view of the tree
+to match `FullTreeHead.tree_head.size` followed by either a fixed-version or
+greatest-version search for the requested label, depending on whether `version`
+was provided in `SearchRequest` or not.
+
+The `inclusion` field contains a proof of inclusion for all of the log tree
+leaves where either a search proof was provided in
+`CombinedTreeProof.prefix_proofs` or the prefix tree root hash was provided
+directly in `CombinedTreeProof.prefix_roots`. If the user advertised a
+previously-observed tree size in `last`, the proof in `inclusion` also functions
+as a proof of consistency.
+
 Users verify a search response by following these steps:
 
-1. Evaluate the search proof in `search` according to the steps in
-   {{proof-combined-tree}}. This will produce a verdict as to whether the search
-   was executed correctly and also a candidate root value for the tree. If it's
-   determined that the search was executed incorrectly, abort with an error.
-2. With the candidate root value for the tree, verify the given `FullTreeHead`.
-3. Verify that the commitment in the terminal search step opens to
+1. Compute the VRF output for each version of the label from the proofs in
+   `binary_ladder`.
+2. Verify the proof in `search` as described in {{proof-combined-tree}}.
+3. Compute a candidate root value for the tree from the proof in `inclusion`,
+   the hashes of log entries used in `search`, and any previously-retained full
+   subtrees of the log tree.
+4. With the candidate root value for the tree, verify `FullTreeHead`.
+5. Verify that the commitment to the target version of the label opens to
    `SearchResponse.value` with opening `SearchResponse.opening`.
 
 Depending on the deployment mode of the Transparency Log, the `value` field may
@@ -1561,14 +1590,17 @@ struct {
 
 If the request passes application-layer policy checks, the Transparency Log adds
 a new label-version pair to the prefix tree, followed by adding a new entry to
-the log tree with the associated value and updated prefix tree root. It returns
+the log tree with an updated timestamp and prefix tree root. It returns
 an UpdateResponse structure:
 
 ~~~ tls-presentation
 struct {
   FullTreeHead full_tree_head;
 
-  SearchProof search;
+  BinaryLadderStep binary_ladder<0..2^8-1>;
+  CombinedTreeProof search;
+  InclusionProof inclusion;
+
   opaque opening<16>;
   UpdatePrefix prefix;
 } UpdateResponse;
@@ -1578,6 +1610,8 @@ Users verify the UpdateResponse as if it were a SearchResponse for the most
 recent version of `label`. To aid verification, the update response
 provides the `UpdatePrefix` structure necessary to reconstruct the
 `UpdateValue`.
+
+<!-- TODO: This could probably be a lot more efficient -->
 
 ## Monitor
 
