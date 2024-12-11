@@ -17,7 +17,8 @@ way that reliably either prevents interference or detects that it occurred in a
 timely manner. 
     " name="description">
 <meta content="xml2rfc 3.25.0" name="generator">
-<meta content="draft-keytrans-mcmillion-protocol-latest" name="ietf.draft">
+<meta content="key transparency" name="keyword">
+<meta content="draft-ietf-keytrans-protocol-latest" name="ietf.draft">
 <!-- Generator version information:
   xml2rfc 3.25.0
     Python 3.12.7
@@ -33,7 +34,7 @@ timely manner.
     setuptools 70.3.0
     wcwidth 0.2.13
 -->
-<link href="draft-keytrans-mcmillion-protocol.xml" rel="alternate" type="application/rfc+xml">
+<link href="draft-ietf-keytrans-protocol.xml" rel="alternate" type="application/rfc+xml">
 <link href="#copyright" rel="license">
 <style type="text/css">@font-face {
   font-family: 'Lora';
@@ -1054,7 +1055,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">McMillion &amp; Linker</td>
-<td class="center">Expires 13 June 2025</td>
+<td class="center">Expires 14 June 2025</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1064,15 +1065,15 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dt class="label-workgroup">Workgroup:</dt>
 <dd class="workgroup">KEYTRANS Working Group</dd>
 <dt class="label-internet-draft">Internet-Draft:</dt>
-<dd class="internet-draft">draft-keytrans-mcmillion-protocol-latest</dd>
+<dd class="internet-draft">draft-ietf-keytrans-protocol-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2024-12-10" class="published">10 December 2024</time>
+<time datetime="2024-12-11" class="published">11 December 2024</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2025-06-13">13 June 2025</time></dd>
+<dd class="expires"><time datetime="2025-06-14">14 June 2025</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1101,10 +1102,15 @@ timely manner.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
       </h2>
 <p id="section-note.1-1">This note is to be removed before publishing as an RFC.<a href="#section-note.1-1" class="pilcrow">¶</a></p>
 <p id="section-note.1-2">
-        The latest revision of this draft can be found at <span><a href="https://Bren2010.github.io/draft-keytrans/draft-keytrans-mcmillion-protocol.html">https://Bren2010.github.io/draft-keytrans/draft-keytrans-mcmillion-protocol.html</a></span>.
-        Status information for this document may be found at <span><a href="https://datatracker.ietf.org/doc/draft-keytrans-mcmillion-protocol/">https://datatracker.ietf.org/doc/draft-keytrans-mcmillion-protocol/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
-<p id="section-note.1-3">Source for this draft and an issue tracker can be found at
-        <span><a href="https://github.com/Bren2010/draft-keytrans">https://github.com/Bren2010/draft-keytrans</a></span>.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
+        The latest revision of this draft can be found at <span><a href="https://ietf-wg-keytrans.github.io/draft-protocol/draft-ietf-keytrans-protocol.html">https://ietf-wg-keytrans.github.io/draft-protocol/draft-ietf-keytrans-protocol.html</a></span>.
+        Status information for this document may be found at <span><a href="https://datatracker.ietf.org/doc/draft-ietf-keytrans-protocol/">https://datatracker.ietf.org/doc/draft-ietf-keytrans-protocol/</a></span>.<a href="#section-note.1-2" class="pilcrow">¶</a></p>
+<p id="section-note.1-3">
+        Discussion of this document takes place on the
+        Key Transparency Working Group mailing list (<span><a href="mailto:keytrans@ietf.org">mailto:keytrans@ietf.org</a></span>),
+        which is archived at <span><a href="https://mailarchive.ietf.org/arch/browse/keytrans/">https://mailarchive.ietf.org/arch/browse/keytrans/</a></span>.
+        Subscribe at <span><a href="https://www.ietf.org/mailman/listinfo/keytrans/">https://www.ietf.org/mailman/listinfo/keytrans/</a></span>.<a href="#section-note.1-3" class="pilcrow">¶</a></p>
+<p id="section-note.1-4">Source for this draft and an issue tracker can be found at
+        <span><a href="https://github.com/ietf-wg-keytrans/draft-protocol">https://github.com/ietf-wg-keytrans/draft-protocol</a></span>.<a href="#section-note.1-4" class="pilcrow">¶</a></p>
 </section>
 <div id="status-of-memo">
 <section id="section-boilerplate.1">
@@ -1125,7 +1131,7 @@ timely manner.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 13 June 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 14 June 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1316,7 +1322,7 @@ timely manner.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.15">
-            <p id="section-toc.1-1.15.1"><a href="#appendix-A" class="auto internal xref"></a><a href="#name-acknowledgments" class="internal xref">Acknowledgments</a></p>
+            <p id="section-toc.1-1.15.1"><a href="#appendix-A" class="auto internal xref">Appendix A</a>.  <a href="#name-implicit-binary-search-tree-2" class="internal xref">Implicit Binary Search Tree</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.16">
             <p id="section-toc.1-1.16.1"><a href="#appendix-B" class="auto internal xref"></a><a href="#name-authors-addresses" class="internal xref">Authors' Addresses</a></p>
@@ -1778,7 +1784,7 @@ the timestamp that it was created. With some caveats, this combined structure
 supports both efficient consistency proofs and can be efficiently searched.<a href="#section-3.4-2" class="pilcrow">¶</a></p>
 <p id="section-3.4-3">Note that, although the Transparency Log maintains a single logical prefix tree,
 each modification of this tree results in a new root hash which is then stored
-in the log tree. And, as part of the protocol, the Transparency Log is often
+in the log tree. As part of the protocol, the Transparency Log is often
 required to perform lookups in different versions of the prefix tree. Therefore,
 when instructions refer to "looking up a label-version pair in the prefix tree
 at a given log entry," this means performing the search in the specific version
@@ -1787,48 +1793,48 @@ entry" refers to a leaf of the log tree).<a href="#section-3.4-3" class="pilcrow
 <span id="name-an-example-evolution-of-the"></span><figure id="figure-7">
           <div id="section-3.4-4.1">
             <div class="alignLeft art-svg artwork" id="section-3.4-4.1.1">
-<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="144" width="648" viewBox="0 0 648 144" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="144" width="576" viewBox="0 0 576 144" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
                 <path d="M 136,64 L 136,80" fill="none" stroke="black"></path>
-                <path d="M 400,64 L 400,80" fill="none" stroke="black"></path>
-                <path d="M 488,80 L 488,96" fill="none" stroke="black"></path>
-                <path d="M 264,46 L 280,46" fill="none" stroke="black"></path>
-                <path d="M 264,50 L 280,50" fill="none" stroke="black"></path>
+                <path d="M 376,64 L 376,80" fill="none" stroke="black"></path>
+                <path d="M 456,80 L 456,96" fill="none" stroke="black"></path>
+                <path d="M 240,46 L 256,46" fill="none" stroke="black"></path>
+                <path d="M 240,50 L 256,50" fill="none" stroke="black"></path>
                 <path d="M 104,80 L 176,80" fill="none" stroke="black"></path>
-                <path d="M 320,80 L 480,80" fill="none" stroke="black"></path>
-                <path d="M 424,96 L 536,96" fill="none" stroke="black"></path>
+                <path d="M 296,80 L 448,80" fill="none" stroke="black"></path>
+                <path d="M 400,96 L 496,96" fill="none" stroke="black"></path>
                 <path d="M 96,80 L 124,136" fill="none" stroke="black"></path>
                 <path d="M 176,80 L 192,112" fill="none" stroke="black"></path>
-                <path d="M 312,80 L 340,136" fill="none" stroke="black"></path>
-                <path d="M 536,96 L 544,112" fill="none" stroke="black"></path>
+                <path d="M 288,80 L 316,136" fill="none" stroke="black"></path>
+                <path d="M 496,96 L 504,112" fill="none" stroke="black"></path>
                 <path d="M 68,136 L 96,80" fill="none" stroke="black"></path>
-                <path d="M 284,136 L 312,80" fill="none" stroke="black"></path>
-                <path d="M 416,112 L 424,96" fill="none" stroke="black"></path>
+                <path d="M 260,136 L 288,80" fill="none" stroke="black"></path>
+                <path d="M 392,112 L 400,96" fill="none" stroke="black"></path>
                 <path d="M 68,136 L 124,136" fill="none" stroke="black"></path>
-                <path d="M 284,136 L 340,136" fill="none" stroke="black"></path>
-                <polygon class="arrowhead" points="288,48 276,42.4 276,53.6" fill="black" transform="rotate(0,280,48)"></polygon>
+                <path d="M 260,136 L 316,136" fill="none" stroke="black"></path>
+                <polygon class="arrowhead" points="264,48 252,42.4 252,53.6" fill="black" transform="rotate(0,256,48)"></polygon>
                 <circle cx="96" cy="80" r="6" class="opendot" fill="white" stroke="black"></circle>
                 <circle cx="136" cy="64" r="6" class="opendot" fill="white" stroke="black"></circle>
-                <circle cx="312" cy="80" r="6" class="opendot" fill="white" stroke="black"></circle>
-                <circle cx="400" cy="64" r="6" class="opendot" fill="white" stroke="black"></circle>
-                <circle cx="488" cy="80" r="6" class="opendot" fill="white" stroke="black"></circle>
+                <circle cx="288" cy="80" r="6" class="opendot" fill="white" stroke="black"></circle>
+                <circle cx="376" cy="64" r="6" class="opendot" fill="white" stroke="black"></circle>
+                <circle cx="456" cy="80" r="6" class="opendot" fill="white" stroke="black"></circle>
                 <g class="text">
                   <text x="28" y="36">Epoch:</text>
                   <text x="136" y="36">n</text>
-                  <text x="400" y="36">n+1</text>
+                  <text x="376" y="36">n+1</text>
                   <text x="16" y="68">Log</text>
                   <text x="56" y="68">tree:</text>
                   <text x="168" y="132">[T_n;</text>
-                  <text x="228" y="132">h(PT_n)]</text>
-                  <text x="384" y="132">[T_n;</text>
-                  <text x="444" y="132">h(PT_n)]</text>
-                  <text x="528" y="132">[T_n+1;</text>
-                  <text x="604" y="132">h(PT_n+1)]</text>
+                  <text x="216" y="132">PT_n]</text>
+                  <text x="360" y="132">[T_n;</text>
+                  <text x="408" y="132">PT_n]</text>
+                  <text x="480" y="132">[T_n+1;</text>
+                  <text x="544" y="132">PT_n+1]</text>
                 </g>
               </svg><a href="#section-3.4-4.1.1" class="pilcrow">¶</a>
 </div>
 </div>
 <figcaption><a href="#figure-7" class="selfRef">Figure 7</a>:
-<a href="#name-an-example-evolution-of-the" class="selfRef">An example evolution of the combined tree structure. At every epoch, a new leaf is added to a log tree containing the timestamp T_n, and the new prefix tree root hash PT_n.</a>
+<a href="#name-an-example-evolution-of-the" class="selfRef">An example evolution of the combined tree structure. At every epoch, a new leaf is added to a log tree containing the timestamp T_n and the new prefix tree root hash PT_n.</a>
           </figcaption></figure>
 </section>
 </div>
@@ -1855,8 +1861,8 @@ have a complexity logarithmic in the number of the log's leaves.<a href="#sectio
 <p id="section-4.1-1">Intuitively, the leaves of the log tree can be considered a flat array
 representation of a binary tree. This structure is similar to the log tree, but
 distinguished by the fact that not all parent nodes have two children. In this
-representation, "leaf" nodes are stored in even-numbered indices, while
-"intermediate" nodes are stored in odd-numbered indices:<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+representation, "leaf" log entries are stored in even-numbered indices, while
+"intermediate" log entries are stored in odd-numbered indices:<a href="#section-4.1-1" class="pilcrow">¶</a></p>
 <span id="name-a-binary-tree-constructed-f"></span><figure id="figure-8">
           <div id="section-4.1-2.1">
             <div class="alignLeft art-svg artwork" id="section-4.1-2.1.1">
@@ -1917,69 +1923,26 @@ representation, "leaf" nodes are stored in even-numbered indices, while
 <figcaption><a href="#figure-8" class="selfRef">Figure 8</a>:
 <a href="#name-a-binary-tree-constructed-f" class="selfRef">A binary tree constructed from 14 entries in a log</a>
           </figcaption></figure>
-<p id="section-4.1-3">Following the structure of this binary tree when executing searches means that
-only nodes along a specific search path need to be checked for correctness.<a href="#section-4.1-3" class="pilcrow">¶</a></p>
-<p id="section-4.1-4">The following Python code demonstrates the computations used for following this
-tree structure:<a href="#section-4.1-4" class="pilcrow">¶</a></p>
-<div class="lang-python sourcecode" id="section-4.1-5">
-<pre>
-# The exponent of the largest power of 2 less than x. Equivalent to:
-#   int(math.floor(math.log(x, 2)))
-def log2(x):
-    if x == 0:
-        return 0
-    k = 0
-    while (x &gt;&gt; k) &gt; 0:
-        k += 1
-    return k-1
-
-# The level of a node in the tree. Leaves are level 0, their parents
-# are level 1, etc. If a node's children are at different levels,
-# then its level is the max level of its children plus one.
-def level(x):
-    if x &amp; 0x01 == 0:
-        return 0
-    k = 0
-    while ((x &gt;&gt; k) &amp; 0x01) == 1:
-        k += 1
-    return k
-
-# The root index of a search if the log has `n` entries.
-def root(n):
-    return (1 &lt;&lt; log2(n)) - 1
-
-# The left child of an intermediate node.
-def left(x):
-    k = level(x)
-    if k == 0:
-        raise Exception('leaf node has no children')
-    return x ^ (0x01 &lt;&lt; (k - 1))
-
-# The right child of an intermediate node.
-def right(x, n):
-    k = level(x)
-    if k == 0:
-        raise Exception('leaf node has no children')
-    x = x ^ (0x03 &lt;&lt; (k - 1))
-    while x &gt;= n:
-        x = left(x)
-    return x
-</pre><a href="#section-4.1-5" class="pilcrow">¶</a>
-</div>
-<p id="section-4.1-6">The <code>root</code> function returns the index in the log at which a search should
-start. The <code>left</code> and <code>right</code> functions determine the subsequent index to be
-accessed, depending on whether the search moves left or right.<a href="#section-4.1-6" class="pilcrow">¶</a></p>
-<p id="section-4.1-7">For example, in a search where the log has 50 entries, instead of starting the
+<p id="section-4.1-3">The index of the root log entry is the greatest power of two, minus one, that is
+less than the size of the log. The index of a log entry's left child is the log
+entry's index minus the greatest power of two that would not take it out of
+bounds. Similarly, the index of a log entry's right child is the entry's index
+plus the greatest power of two that would not take it out of bounds. Following
+the structure of this tree when executing searches means that only a small
+number of log entries need to be checked for correctness.<a href="#section-4.1-3" class="pilcrow">¶</a></p>
+<p id="section-4.1-4">For example, in a search where the log has 50 entries, instead of starting the
 search at the typical "middle" entry of <code>50/2 = 25</code>, users would start at entry
-<code>root(50) = 31</code>. If the next step in the search is to move right, the next index
-to access would be <code>right(31, 50) = 47</code>. As more entries are added to the log,
-users will consistently revisit entries 31 and 47, while they may never revisit
-entry 25 after even a single new entry is added to the log.<a href="#section-4.1-7" class="pilcrow">¶</a></p>
-<p id="section-4.1-8">It is also frequently useful to refer to the <strong>frontier</strong> of the log. The
-frontier consists of the root node of a search, followed by the entries produced
-by repeatedly calling <code>right</code> until reaching the last entry of the log. Using
+<code>31</code>. If the next step in the search is to move right, the next index to access
+would be <code>31 + 16 = 47</code>. As more entries are added to the log, users will
+consistently revisit entries 31 and 47, while they may never revisit entry 25
+after even a single new entry is added to the log.<a href="#section-4.1-4" class="pilcrow">¶</a></p>
+<p id="section-4.1-5">It is also frequently useful to refer to the <strong>frontier</strong> of the log. The
+frontier consists of the root log entry, followed by the entries produced
+by repeatedly moving right until reaching the last entry of the log. Using
 the same example of a search where the log has 50 entries, the frontier would be
-entries: 31, 47, 49.<a href="#section-4.1-8" class="pilcrow">¶</a></p>
+entries: 31, 47, 49.<a href="#section-4.1-5" class="pilcrow">¶</a></p>
+<p id="section-4.1-6">Example code for efficiently navigating the implicit binary search tree is
+provided in <a href="#appendix-implicit-search-tree" class="auto internal xref">Appendix A</a>.<a href="#section-4.1-6" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="binary-ladder">
@@ -3417,11 +3380,58 @@ uint16 CipherSuite;
 </div>
 </section>
 </div>
-<div id="acknowledgments">
+<div id="appendix-implicit-search-tree">
 <section id="appendix-A">
-      <h2 id="name-acknowledgments">
-<a href="#name-acknowledgments" class="section-name selfRef">Acknowledgments</a>
+      <h2 id="name-implicit-binary-search-tree-2">
+<a href="#appendix-A" class="section-number selfRef">Appendix A. </a><a href="#name-implicit-binary-search-tree-2" class="section-name selfRef">Implicit Binary Search Tree</a>
       </h2>
+<p id="appendix-A-1">The following Python code demonstrates efficient algorithms for navigating the
+implicit binary search tree:<a href="#appendix-A-1" class="pilcrow">¶</a></p>
+<div class="lang-python sourcecode" id="appendix-A-2">
+<pre>
+# The exponent of the largest power of 2 less than x. Equivalent to:
+#   int(math.floor(math.log(x, 2)))
+def log2(x):
+    if x == 0:
+        return 0
+    k = 0
+    while (x &gt;&gt; k) &gt; 0:
+        k += 1
+    return k-1
+
+# The level of a node in the tree. Leaves are level 0, their parents
+# are level 1, etc. If a node's children are at different levels,
+# then its level is the max level of its children plus one.
+def level(x):
+    if x &amp; 0x01 == 0:
+        return 0
+    k = 0
+    while ((x &gt;&gt; k) &amp; 0x01) == 1:
+        k += 1
+    return k
+
+# The root index of a search if the log has `n` entries.
+def root(n):
+    return (1 &lt;&lt; log2(n)) - 1
+
+# The left child of an intermediate node.
+def left(x):
+    k = level(x)
+    if k == 0:
+        raise Exception('leaf node has no children')
+    return x ^ (0x01 &lt;&lt; (k - 1))
+
+# The right child of an intermediate node.
+def right(x, n):
+    k = level(x)
+    if k == 0:
+        raise Exception('leaf node has no children')
+    x = x ^ (0x03 &lt;&lt; (k - 1))
+    while x &gt;= n:
+        x = left(x)
+    return x
+</pre><a href="#appendix-A-2" class="pilcrow">¶</a>
+</div>
 </section>
 </div>
 <div id="authors-addresses">
