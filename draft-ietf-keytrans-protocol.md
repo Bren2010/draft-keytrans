@@ -379,7 +379,7 @@ supports both efficient consistency proofs and can be efficiently searched.
 
 Note that, although the Transparency Log maintains a single logical prefix tree,
 each modification of this tree results in a new root hash which is then stored
-in the log tree. And, as part of the protocol, the Transparency Log is often
+in the log tree. As part of the protocol, the Transparency Log is often
 required to perform lookups in different versions of the prefix tree. Therefore,
 when instructions refer to "looking up a label-version pair in the prefix tree
 at a given log entry," this means performing the search in the specific version
@@ -387,16 +387,16 @@ of the prefix tree whose root hash is stored at that log entry (where a "log
 entry" refers to a leaf of the log tree).
 
 ~~~ aasvg
-Epoch:          n                               n+1
-                                ==>
-Log tree:       o                                o
-           o----+----.                o----------+----------o
-          / \         \              / \            .-------+-----.
-         /   \         |            /   \          /               \
-        /_____\   [T_n; h(PT_n)]   /_____\   [T_n; h(PT_n)]   [T_n+1; h(PT_n+1)]
+Epoch:          n                            n+1
+                             ==>
+Log tree:       o                             o
+           o----+----.             o----------+---------o
+          / \         \           / \            .------+----.
+         /   \         |         /   \          /             \
+        /_____\   [T_n; PT_n]   /_____\   [T_n; PT_n]   [T_n+1; PT_n+1]
 ~~~
 {: title="An example evolution of the combined tree structure. At every epoch, a
-new leaf is added to a log tree containing the timestamp T_n, and the new
+new leaf is added to a log tree containing the timestamp T_n and the new
 prefix tree root hash PT_n."}
 
 # Fixed-Version Searches
@@ -415,8 +415,8 @@ have a complexity logarithmic in the number of the log's leaves.
 Intuitively, the leaves of the log tree can be considered a flat array
 representation of a binary tree. This structure is similar to the log tree, but
 distinguished by the fact that not all parent nodes have two children. In this
-representation, "leaf" nodes are stored in even-numbered indices, while
-"intermediate" nodes are stored in odd-numbered indices:
+representation, "leaf" log entries are stored in even-numbered indices, while
+"intermediate" log entries are stored in odd-numbered indices:
 
 ~~~ aasvg
                              X
@@ -436,72 +436,29 @@ Index:  0  1  2  3  4  5  6  7  8  9 10 11 12 13
 ~~~
 {: title="A binary tree constructed from 14 entries in a log" }
 
-Following the structure of this binary tree when executing searches means that
-only nodes along a specific search path need to be checked for correctness.
-
-The following Python code demonstrates the computations used for following this
-tree structure:
-
-~~~ python
-# The exponent of the largest power of 2 less than x. Equivalent to:
-#   int(math.floor(math.log(x, 2)))
-def log2(x):
-    if x == 0:
-        return 0
-    k = 0
-    while (x >> k) > 0:
-        k += 1
-    return k-1
-
-# The level of a node in the tree. Leaves are level 0, their parents
-# are level 1, etc. If a node's children are at different levels,
-# then its level is the max level of its children plus one.
-def level(x):
-    if x & 0x01 == 0:
-        return 0
-    k = 0
-    while ((x >> k) & 0x01) == 1:
-        k += 1
-    return k
-
-# The root index of a search if the log has `n` entries.
-def root(n):
-    return (1 << log2(n)) - 1
-
-# The left child of an intermediate node.
-def left(x):
-    k = level(x)
-    if k == 0:
-        raise Exception('leaf node has no children')
-    return x ^ (0x01 << (k - 1))
-
-# The right child of an intermediate node.
-def right(x, n):
-    k = level(x)
-    if k == 0:
-        raise Exception('leaf node has no children')
-    x = x ^ (0x03 << (k - 1))
-    while x >= n:
-        x = left(x)
-    return x
-~~~
-
-The `root` function returns the index in the log at which a search should
-start. The `left` and `right` functions determine the subsequent index to be
-accessed, depending on whether the search moves left or right.
+The index of the root log entry is the greatest power of two, minus one, that is
+less than the size of the log. The index of a log entry's left child is the log
+entry's index minus the greatest power of two that would not take it out of
+bounds. Similarly, the index of a log entry's right child is the entry's index
+plus the greatest power of two that would not take it out of bounds. Following
+the structure of this tree when executing searches means that only a small
+number of log entries need to be checked for correctness.
 
 For example, in a search where the log has 50 entries, instead of starting the
 search at the typical "middle" entry of `50/2 = 25`, users would start at entry
-`root(50) = 31`. If the next step in the search is to move right, the next index
-to access would be `right(31, 50) = 47`. As more entries are added to the log,
-users will consistently revisit entries 31 and 47, while they may never revisit
-entry 25 after even a single new entry is added to the log.
+`31`. If the next step in the search is to move right, the next index to access
+would be `31 + 16 = 47`. As more entries are added to the log, users will
+consistently revisit entries 31 and 47, while they may never revisit entry 25
+after even a single new entry is added to the log.
 
 It is also frequently useful to refer to the **frontier** of the log. The
-frontier consists of the root node of a search, followed by the entries produced
-by repeatedly calling `right` until reaching the last entry of the log. Using
+frontier consists of the root log entry, followed by the entries produced
+by repeatedly moving right until reaching the last entry of the log. Using
 the same example of a search where the log has 50 entries, the frontier would be
 entries: 31, 47, 49.
+
+Example code for efficiently navigating the implicit binary search tree is
+provided in {{appendix-implicit-search-tree}}.
 
 ## Binary Ladder
 
@@ -1770,7 +1727,51 @@ uint16 CipherSuite;
 
 --- back
 
-# Acknowledgments
-{:numbered="false"}
+# Implicit Binary Search Tree {#appendix-implicit-search-tree}
 
-<!-- TODO acknowledge. -->
+The following Python code demonstrates efficient algorithms for navigating the
+implicit binary search tree:
+
+~~~ python
+# The exponent of the largest power of 2 less than x. Equivalent to:
+#   int(math.floor(math.log(x, 2)))
+def log2(x):
+    if x == 0:
+        return 0
+    k = 0
+    while (x >> k) > 0:
+        k += 1
+    return k-1
+
+# The level of a node in the tree. Leaves are level 0, their parents
+# are level 1, etc. If a node's children are at different levels,
+# then its level is the max level of its children plus one.
+def level(x):
+    if x & 0x01 == 0:
+        return 0
+    k = 0
+    while ((x >> k) & 0x01) == 1:
+        k += 1
+    return k
+
+# The root index of a search if the log has `n` entries.
+def root(n):
+    return (1 << log2(n)) - 1
+
+# The left child of an intermediate node.
+def left(x):
+    k = level(x)
+    if k == 0:
+        raise Exception('leaf node has no children')
+    return x ^ (0x01 << (k - 1))
+
+# The right child of an intermediate node.
+def right(x, n):
+    k = level(x)
+    if k == 0:
+        raise Exception('leaf node has no children')
+    x = x ^ (0x03 << (k - 1))
+    while x >= n:
+        x = left(x)
+    return x
+~~~
