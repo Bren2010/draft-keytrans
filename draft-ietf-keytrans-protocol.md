@@ -484,7 +484,7 @@ entries, the frontier would be entries: 31, 47, 49.
 Example code for efficiently navigating the implicit binary search tree is
 provided in {{appendix-implicit-search-tree}}.
 
-## Algorithm
+## Algorithm {#update-algorithm}
 
 Users retain the following information about the last tree head they've
 observed:
@@ -846,9 +846,9 @@ position in their Monitor request. For a number of subsequent distinguished log
 entries, the Transparency Log states the greatest version of the label that the
 log entry's prefix tree contains. It then provides a search-style binary ladder,
 as described in {{binary-ladder}}, including any lookups that would typically be
-omitted. Users verify that the version has not unexpectedly increased and that
-the binary ladder terminates in way that's consistent with the provided version
-being the greatest that exists.
+omitted. Users verify that the version has not unexpectedly increased or
+decreased, and that the binary ladder terminates in way that's consistent with
+the provided version being the greatest that exists.
 
 Importantly, users verify that they receive a binary ladder for the
 distinguished log entry immediately following the one they've advertised, the
@@ -884,19 +884,22 @@ To perform a greatest-version search, the Transparency Log provides the greatest
 version of the label that exists. It then provides a binary ladder, with the
 greatest version as the target, from the rightmost distinguished log entry. If
 there is no distinguished log entry yet, the search starts at the root instead.
-The Transparency Log then proceeds down the remainder of the frontier: the
-starting log entry's right child, the right child's right child, and so on until
-reaching the last log entry. From each of these log entries, a binary ladder
-targeting the label's greatest version is provided.
+From this log entry, the Transparency Log then proceeds down the remainder of
+the frontier: the starting log entry's right child, the right child's right
+child, and so on until reaching the last log entry. From each of these log
+entries, a binary ladder targeting the label's greatest version is provided.
 
 As in {{fixed-version-searches}}, users verify that the log entry timestamps and
 the binary ladders from each log entry each represent a monotonically-increasing
 series. Users additionally verify that the binary ladder from the rightmost log
 entry terminates in a way that is consistent with the target version being the
 greatest that exists. If this verification is successful, users move on to
-opening the commimtent for whichever label-version pair was identified as the
+opening the commitment for whichever label-version pair was identified as the
 greatest.
 
+If the starting log entry was not distinguished or if the starting log entry did
+not contain the greatest version of the label, the user may be obligated to
+monitor the label in the future, per {{reasonable-monitoring-window}}.
 
 # Ciphersuites
 
@@ -1038,7 +1041,8 @@ called `opening` and computes:
 commitment = HMAC(Kc, CommitmentValue)
 ~~~
 
-where `Kc` is defined by the ciphersuite and CommitmentValue is specified as:
+where `Kc` is a string of bytes defined by the ciphersuite and CommitmentValue
+is specified as:
 
 ~~~ tls-presentation
 struct {
@@ -1266,15 +1270,15 @@ struct {
 The elements of the `timestamps` field are the timestamps of log entries, and
 the elements of the `prefix_proofs` field are search proofs from the prefix
 trees at particular log entries. There is no explicit indication as to which log
-entry the elements correspond to, as they are provided in the order that they're
-meant to be consumed. The elements of the `prefix_roots` field contain, in
-left-to-right order, the prefix tree root hashes for any log entries whose
-timestamp was provided in `timestamps` but a search proof was not provided in
-`prefix_proofs`.
+entry the elements correspond to, as they are provided in the order that the
+algorithm the user is executing would request them. The elements of the
+`prefix_roots` field are, in left-to-right order, the prefix tree root
+hashes for any log entries whose timestamp was provided in `timestamps` but a
+search proof was not provided in `prefix_proofs`.
 
-If a log entry's timestamp is referenced multiple times, it is only added to the
+If a log entry's timestamp is referenced multiple times, it is only added to
 `timestamps` the first time. Additionally, when a user advertises a
-previously-observed tree size in their request, log entry timestamps which the
+previously-observed tree size in their request, log entry timestamps that the
 user is expected to have retained are excluded from `timestamps`.
 
 The `prefix_proofs` array differs from the `timestamps` array in two important
@@ -1297,7 +1301,7 @@ For a user to update their view of the tree, the following is provided:
 - If the user has not previously observed a tree head, the timestamp of each log
   entry along the frontier.
 - If the user has previously observed a tree head, the timestamps of each log
-  entry from the list computed in {{updating-views-of-the-tree}}.
+  entry from the list computed in {{update-algorithm}}.
 
 Users verify that the timestamps represent a monotonic series, and that the
 rightmost timestamp is within the bounds defined by `max_ahead` and
@@ -1328,14 +1332,12 @@ For a user to search the combined tree for the greatest version of a label, the
 following is provided:
 
 - For each log entry along the frontier, starting from the log entry identified
-  in {{greatest-version-searches}}: a `PrefixProof` corresponding to a
-  non-truncated binary ladder.
+  in {{greatest-version-searches}}: a `PrefixProof` corresponding to a binary
+  ladder.
 
 Note that the log entry timestamps are already provided as part of updating the
 user's view of the tree, and that no additional timestamps are necessary to
 identify the starting log entry.
-
-TODO Add back reduced binary ladder
 
 ### Monitor
 
