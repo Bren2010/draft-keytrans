@@ -5,7 +5,7 @@
 KEYTRANS Working Group                                      B. McMillion
 Internet-Draft                                                          
 Intended status: Standards Track                               F. Linker
-Expires: 19 June 2025                                   16 December 2024
+Expires: 20 June 2025                                   17 December 2024
 
 
                        Key Transparency Protocol
@@ -54,7 +54,7 @@ Status of This Memo
    time.  It is inappropriate to use Internet-Drafts as reference
    material or to cite them other than as "work in progress."
 
-   This Internet-Draft will expire on 19 June 2025.
+   This Internet-Draft will expire on 20 June 2025.
 
 Copyright Notice
 
@@ -989,8 +989,9 @@ Table of Contents
    tree contains.  It then provides a search-style binary ladder, as
    described in Section 5.1, including any lookups that would typically
    be omitted.  Users verify that the version has not unexpectedly
-   increased and that the binary ladder terminates in way that's
-   consistent with the provided version being the greatest that exists.
+   increased or decreased, and that the binary ladder terminates in way
+   that's consistent with the provided version being the greatest that
+   exists.
 
    Importantly, users verify that they receive a binary ladder for the
    distinguished log entry immediately following the one they've
@@ -1028,19 +1029,24 @@ Table of Contents
    the greatest version of the label that exists.  It then provides a
    binary ladder, with the greatest version as the target, from the
    rightmost distinguished log entry.  If there is no distinguished log
-   entry yet, the search starts at the root instead.  The Transparency
-   Log then proceeds down the remainder of the frontier: the starting
-   log entry's right child, the right child's right child, and so on
-   until reaching the last log entry.  From each of these log entries, a
-   binary ladder targeting the label's greatest version is provided.
+   entry yet, the search starts at the root instead.  From this log
+   entry, the Transparency Log then proceeds down the remainder of the
+   frontier: the starting log entry's right child, the right child's
+   right child, and so on until reaching the last log entry.  From each
+   of these log entries, a binary ladder targeting the label's greatest
+   version is provided.
 
    As in Section 5, users verify that the log entry timestamps and the
    binary ladders from each log entry each represent a monotonically-
    increasing series.  Users additionally verify that the binary ladder
    from the rightmost log entry terminates in a way that is consistent
    with the target version being the greatest that exists.  If this
-   verification is successful, users move on to opening the commimtent
+   verification is successful, users move on to opening the commitment
    for whichever label-version pair was identified as the greatest.
+
+   If the starting log entry was not distinguished or if the starting
+   log entry did not contain the greatest version of the label, the user
+   may be obligated to monitor the label in the future, per Section 6.1.
 
 8.  Ciphersuites
 
@@ -1181,8 +1187,8 @@ Table of Contents
 
    commitment = HMAC(Kc, CommitmentValue)
 
-   where Kc is defined by the ciphersuite and CommitmentValue is
-   specified as:
+   where Kc is a string of bytes defined by the ciphersuite and
+   CommitmentValue is specified as:
 
    struct {
      opaque opening<Nc>;
@@ -1399,16 +1405,16 @@ Table of Contents
    entries, and the elements of the prefix_proofs field are search
    proofs from the prefix trees at particular log entries.  There is no
    explicit indication as to which log entry the elements correspond to,
-   as they are provided in the order that they're meant to be consumed.
-   The elements of the prefix_roots field contain, in left-to-right
-   order, the prefix tree root hashes for any log entries whose
-   timestamp was provided in timestamps but a search proof was not
-   provided in prefix_proofs.
+   as they are provided in the order that the algorithm the user is
+   executing would request them.  The elements of the prefix_roots field
+   are, in left-to-right order, the prefix tree root hashes for any log
+   entries whose timestamp was provided in timestamps but a search proof
+   was not provided in prefix_proofs.
 
    If a log entry's timestamp is referenced multiple times, it is only
-   added to the timestamps the first time.  Additionally, when a user
+   added to timestamps the first time.  Additionally, when a user
    advertises a previously-observed tree size in their request, log
-   entry timestamps which the user is expected to have retained are
+   entry timestamps that the user is expected to have retained are
    excluded from timestamps.
 
    The prefix_proofs array differs from the timestamps array in two
@@ -1435,7 +1441,7 @@ Table of Contents
       of each log entry along the frontier.
 
    *  If the user has previously observed a tree head, the timestamps of
-      each log entry from the list computed in Section 4.
+      each log entry from the list computed in Section 4.2.
 
    Users verify that the timestamps represent a monotonic series, and
    that the rightmost timestamp is within the bounds defined by
@@ -1472,14 +1478,12 @@ Table of Contents
    label, the following is provided:
 
    *  For each log entry along the frontier, starting from the log entry
-      identified in Section 7: a PrefixProof corresponding to a non-
-      truncated binary ladder.
+      identified in Section 7: a PrefixProof corresponding to a binary
+      ladder.
 
    Note that the log entry timestamps are already provided as part of
    updating the user's view of the tree, and that no additional
    timestamps are necessary to identify the starting log entry.
-
-   TODO Add back reduced binary ladder
 
 10.3.4.  Monitor
 
