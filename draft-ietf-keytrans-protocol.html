@@ -21,15 +21,15 @@ timely manner.
 <meta content="draft-ietf-keytrans-protocol-latest" name="ietf.draft">
 <!-- Generator version information:
   xml2rfc 3.25.0
-    Python 3.12.7
+    Python 3.12.8
     ConfigArgParse 1.7
     google-i18n-address 3.1.1
     intervaltree 3.1.0
     Jinja2 3.1.4
     lxml 5.3.0
     platformdirs 4.3.6
-    pycountry 22.3.5
-    PyYAML 6.0.1
+    pycountry 24.6.1
+    PyYAML 6.0.2
     requests 2.32.3
     setuptools 70.3.0
     wcwidth 0.2.13
@@ -1055,7 +1055,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">McMillion &amp; Linker</td>
-<td class="center">Expires 13 June 2025</td>
+<td class="center">Expires 21 June 2025</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1068,12 +1068,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-ietf-keytrans-protocol-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2024-12-10" class="published">10 December 2024</time>
+<time datetime="2024-12-18" class="published">18 December 2024</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2025-06-13">13 June 2025</time></dd>
+<dd class="expires"><time datetime="2025-06-21">21 June 2025</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1131,7 +1131,7 @@ timely manner.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 13 June 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 21 June 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1210,19 +1210,22 @@ timely manner.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
             <p id="section-toc.1-1.7.1"><a href="#section-7" class="auto internal xref">7</a>.  <a href="#name-cryptographic-computations" class="internal xref">Cryptographic Computations</a></p>
 <ul class="compact toc ulBare ulEmpty">
 <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.1">
-                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="auto internal xref">7.1</a>.  <a href="#name-verifiable-random-function" class="internal xref">Verifiable Random Function</a></p>
+                <p id="section-toc.1-1.7.2.1.1"><a href="#section-7.1" class="auto internal xref">7.1</a>.  <a href="#name-tree-head-signature" class="internal xref">Tree Head Signature</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.2">
-                <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="auto internal xref">7.2</a>.  <a href="#name-commitment" class="internal xref">Commitment</a></p>
+                <p id="section-toc.1-1.7.2.2.1"><a href="#section-7.2" class="auto internal xref">7.2</a>.  <a href="#name-update-format" class="internal xref">Update Format</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.3">
-                <p id="section-toc.1-1.7.2.3.1"><a href="#section-7.3" class="auto internal xref">7.3</a>.  <a href="#name-prefix-tree-2" class="internal xref">Prefix Tree</a></p>
+                <p id="section-toc.1-1.7.2.3.1"><a href="#section-7.3" class="auto internal xref">7.3</a>.  <a href="#name-commitment" class="internal xref">Commitment</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.4">
-                <p id="section-toc.1-1.7.2.4.1"><a href="#section-7.4" class="auto internal xref">7.4</a>.  <a href="#name-log-tree-2" class="internal xref">Log Tree</a></p>
+                <p id="section-toc.1-1.7.2.4.1"><a href="#section-7.4" class="auto internal xref">7.4</a>.  <a href="#name-verifiable-random-function" class="internal xref">Verifiable Random Function</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.5">
-                <p id="section-toc.1-1.7.2.5.1"><a href="#section-7.5" class="auto internal xref">7.5</a>.  <a href="#name-tree-head-signature" class="internal xref">Tree Head Signature</a></p>
+                <p id="section-toc.1-1.7.2.5.1"><a href="#section-7.5" class="auto internal xref">7.5</a>.  <a href="#name-log-tree-2" class="internal xref">Log Tree</a></p>
+</li>
+              <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.7.2.6">
+                <p id="section-toc.1-1.7.2.6.1"><a href="#section-7.6" class="auto internal xref">7.6</a>.  <a href="#name-tree-head-signature-2" class="internal xref">Tree Head Signature</a></p>
 </li>
             </ul>
 </li>
@@ -1233,7 +1236,7 @@ timely manner.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
                 <p id="section-toc.1-1.8.2.1.1"><a href="#section-8.1" class="auto internal xref">8.1</a>.  <a href="#name-log-tree-3" class="internal xref">Log Tree</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.2">
-                <p id="section-toc.1-1.8.2.2.1"><a href="#section-8.2" class="auto internal xref">8.2</a>.  <a href="#name-prefix-tree-3" class="internal xref">Prefix Tree</a></p>
+                <p id="section-toc.1-1.8.2.2.1"><a href="#section-8.2" class="auto internal xref">8.2</a>.  <a href="#name-prefix-tree-2" class="internal xref">Prefix Tree</a></p>
 </li>
               <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.8.2.3">
                 <p id="section-toc.1-1.8.2.3.1"><a href="#section-8.3" class="auto internal xref">8.3</a>.  <a href="#name-combined-tree-2" class="internal xref">Combined Tree</a></p>
@@ -1249,7 +1252,7 @@ timely manner.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
             </ul>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.9">
-            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-update-format" class="internal xref">Update Format</a></p>
+            <p id="section-toc.1-1.9.1"><a href="#section-9" class="auto internal xref">9</a>.  <a href="#name-update-format-2" class="internal xref">Update Format</a></p>
 </li>
           <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10">
             <p id="section-toc.1-1.10.1"><a href="#section-10" class="auto internal xref">10</a>. <a href="#name-user-operations" class="internal xref">User Operations</a></p>
@@ -1349,37 +1352,24 @@ pairs</em> to cryptographic keys or other structured data. Labels correspond to 
 identifiers, and a new version of a label is created each time the label's
 associated value changes. Transparency Logs have an <em>epoch</em> counter which is
 incremented every time a new set of label-version pairs are added.<a href="#section-3-1" class="pilcrow">¶</a></p>
-<span id="name-an-example-log-history-at-e"></span><figure id="figure-1">
-        <div class="alignLeft art-text artwork" id="section-3-2.1">
-<pre>
-  Epoch   Update      Set of logged Label-Version Pairs
-* n       X:0 -&gt; k    { ..., X:0 }
-* n+1     Y:3 -&gt; l    { ..., X:0, Y:3 }
-* n+2     Z:2 -&gt; m    { ..., X:0, Y:3, Z:2 }
-* n+3     X:1 -&gt; n    { ..., X:0, Y:3, Z:2, X:1 }
-</pre>
-</div>
-<figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
-<a href="#name-an-example-log-history-at-e" class="selfRef">An example log history. At epoch n the user with label X submits their first key k. As it is their first key, it is associated with version 0. At epoch n+1, user Y updates their key to l.</a>
-        </figcaption></figure>
-<p id="section-3-3">KT uses a <em>prefix tree</em> to commit to a mapping between each label-version pair
+<p id="section-3-2">KT uses a <em>prefix tree</em> to establish a mapping between each label-version pair
 and a commitment to the label's value at that version. Every time the prefix
 tree changes, its new root hash is stored in a <em>log tree</em>. The benefit of the
 prefix tree is that it is easily searchable, and the benefit of the log tree is
 that it can easily be verified to be append-only. The data structure powering KT
 combines a log tree and a prefix tree, and is called the <em>combined tree
-structure</em>.<a href="#section-3-3" class="pilcrow">¶</a></p>
-<p id="section-3-4">This section describes the operation of
+structure</em>.<a href="#section-3-2" class="pilcrow">¶</a></p>
+<p id="section-3-3">This section describes the operation of
 both prefix and log trees at a high level and the way that they're combined. More precise algorithms
 for computing the intermediate and root values of the trees are given in
-<a href="#cryptographic-computations" class="auto internal xref">Section 7</a>.<a href="#section-3-4" class="pilcrow">¶</a></p>
+<a href="#cryptographic-computations" class="auto internal xref">Section 7</a>.<a href="#section-3-3" class="pilcrow">¶</a></p>
 <div id="terminology">
 <section id="section-3.1">
         <h3 id="name-terminology">
 <a href="#section-3.1" class="section-number selfRef">3.1. </a><a href="#name-terminology" class="section-name selfRef">Terminology</a>
         </h3>
 <p id="section-3.1-1">Trees consist of
-<em>nodes</em> which have a byte string as their <em>hash value</em>. A node is either a
+<em>nodes</em>, which have a byte string as their <em>hash value</em>. A node is either a
 <em>leaf</em> if it has no children, or a <em>parent</em>
 if it has either a <em>left child</em> or a <em>right child</em>. A node is the <em>root</em> of a
 tree if it has no parents, and an <em>intermediate</em> if it has both children and
@@ -1391,6 +1381,8 @@ particular node, called the <em>head</em> of the subtree.<a href="#section-3.1-2
 concatenation of that node's parent along with the parent's direct path. The
 <em>copath</em> of a node is the node's sibling concatenated with the list of siblings
 of all the nodes in its direct path, excluding the root.<a href="#section-3.1-3" class="pilcrow">¶</a></p>
+<p id="section-3.1-4">The <em>size</em> of a tree or subtree is defined as the number of leaf nodes it
+contains.<a href="#section-3.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="log-tree">
@@ -1408,7 +1400,7 @@ constructed from the leaves present in the parent's own subtree. Given a list of
 <code>n</code> items, there is a unique left-balanced binary tree structure with these
 elements as leaves. Note also that every parent always has both a left and right
 child.<a href="#section-3.2-2" class="pilcrow">¶</a></p>
-<span id="name-a-log-tree-containing-five-"></span><figure id="figure-2">
+<span id="name-a-log-tree-containing-five-"></span><figure id="figure-1">
           <div id="section-3.2-3.1">
             <div class="alignLeft art-svg artwork" id="section-3.2-3.1.1">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="256" width="272" viewBox="0 0 272 256" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
@@ -1445,13 +1437,13 @@ child.<a href="#section-3.2-2" class="pilcrow">¶</a></p>
               </svg><a href="#section-3.2-3.1.1" class="pilcrow">¶</a>
 </div>
 </div>
-<figcaption><a href="#figure-2" class="selfRef">Figure 2</a>:
+<figcaption><a href="#figure-1" class="selfRef">Figure 1</a>:
 <a href="#name-a-log-tree-containing-five-" class="selfRef">A log tree containing five leaves.</a>
           </figcaption></figure>
 <p id="section-3.2-4">Log trees initially consist of a single leaf node. New leaves are
-added to the right-most edge of the tree along with a single parent node, to
+added to the right-most edge of the tree along with a single parent node to
 construct the left-balanced binary tree with <code>n+1</code> leaves.<a href="#section-3.2-4" class="pilcrow">¶</a></p>
-<span id="name-example-of-inserting-a-new-"></span><figure id="figure-3">
+<span id="name-example-of-inserting-a-new-"></span><figure id="figure-2">
           <div id="section-3.2-5.1">
             <div class="alignLeft art-svg artwork" id="section-3.2-5.1.1">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="256" width="320" viewBox="0 0 320 256" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
@@ -1493,7 +1485,7 @@ construct the left-balanced binary tree with <code>n+1</code> leaves.<a href="#s
               </svg><a href="#section-3.2-5.1.1" class="pilcrow">¶</a>
 </div>
 </div>
-<figcaption><a href="#figure-3" class="selfRef">Figure 3</a>:
+<figcaption><a href="#figure-2" class="selfRef">Figure 2</a>:
 <a href="#name-example-of-inserting-a-new-" class="selfRef">Example of inserting a new leaf with index 5 into the previously depicted log tree. Observe that only the nodes on the path from the new root to the new leaf change.</a>
           </figcaption></figure>
 <p id="section-3.2-6">While leaves contain arbitrary data, the value of a parent node is always the
@@ -1509,7 +1501,7 @@ more general version of the same idea. With a consistency proof, the prover
 provides the minimum set of intermediate node values from the current tree that
 allows the verifier to compute both the old root value and the current root
 value. An algorithm for this is given in section 2.1.2 of <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span>.<a href="#section-3.2-8" class="pilcrow">¶</a></p>
-<span id="name-illustration-of-a-proof-of-"></span><figure id="figure-4">
+<span id="name-illustration-of-a-proof-of-"></span><figure id="figure-3">
           <div id="section-3.2-9.1">
             <div class="alignLeft art-svg artwork" id="section-3.2-9.1.1">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="256" width="320" viewBox="0 0 320 256" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
@@ -1551,10 +1543,10 @@ value. An algorithm for this is given in section 2.1.2 of <span>[<a href="#RFC69
               </svg><a href="#section-3.2-9.1.1" class="pilcrow">¶</a>
 </div>
 </div>
-<figcaption><a href="#figure-4" class="selfRef">Figure 4</a>:
+<figcaption><a href="#figure-3" class="selfRef">Figure 3</a>:
 <a href="#name-illustration-of-a-proof-of-" class="selfRef">Illustration of a proof of inclusion. To verify that leaf 2 is included in the tree, the server provides the client with the hashes of the nodes on its copath, i.e., all hashes that are required for the client to compute the root hash itself. In the figure, the copath consists of the nodes marked by (X).</a>
           </figcaption></figure>
-<span id="name-illustration-of-a-consisten"></span><figure id="figure-5">
+<span id="name-illustration-of-a-consisten"></span><figure id="figure-4">
           <div id="section-3.2-10.1">
             <div class="alignLeft art-svg artwork" id="section-3.2-10.1.1">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="256" width="328" viewBox="0 0 328 256" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
@@ -1596,7 +1588,7 @@ value. An algorithm for this is given in section 2.1.2 of <span>[<a href="#RFC69
               </svg><a href="#section-3.2-10.1.1" class="pilcrow">¶</a>
 </div>
 </div>
-<figcaption><a href="#figure-5" class="selfRef">Figure 5</a>:
+<figcaption><a href="#figure-4" class="selfRef">Figure 4</a>:
 <a href="#name-illustration-of-a-consisten" class="selfRef">Illustration of a consistency proof. The server proves to the client that it correctly extended the tree by giving it the hashes of marked nodes ([X] / (X)). The client can verify that it can construct the old root hash from the hashes of nodes marked by (X), and that it can construct the new root hash when also considering the hash of the node [X].</a>
           </figcaption></figure>
 </section>
@@ -1606,23 +1598,24 @@ value. An algorithm for this is given in section 2.1.2 of <span>[<a href="#RFC69
         <h3 id="name-prefix-tree">
 <a href="#section-3.3" class="section-number selfRef">3.3. </a><a href="#name-prefix-tree" class="section-name selfRef">Prefix Tree</a>
         </h3>
-<p id="section-3.3-1">Prefix trees are used for storing key-value pairs, in a way that provides the
-ability to efficiently prove that a search key's value was looked up correctly.<a href="#section-3.3-1" class="pilcrow">¶</a></p>
-<p id="section-3.3-2">Each leaf node in a prefix tree represents a specific key-value pair, while each parent
-node represents some prefix which all search keys in the subtree headed by that node
-have in common. The subtree headed by a parent's left child contains all search keys
-that share its prefix followed by an additional 0 bit, while the subtree headed
-by a parent's right child contains all search keys that share its prefix followed by
-an additional 1 bit.<a href="#section-3.3-2" class="pilcrow">¶</a></p>
+<p id="section-3.3-1">Prefix trees store a mapping between search keys and their corresponding values,
+with the ability to efficiently prove that a search key's value was looked up
+correctly.<a href="#section-3.3-1" class="pilcrow">¶</a></p>
+<p id="section-3.3-2">Each leaf node in a prefix tree represents a specific mapping from search key to
+value, while each parent node represents some prefix which all search keys in
+the subtree headed by that node have in common. The subtree headed by a parent's
+left child contains all search keys that share its prefix followed by an
+additional 0 bit, while the subtree headed by a parent's right child contains
+all search keys that share its prefix followed by an additional 1 bit.<a href="#section-3.3-2" class="pilcrow">¶</a></p>
 <p id="section-3.3-3">The root node, in particular, represents the empty string as a prefix. The
 root's left child contains all search keys that begin with a 0 bit, while the right
 child contains all search keys that begin with a 1 bit.<a href="#section-3.3-3" class="pilcrow">¶</a></p>
-<p id="section-3.3-4">A prefix tree can be searched by starting at the root node, and moving to the
+<p id="section-3.3-4">A prefix tree can be searched by starting at the root node and moving to the
 left child if the first bit of a search key is 0, or the right child if the first bit
 is 1. This is then repeated for the second bit, third bit, and so on until the
 search either terminates at a leaf node (which may or may not be for the desired
 value), or a parent node that lacks the desired child.<a href="#section-3.3-4" class="pilcrow">¶</a></p>
-<span id="name-a-prefix-tree-containing-fi"></span><figure id="figure-6">
+<span id="name-a-prefix-tree-containing-fi"></span><figure id="figure-5">
           <div id="section-3.3-5.1">
             <div class="alignLeft art-svg artwork" id="section-3.3-5.1.1">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="240" width="296" viewBox="0 0 296 240" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
@@ -1662,7 +1655,7 @@ value), or a parent node that lacks the desired child.<a href="#section-3.3-4" c
               </svg><a href="#section-3.3-5.1.1" class="pilcrow">¶</a>
 </div>
 </div>
-<figcaption><a href="#figure-6" class="selfRef">Figure 6</a>:
+<figcaption><a href="#figure-5" class="selfRef">Figure 5</a>:
 <a href="#name-a-prefix-tree-containing-fi" class="selfRef">A prefix tree containing five entries.</a>
           </figcaption></figure>
 <p id="section-3.3-6">New key-value pairs are added to the tree by searching it according to the same process.
@@ -1672,7 +1665,7 @@ leaf for the wrong search key, one or more intermediate nodes are added until th
 leaf and the existing leaf would no longer reside in the same place. That is,
 until we reach the first bit that differs between the new search key and the existing
 search key.<a href="#section-3.3-6" class="pilcrow">¶</a></p>
-<span id="name-the-previous-prefix-tree-af"></span><figure id="figure-7">
+<span id="name-the-previous-prefix-tree-af"></span><figure id="figure-6">
           <div id="section-3.3-7.1">
             <div class="alignLeft art-svg artwork" id="section-3.3-7.1.1">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="240" width="344" viewBox="0 0 344 240" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
@@ -1718,7 +1711,7 @@ search key.<a href="#section-3.3-6" class="pilcrow">¶</a></p>
               </svg><a href="#section-3.3-7.1.1" class="pilcrow">¶</a>
 </div>
 </div>
-<figcaption><a href="#figure-7" class="selfRef">Figure 7</a>:
+<figcaption><a href="#figure-6" class="selfRef">Figure 6</a>:
 <a href="#name-the-previous-prefix-tree-af" class="selfRef">The previous prefix tree after adding the key-value pair: 01101 -&gt; F.</a>
           </figcaption></figure>
 <p id="section-3.3-8">The value of a leaf node is the encoded key-value pair, while the value of a
@@ -1739,7 +1732,7 @@ hash value of the tree.<a href="#section-3.3-9" class="pilcrow">¶</a></p>
 <a href="#section-3.4" class="section-number selfRef">3.4. </a><a href="#name-combined-tree" class="section-name selfRef">Combined Tree</a>
         </h3>
 <p id="section-3.4-1">Log trees are desirable because they can provide efficient consistency proofs to
-assure verifiers that nothing has been removed from a log that was present in a
+convince verifiers that nothing has been removed from a log that was present in a
 previous version. However, log trees can't be efficiently searched without
 downloading the entire log. Prefix trees are efficient to search and can provide
 inclusion proofs to convince verifiers that the returned search results are
@@ -1753,12 +1746,14 @@ log tree contains a record of each version of the prefix tree that's created.
 With some caveats, this combined structure supports both efficient consistency
 proofs and can be efficiently searched.<a href="#section-3.4-2" class="pilcrow">¶</a></p>
 <p id="section-3.4-3">Note that, although the Transparency Log maintains a single logical prefix tree,
-each modification of this tree results in a new root hash, which is then stored
-in the log tree. Therefore, when instructions refer to "looking up a label-version pair in the
-prefix tree at a given log entry," this actually means searching in the specific
-version of the prefix tree that corresponds to the root hash stored at that log
-entry (where a "log entry" refers to a leaf of the log tree).<a href="#section-3.4-3" class="pilcrow">¶</a></p>
-<span id="name-an-example-evolution-of-the"></span><figure id="figure-8">
+each modification of this tree results in a new root hash which is then stored
+in the log tree. As part of the protocol, the Transparency Log is often
+required to perform lookups in different versions of the prefix tree. Therefore,
+when instructions refer to "looking up a label-version pair in the prefix tree
+at a given log entry," this means performing the search in the specific version
+of the prefix tree whose root hash is stored at that log entry (where a "log
+entry" refers to a leaf of the log tree).<a href="#section-3.4-3" class="pilcrow">¶</a></p>
+<span id="name-an-example-evolution-of-the"></span><figure id="figure-7">
           <div id="section-3.4-4.1">
             <div class="alignLeft art-svg artwork" id="section-3.4-4.1.1">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="176" width="624" viewBox="0 0 624 176" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
@@ -1802,7 +1797,7 @@ entry (where a "log entry" refers to a leaf of the log tree).<a href="#section-3
               </svg><a href="#section-3.4-4.1.1" class="pilcrow">¶</a>
 </div>
 </div>
-<figcaption><a href="#figure-8" class="selfRef">Figure 8</a>:
+<figcaption><a href="#figure-7" class="selfRef">Figure 7</a>:
 <a href="#name-an-example-evolution-of-the" class="selfRef">An example evolution of the combined tree structure, following the example from the beginning of the section. At every epoch, a new leaf is added to a log tree, containing a change to a label's value and the updated prefix tree (PT).</a>
           </figcaption></figure>
 </section>
@@ -1841,9 +1836,9 @@ This is described in more detail in <a href="#putting-it-together" class="auto i
 <p id="section-4.1-1">Intuitively, the leaves of the log tree can be considered a flat array
 representation of a binary tree. This structure is similar to the log tree, but
 distinguished by the fact that not all parent nodes have two children. In this
-representation, "leaf" nodes are stored in even-numbered indices, while
-"intermediate" nodes are stored in odd-numbered indices:<a href="#section-4.1-1" class="pilcrow">¶</a></p>
-<span id="name-a-binary-tree-constructed-f"></span><figure id="figure-9">
+representation, "leaf" log entries are stored in even-numbered indices, while
+"intermediate" log entries are stored in odd-numbered indices:<a href="#section-4.1-1" class="pilcrow">¶</a></p>
+<span id="name-a-binary-tree-constructed-f"></span><figure id="figure-8">
           <div id="section-4.1-2.1">
             <div class="alignLeft art-svg artwork" id="section-4.1-2.1.1">
 <svg xmlns="http://www.w3.org/2000/svg" version="1.1" height="256" width="392" viewBox="0 0 392 256" class="diagram" text-anchor="middle" font-family="monospace" font-size="13px" stroke-linecap="round">
@@ -1900,7 +1895,7 @@ representation, "leaf" nodes are stored in even-numbered indices, while
               </svg><a href="#section-4.1-2.1.1" class="pilcrow">¶</a>
 </div>
 </div>
-<figcaption><a href="#figure-9" class="selfRef">Figure 9</a>:
+<figcaption><a href="#figure-8" class="selfRef">Figure 8</a>:
 <a href="#name-a-binary-tree-constructed-f" class="selfRef">A binary tree constructed from 14 entries in a log</a>
           </figcaption></figure>
 <p id="section-4.1-3">Following the structure of this binary tree when executing searches makes
@@ -2155,7 +2150,7 @@ are established and verifies that they're constructed correctly. Note that users
 can often execute this process with the output of Search or Update operations
 for a label, without waiting to make explicit Monitor queries.<a href="#section-5-5" class="pilcrow">¶</a></p>
 <p id="section-5-6">It is also worth noting that the work required to monitor several versions of
-the same label scales sublinearly, due to the fact that the direct paths of the
+the same label scales sublinearly due to the fact that the direct paths of the
 different versions will often intersect. Intersections reduce the total number
 of entries in the map and therefore the amount of work that will be needed to
 monitor the label from then on.<a href="#section-5-6" class="pilcrow">¶</a></p>
@@ -2168,7 +2163,7 @@ monitor the label from then on.<a href="#section-5-6" class="pilcrow">¶</a></p>
 <a href="#section-6" class="section-number selfRef">6. </a><a href="#name-ciphersuites" class="section-name selfRef">Ciphersuites</a>
       </h2>
 <p id="section-6-1">Each Transparency Log uses a single fixed ciphersuite, chosen when the log is
-initially created, that specifies the following primitives to be used for
+initially created, that specifies the following primitives and parameters to be used for
 cryptographic computations:<a href="#section-6-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-6-2.1">
@@ -2179,6 +2174,12 @@ cryptographic computations:<a href="#section-6-1" class="pilcrow">¶</a></p>
 </li>
         <li class="normal" id="section-6-2.3">
           <p id="section-6-2.3.1">A Verifiable Random Function (VRF) algorithm<a href="#section-6-2.3.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-6-2.4">
+          <p id="section-6-2.4.1"><code>Nc</code>: The size in bytes of commitment openings<a href="#section-6-2.4.1" class="pilcrow">¶</a></p>
+</li>
+        <li class="normal" id="section-6-2.5">
+          <p id="section-6-2.5.1"><code>Kc</code>: A fixed string of bytes used in the computation of commitments<a href="#section-6-2.5.1" class="pilcrow">¶</a></p>
 </li>
       </ul>
 <p id="section-6-3">The hash algorithm is used for computing the intermediate and root values of
@@ -2195,178 +2196,28 @@ defined in <a href="#kt-ciphersuites" class="auto internal xref">Section 12.1</a
       <h2 id="name-cryptographic-computations">
 <a href="#section-7" class="section-number selfRef">7. </a><a href="#name-cryptographic-computations" class="section-name selfRef">Cryptographic Computations</a>
       </h2>
-<div id="verifiable-random-function">
-<section id="section-7.1">
-        <h3 id="name-verifiable-random-function">
-<a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-verifiable-random-function" class="section-name selfRef">Verifiable Random Function</a>
-        </h3>
-<p id="section-7.1-1">Each label-version pair created in a log will have a unique
-representation in the prefix tree. This is computed by providing the combined
-label and version as inputs to the VRF:<a href="#section-7.1-1" class="pilcrow">¶</a></p>
-<div class="lang-tls-presentation sourcecode" id="section-7.1-2">
-<pre>
-struct {
-  opaque label&lt;0..2^8-1&gt;;
-  uint32 version;
-} VrfInput;
-</pre><a href="#section-7.1-2" class="pilcrow">¶</a>
-</div>
-<p id="section-7.1-3">The VRF's output evaluated on <code>VrfInput</code> is the concrete value inserted into the
-prefix tree.<a href="#section-7.1-3" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="commitment">
-<section id="section-7.2">
-        <h3 id="name-commitment">
-<a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-commitment" class="section-name selfRef">Commitment</a>
-        </h3>
-<p id="section-7.2-1">As discussed in <a href="#combined-tree" class="auto internal xref">Section 3.4</a>, commitments are stored in the leaves of the
-log tree and correspond to updates. Commitments are computed
-with HMAC <span>[<a href="#RFC2104" class="cite xref">RFC2104</a>]</span>, using the hash function specified by the ciphersuite. To
-produce a new commitment, the application generates a random 16 byte value
-called <code>opening</code> and computes:<a href="#section-7.2-1" class="pilcrow">¶</a></p>
-<div class="lang-pseudocode sourcecode" id="section-7.2-2">
-<pre>
-commitment = HMAC(fixedKey, CommitmentValue)
-</pre><a href="#section-7.2-2" class="pilcrow">¶</a>
-</div>
-<p id="section-7.2-3">where <code>fixedKey</code> is the 16 byte hex-decoded value:<a href="#section-7.2-3" class="pilcrow">¶</a></p>
-<div class="alignLeft art-text artwork" id="section-7.2-4">
-<pre>
-d821f8790d97709796b4d7903357c3f5
-</pre><a href="#section-7.2-4" class="pilcrow">¶</a>
-</div>
-<p id="section-7.2-5">and CommitmentValue is specified as:<a href="#section-7.2-5" class="pilcrow">¶</a></p>
-<div class="lang-tls-presentation sourcecode" id="section-7.2-6">
-<pre>
-struct {
-  opaque opening&lt;16&gt;;
-  opaque label&lt;0..2^8-1&gt;;
-  UpdateValue update;
-} CommitmentValue;
-</pre><a href="#section-7.2-6" class="pilcrow">¶</a>
-</div>
-<p id="section-7.2-7">This fixed key allows the HMAC function, and thereby the commitment scheme, to
-be modeled as a random oracle. The <code>label</code> field of CommitmentValue
-contains the label being updated
-and the <code>update</code> field contains the new value for the label.<a href="#section-7.2-7" class="pilcrow">¶</a></p>
-<p id="section-7.2-8">The output value <code>commitment</code> may be published, while <code>opening</code> should be kept
-private until the commitment is meant to be revealed.<a href="#section-7.2-8" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="prefix-tree-1">
-<section id="section-7.3">
-        <h3 id="name-prefix-tree-2">
-<a href="#section-7.3" class="section-number selfRef">7.3. </a><a href="#name-prefix-tree-2" class="section-name selfRef">Prefix Tree</a>
-        </h3>
-<p id="section-7.3-1">The leaf nodes of a prefix tree are serialized as:<a href="#section-7.3-1" class="pilcrow">¶</a></p>
-<div class="lang-tls sourcecode" id="section-7.3-2">
-<pre>
-struct {
-    opaque vrf_output&lt;VRF.Nh&gt;;
-    uint64 update_index;
-} PrefixLeaf;
-</pre><a href="#section-7.3-2" class="pilcrow">¶</a>
-</div>
-<p id="section-7.3-3">where <code>vrf_output</code> is the VRF output for the label-version pair, <code>VRF.Nh</code> is the
-output size of the ciphersuite VRF in bytes, and <code>update_index</code> is the index of
-the log tree's leaf committing to the respective value, i.e., the log tree's
-<code>tree_size</code> just after the respective label-version pair was inserted minus one.<a href="#section-7.3-3" class="pilcrow">¶</a></p>
-<p id="section-7.3-4">The parent nodes of a prefix tree are serialized as:<a href="#section-7.3-4" class="pilcrow">¶</a></p>
-<div class="lang-tls sourcecode" id="section-7.3-5">
-<pre>
-struct {
-  opaque value&lt;Hash.Nh&gt;;
-} PrefixParent;
-</pre><a href="#section-7.3-5" class="pilcrow">¶</a>
-</div>
-<p id="section-7.3-6">where <code>Hash.Nh</code> is the output length of the ciphersuite hash function. The value
-of a parent node is computed by hashing together the values of its left and
-right children:<a href="#section-7.3-6" class="pilcrow">¶</a></p>
-<div class="lang-pseudocode sourcecode" id="section-7.3-7">
-<pre>
-parent.value = Hash(0x01 ||
-                   nodeValue(parent.leftChild) ||
-                   nodeValue(parent.rightChild))
-
-nodeValue(node):
-  if node.type == emptyNode:
-    return 0 // all-zero vector of length Hash.Nh
-  else if node.type == leafNode:
-    return Hash(0x00 || node.vrf_output || node.update_index)
-  else if node.type == parentNode:
-    return node.value
-</pre><a href="#section-7.3-7" class="pilcrow">¶</a>
-</div>
-<p id="section-7.3-8">where <code>Hash</code> denotes the ciphersuite hash function.<a href="#section-7.3-8" class="pilcrow">¶</a></p>
-</section>
-</div>
-<div id="crypto-log-tree">
-<section id="section-7.4">
-        <h3 id="name-log-tree-2">
-<a href="#section-7.4" class="section-number selfRef">7.4. </a><a href="#name-log-tree-2" class="section-name selfRef">Log Tree</a>
-        </h3>
-<p id="section-7.4-1">The leaf and parent nodes of a log tree are serialized as:<a href="#section-7.4-1" class="pilcrow">¶</a></p>
-<div class="lang-tls-presentation sourcecode" id="section-7.4-2">
-<pre>
-struct {
-  opaque commitment&lt;Hash.Nh&gt;;
-  opaque prefix_tree&lt;Hash.Nh&gt;;
-} LogLeaf;
-
-struct {
-  opaque value&lt;Hash.Nh&gt;;
-} LogParent;
-</pre><a href="#section-7.4-2" class="pilcrow">¶</a>
-</div>
-<p id="section-7.4-3">The <code>commitment</code> field contains the output of evaluating HMAC on
-<code>CommitmentValue</code>, as described in <a href="#commitment" class="auto internal xref">Section 7.2</a>. The <code>prefix_tree</code> field
-contains the root hash of the prefix tree, after inserting a new label-version
-pair for the <code>label</code> in <code>CommitmentValue</code>.<a href="#section-7.4-3" class="pilcrow">¶</a></p>
-<p id="section-7.4-4">The value of a parent node is computed by hashing together the values of its
-left and right children:<a href="#section-7.4-4" class="pilcrow">¶</a></p>
-<div class="lang-pseudocode sourcecode" id="section-7.4-5">
-<pre>
-parent.value = Hash(hashContent(parent.leftChild) ||
-                    hashContent(parent.rightChild))
-
-hashContent(node):
-  if node.type == leafNode:
-    return 0x00 || nodeValue(node)
-  else if node.type == parentNode:
-    return 0x01 || nodeValue(node)
-
-nodeValue(node):
-  if node.type == leafNode:
-    return Hash(node.commitment || node.prefix_tree)
-  else if node.type == parentNode:
-    return node.value
-</pre><a href="#section-7.4-5" class="pilcrow">¶</a>
-</div>
-</section>
-</div>
 <div id="tree-head-signature">
-<section id="section-7.5">
+<section id="section-7.1">
         <h3 id="name-tree-head-signature">
-<a href="#section-7.5" class="section-number selfRef">7.5. </a><a href="#name-tree-head-signature" class="section-name selfRef">Tree Head Signature</a>
+<a href="#section-7.1" class="section-number selfRef">7.1. </a><a href="#name-tree-head-signature" class="section-name selfRef">Tree Head Signature</a>
         </h3>
-<p id="section-7.5-1">The head of a Transparency Log, which represents the log's most recent state, is
-represented as:<a href="#section-7.5-1" class="pilcrow">¶</a></p>
-<div class="lang-tls-presentation sourcecode" id="section-7.5-2">
+<p id="section-7.1-1">The head of a Transparency Log, which represents the log's most recent state, is
+represented as:<a href="#section-7.1-1" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-7.1-2">
 <pre>
 struct {
   uint64 tree_size;
   opaque signature&lt;0..2^16-1&gt;;
 } TreeHead;
-</pre><a href="#section-7.5-2" class="pilcrow">¶</a>
+</pre><a href="#section-7.1-2" class="pilcrow">¶</a>
 </div>
-<p id="section-7.5-3">where <code>tree_size</code> counts the number of entries in the log tree. If the
-Transparency Log is deployed with Third-party Management then the public key
+<p id="section-7.1-3">where <code>tree_size</code> counts the number of leaves of the log tree. If the
+Transparency Log is deployed with Third-party Management, then the public key
 used to verify the signature belongs to the third-party manager; otherwise the
-public key used belongs to the service operator.<a href="#section-7.5-3" class="pilcrow">¶</a></p>
-<p id="section-7.5-4">The signature itself is computed over a <code>TreeHeadTBS</code> structure, which
-incorporates the log's current state as well as long-term log configuration:<a href="#section-7.5-4" class="pilcrow">¶</a></p>
-<div class="lang-tls-presentation sourcecode" id="section-7.5-5">
+public key used belongs to the service operator.<a href="#section-7.1-3" class="pilcrow">¶</a></p>
+<p id="section-7.1-4">The signature itself is computed over a <code>TreeHeadTBS</code> structure which
+incorporates the log's current state as well as long-term log configuration:<a href="#section-7.1-4" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-7.1-5">
 <pre>
 enum {
   reserved(0),
@@ -2396,7 +2247,203 @@ struct {
   uint64 tree_size;
   opaque root&lt;Hash.Nh&gt;;
 } TreeHeadTBS;
+</pre><a href="#section-7.1-5" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="update-format">
+<section id="section-7.2">
+        <h3 id="name-update-format">
+<a href="#section-7.2" class="section-number selfRef">7.2. </a><a href="#name-update-format" class="section-name selfRef">Update Format</a>
+        </h3>
+<p id="section-7.2-1">The updates committed to by the prefix tree contain the new value of a label,
+along with additional information depending on the deployment mode of the
+Transparency Log. They are serialized as follows:<a href="#section-7.2-1" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-7.2-2">
+<pre>
+struct {
+  select (Configuration.mode) {
+    case thirdPartyManagement:
+      opaque signature&lt;0..2^16-1&gt;;
+  };
+} UpdatePrefix;
+
+struct {
+  UpdatePrefix prefix;
+  opaque value&lt;0..2^32-1&gt;;
+} UpdateValue;
+</pre><a href="#section-7.2-2" class="pilcrow">¶</a>
+</div>
+<p id="section-7.2-3">The <code>value</code> field contains the new value associated with the label.<a href="#section-7.2-3" class="pilcrow">¶</a></p>
+<p id="section-7.2-4">In the event that third-party management is used, the <code>prefix</code> field contains a
+signature from the service operator, using the public key from
+<code>Configuration.leaf_public_key</code>, over the following structure:<a href="#section-7.2-4" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-7.2-5">
+<pre>
+struct {
+  opaque label&lt;0..2^8-1&gt;;
+  uint32 version;
+  opaque value&lt;0..2^32-1&gt;;
+} UpdateTBS;
+</pre><a href="#section-7.2-5" class="pilcrow">¶</a>
+</div>
+<p id="section-7.2-6">The <code>label</code> field contains the label being updated, <code>version</code> contains the new
+version, and <code>value</code> contains the same contents as <code>UpdateValue.value</code>. Clients
+<span class="bcp14">MUST</span> successfully verify this signature before consuming <code>UpdateValue.value</code>.<a href="#section-7.2-6" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="commitment">
+<section id="section-7.3">
+        <h3 id="name-commitment">
+<a href="#section-7.3" class="section-number selfRef">7.3. </a><a href="#name-commitment" class="section-name selfRef">Commitment</a>
+        </h3>
+<p id="section-7.3-1">As discussed in <a href="#combined-tree" class="auto internal xref">Section 3.4</a>, commitments are stored in the leaves of the
+prefix tree rather than raw <code>UpdateValue</code> structures. Commitments are computed
+with HMAC <span>[<a href="#RFC2104" class="cite xref">RFC2104</a>]</span>, using the hash function specified by the ciphersuite. To
+produce a new commitment, the application generates a random <code>Nc</code>-byte value
+called <code>opening</code> and computes:<a href="#section-7.3-1" class="pilcrow">¶</a></p>
+<div class="lang-pseudocode sourcecode" id="section-7.3-2">
+<pre>
+commitment = HMAC(Kc, CommitmentValue)
+</pre><a href="#section-7.3-2" class="pilcrow">¶</a>
+</div>
+<p id="section-7.3-3">where <code>Kc</code> is a string of bytes defined by the ciphersuite and CommitmentValue
+is specified as:<a href="#section-7.3-3" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-7.3-4">
+<pre>
+struct {
+  opaque opening&lt;Nc&gt;;
+  opaque label&lt;0..2^8-1&gt;;
+  UpdateValue update;
+} CommitmentValue;
+</pre><a href="#section-7.3-4" class="pilcrow">¶</a>
+</div>
+<p id="section-7.3-5">The <code>label</code> field of CommitmentValue contains the label being updated and the
+<code>update</code> field contains the new value for the label. The output value
+<code>commitment</code> may be published, while <code>opening</code> should only be revealed to users
+that are authorized to receive the label's contents.<a href="#section-7.3-5" class="pilcrow">¶</a></p>
+<p id="section-7.3-6">The Transparency Log <span class="bcp14">MAY</span> generate <code>opening</code> in a programmatic way. However, it
+<span class="bcp14">SHOULD</span> ensure that <code>opening</code> can later be deleted and not feasibly recovered.
+This preserves the Transparency Log's ability to delete certain information in
+compliance with privacy laws.<a href="#section-7.3-6" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="verifiable-random-function">
+<section id="section-7.4">
+        <h3 id="name-verifiable-random-function">
+<a href="#section-7.4" class="section-number selfRef">7.4. </a><a href="#name-verifiable-random-function" class="section-name selfRef">Verifiable Random Function</a>
+        </h3>
+<p id="section-7.4-1">Each label-version pair created will have a unique
+representation in the prefix tree. This is computed by providing the combined
+label and version as inputs to the VRF:<a href="#section-7.4-1" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-7.4-2">
+<pre>
+struct {
+  opaque label&lt;0..2^8-1&gt;;
+  uint32 version;
+} VrfInput;
+</pre><a href="#section-7.4-2" class="pilcrow">¶</a>
+</div>
+<p id="section-7.4-3">The VRF's output evaluated on <code>VrfInput</code> is the concrete value inserted into the
+prefix tree.<a href="#section-7.4-3" class="pilcrow">¶</a></p>
+</section>
+</div>
+<div id="crypto-log-tree">
+<section id="section-7.5">
+        <h3 id="name-log-tree-2">
+<a href="#section-7.5" class="section-number selfRef">7.5. </a><a href="#name-log-tree-2" class="section-name selfRef">Log Tree</a>
+        </h3>
+<p id="section-7.5-1">The leaf and parent nodes of a log tree are serialized as:<a href="#section-7.5-1" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-7.5-2">
+<pre>
+struct {
+  opaque commitment&lt;Hash.Nh&gt;;
+  opaque prefix_tree&lt;Hash.Nh&gt;;
+} LogLeaf;
+
+struct {
+  opaque value&lt;Hash.Nh&gt;;
+} LogParent;
+</pre><a href="#section-7.5-2" class="pilcrow">¶</a>
+</div>
+<p id="section-7.5-3">The <code>commitment</code> field contains the output of evaluating HMAC on
+<code>CommitmentValue</code>, as described in <a href="#commitment" class="auto internal xref">Section 7.3</a>. The <code>prefix_tree</code> field
+contains the root hash of the prefix tree, after inserting a new label-version
+pair for the <code>label</code> in <code>CommitmentValue</code>.<a href="#section-7.5-3" class="pilcrow">¶</a></p>
+<p id="section-7.5-4">The value of a parent node is computed by hashing together the values of its
+left and right children:<a href="#section-7.5-4" class="pilcrow">¶</a></p>
+<div class="lang-pseudocode sourcecode" id="section-7.5-5">
+<pre>
+parent.value = Hash(hashContent(parent.leftChild) ||
+                    hashContent(parent.rightChild))
+
+hashContent(node):
+  if node.type == leafNode:
+    return 0x00 || nodeValue(node)
+  else if node.type == parentNode:
+    return 0x01 || nodeValue(node)
+
+nodeValue(node):
+  if node.type == leafNode:
+    return Hash(node.commitment || node.prefix_tree)
+  else if node.type == parentNode:
+    return node.value
 </pre><a href="#section-7.5-5" class="pilcrow">¶</a>
+</div>
+</section>
+</div>
+<div id="tree-head-signature-1">
+<section id="section-7.6">
+        <h3 id="name-tree-head-signature-2">
+<a href="#section-7.6" class="section-number selfRef">7.6. </a><a href="#name-tree-head-signature-2" class="section-name selfRef">Tree Head Signature</a>
+        </h3>
+<p id="section-7.6-1">The head of a Transparency Log, which represents the log's most recent state, is
+represented as:<a href="#section-7.6-1" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-7.6-2">
+<pre>
+struct {
+  uint64 tree_size;
+  opaque signature&lt;0..2^16-1&gt;;
+} TreeHead;
+</pre><a href="#section-7.6-2" class="pilcrow">¶</a>
+</div>
+<p id="section-7.6-3">where <code>tree_size</code> counts the number of entries in the log tree. If the
+Transparency Log is deployed with Third-party Management then the public key
+used to verify the signature belongs to the third-party manager; otherwise the
+public key used belongs to the service operator.<a href="#section-7.6-3" class="pilcrow">¶</a></p>
+<p id="section-7.6-4">The signature itself is computed over a <code>TreeHeadTBS</code> structure, which
+incorporates the log's current state as well as long-term log configuration:<a href="#section-7.6-4" class="pilcrow">¶</a></p>
+<div class="lang-tls-presentation sourcecode" id="section-7.6-5">
+<pre>
+enum {
+  reserved(0),
+  contactMonitoring(1),
+  thirdPartyManagement(2),
+  thirdPartyAuditing(3),
+  (255)
+} DeploymentMode;
+
+struct {
+  CipherSuite ciphersuite;
+  DeploymentMode mode;
+  opaque signature_public_key&lt;0..2^16-1&gt;;
+  opaque vrf_public_key&lt;0..2^16-1&gt;;
+
+  select (Configuration.mode) {
+    case contactMonitoring:
+    case thirdPartyManagement:
+      opaque leaf_public_key&lt;0..2^16-1&gt;;
+    case thirdPartyAuditing:
+      opaque auditor_public_key&lt;0..2^16-1&gt;;
+  };
+} Configuration;
+
+struct {
+  Configuration config;
+  uint64 tree_size;
+  opaque root&lt;Hash.Nh&gt;;
+} TreeHeadTBS;
+</pre><a href="#section-7.6-5" class="pilcrow">¶</a>
 </div>
 </section>
 </div>
@@ -2412,10 +2459,10 @@ struct {
         <h3 id="name-log-tree-3">
 <a href="#section-8.1" class="section-number selfRef">8.1. </a><a href="#name-log-tree-3" class="section-name selfRef">Log Tree</a>
         </h3>
-<p id="section-8.1-1">An inclusion proof for a single leaf in a log tree is given by providing the
-copath values of a leaf. Similarly, a bulk inclusion proof for any number of
-leaves is given by providing the fewest node values that can be hashed together
-with the specified leaves to produce the root value. Such a proof is encoded as:<a href="#section-8.1-1" class="pilcrow">¶</a></p>
+<p id="section-8.1-1">The inclusion of some leaf in a tree head, or consistency between two tree
+heads, is proven by providing the smallest set of intermediate nodes from the
+log tree that allows the user to compute the tree's root hash from the leaf or
+other intermediate node values they already have. Such a proof is encoded as:<a href="#section-8.1-1" class="pilcrow">¶</a></p>
 <div class="lang-tls-presentation sourcecode" id="section-8.1-2">
 <pre>
 opaque NodeValue&lt;Hash.Nh&gt;;
@@ -2427,7 +2474,7 @@ struct {
 </div>
 <p id="section-8.1-3">Each <code>NodeValue</code> is a uniform size, computed by passing the relevant <code>LogLeaf</code>
 or <code>LogParent</code> structures through the <code>nodeValue</code> function in
-<a href="#crypto-log-tree" class="auto internal xref">Section 7.4</a>. The contents of the <code>elements</code> array is kept in
+<a href="#crypto-log-tree" class="auto internal xref">Section 7.5</a>. The contents of the <code>elements</code> array is kept in
 left-to-right order: if a node is present in the root's left subtree, its value
 must be listed before any values provided from nodes that are in the root's
 right subtree, and so on recursively.<a href="#section-8.1-3" class="pilcrow">¶</a></p>
@@ -2444,14 +2491,13 @@ struct {
 correspond to those output by the algorithm in Section 2.1.2 of <span>[<a href="#RFC6962" class="cite xref">RFC6962</a>]</span>.<a href="#section-8.1-6" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="prefix-tree-2">
+<div id="prefix-tree-1">
 <section id="section-8.2">
-        <h3 id="name-prefix-tree-3">
-<a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-prefix-tree-3" class="section-name selfRef">Prefix Tree</a>
+        <h3 id="name-prefix-tree-2">
+<a href="#section-8.2" class="section-number selfRef">8.2. </a><a href="#name-prefix-tree-2" class="section-name selfRef">Prefix Tree</a>
         </h3>
-<p id="section-8.2-1">A proof from a prefix tree authenticates that a set of values are either members
-of, or are not members of, the total set of values represented by the prefix
-tree. Such a proof is encoded as:<a href="#section-8.2-1" class="pilcrow">¶</a></p>
+<p id="section-8.2-1">A proof from a prefix tree authenticates that a search was done correctly for a
+given search key. Such a proof is encoded as:<a href="#section-8.2-1" class="pilcrow">¶</a></p>
 <div class="lang-tls sourcecode" id="section-8.2-2">
 <pre>
 enum {
@@ -2464,8 +2510,6 @@ enum {
 struct {
   PrefixSearchResultType result_type;
   select (PrefixSearchResult.result_type) {
-    case inclusion:
-      uint64 update_index;
     case nonInclusionLeaf:
       PrefixLeaf leaf;
   };
@@ -2479,16 +2523,16 @@ struct {
 </pre><a href="#section-8.2-2" class="pilcrow">¶</a>
 </div>
 <p id="section-8.2-3">The <code>results</code> field contains the search result for each individual value. It is
-sorted lexicographically by corresponding value. The <code>result_type</code> field of each
-<code>PrefixSearchResult</code> struct indicates what the terminal node of the search for
-that value was:<a href="#section-8.2-3" class="pilcrow">¶</a></p>
+sorted lexicographically by search key (which is always a VRF output in this
+protocol). The <code>result_type</code> field of each <code>PrefixSearchResult</code> struct indicates
+what the terminal node of the search for that value was:<a href="#section-8.2-3" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-8.2-4.1">
             <p id="section-8.2-4.1.1"><code>inclusion</code> for a leaf node matching the requested value.<a href="#section-8.2-4.1.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-8.2-4.2">
             <p id="section-8.2-4.2.1"><code>nonInclusionLeaf</code> for a leaf node not matching the requested value. In this
-case, the terminal node's value is provided given that it can not be inferred.<a href="#section-8.2-4.2.1" class="pilcrow">¶</a></p>
+case, the terminal node's value is provided since it can not be inferred.<a href="#section-8.2-4.2.1" class="pilcrow">¶</a></p>
 </li>
           <li class="normal" id="section-8.2-4.3">
             <p id="section-8.2-4.3.1"><code>nonInclusionParent</code> for a parent node that lacks the desired child.<a href="#section-8.2-4.3.1" class="pilcrow">¶</a></p>
@@ -2504,8 +2548,8 @@ nodes that are in the root's right subtree, and so on recursively. In the event
 that a node is not present, an all-zero byte string of length <code>Hash.Nh</code> is
 listed instead.<a href="#section-8.2-6" class="pilcrow">¶</a></p>
 <p id="section-8.2-7">The proof is verified by hashing together the provided elements, in the
-left/right arrangement dictated by the tree structure, and checking that the
-result equals the root value of the prefix tree.<a href="#section-8.2-7" class="pilcrow">¶</a></p>
+left/right arrangement dictated by the bits of the search keys, and checking
+that the result equals the root value of the prefix tree.<a href="#section-8.2-7" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="proof-combined-tree">
@@ -2619,10 +2663,10 @@ tree.<a href="#section-8.3.2-6" class="pilcrow">¶</a></p>
 </div>
 </section>
 </div>
-<div id="update-format">
+<div id="update-format-1">
 <section id="section-9">
-      <h2 id="name-update-format">
-<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-update-format" class="section-name selfRef">Update Format</a>
+      <h2 id="name-update-format-2">
+<a href="#section-9" class="section-number selfRef">9. </a><a href="#name-update-format-2" class="section-name selfRef">Update Format</a>
       </h2>
 <p id="section-9-1">The updates committed to by a combined tree structure contain the new value of a
 label, along with additional information depending on the deployment mode
@@ -2734,7 +2778,7 @@ determined that the search was executed incorrectly, abort with an error.<a href
 </li>
         </ol>
 <p id="section-10.1-7">Depending on the deployment mode of the Transparency Log, the <code>value</code> field may
-or may not require additional verification, specified in <a href="#update-format" class="auto internal xref">Section 9</a>,
+or may not require additional verification, specified in <a href="#update-format" class="auto internal xref">Section 7.2</a>,
 before its contents may be consumed.<a href="#section-10.1-7" class="pilcrow">¶</a></p>
 </section>
 </div>
