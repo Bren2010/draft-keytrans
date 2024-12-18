@@ -785,7 +785,7 @@ than for search:
 This could be equivalently computed as a search binary ladder, excluding lookups
 for any versions greater than the target.
 
-## Algorithm
+## Algorithm {#m-algorithm}
 
 To monitor a given label, users maintain a small amount of state: a map from a
 position in the log to a version counter. The version counter is the highest
@@ -844,26 +844,26 @@ retain the rightmost distinguished log entry where they've verified that the
 most recent version of the label is correct. Users advertise this log entry's
 position in their Monitor request. For a number of subsequent distinguished log
 entries, the Transparency Log states the greatest version of the label that the
-log entry's prefix tree contains. It then provides a search-style binary ladder,
-as described in {{binary-ladder}}, including any lookups that would typically be
-omitted. Users verify that the version has not unexpectedly increased or
-decreased, and that the binary ladder terminates in way that's consistent with
-the provided version being the greatest that exists.
+log entry's prefix tree contains and provides a search-style binary ladder, as
+described in {{binary-ladder}}, to prove it. No lookups are omitted from the
+binary ladder according to the rules described in {{binary-ladder}}. However,
+lookups for any versions of the label that were already provided in a
+lower-bound binary ladder from the same log entry *are* omitted.
 
-Importantly, users verify that they receive a binary ladder for the
-distinguished log entry immediately following the one they've advertised, the
-distinguished log entry immediately following that one, and so on. The
-Transparency Log provides whichever intermediate timestamps are necessary to
-demonstrate that this is the case. To avoid overloading itself, the Transparency
-Log has the option to limit the number of distinguished log entries it provides
-binary ladders for in a single response.
+Users verify that the version has not unexpectedly increased or decreased, and
+that the binary ladder terminates in way that's consistent with the provided
+version being the greatest that exists. Importantly, users also verify that they
+receive a binary ladder for the distinguished log entry immediately following
+the one they've advertised, the distinguished log entry immediately following
+that one, and so on. The Transparency Log provides whichever intermediate
+timestamps are necessary to demonstrate that this is the case. To avoid
+overloading itself, the Transparency Log has the option to limit the number of
+distinguished log entries it provides binary ladders for in a single response.
 
-If the user is monitoring the label for the first time since it was created (or
-for the first time since they took ownership of it), they advertise no log entry
-to the Transparency Log and initialize their state by setting it to be the
-distinguished log entry that terminates monitoring in step 4 above. The
-Transparency Log provides binary ladders for additional subsequent distinguised
-log entries.
+If the user is monitoring the label for the first time since it was created,
+they advertise the first distinguished log entry to the left of the first log
+entry to contain the label. The Transparency Log provides binary ladders for
+subsequent distinguised log entries.
 
 
 # Greatest-Version Searches
@@ -1326,6 +1326,23 @@ following is provided:
 
 Users verify the output as specified in {{fv-algorithm}}.
 
+### Monitor
+
+For a user to monitor a label in the combined tree, the following is provided:
+
+- For each entry in the user's monitoring map:
+  - The timestamps needed by the algorithm in {{distinguished-log-entries}} to
+    determine where the monitoring algorithm would first reach a distinguished
+    log entry. This may either be the log entry in the user's monitoring map, or
+    some other log entry from the list computed in step 2 of {{m-algorithm}}.
+  - Where necessary for the algorithm in {{m-algorithm}}, a lower-bound binary
+    ladder targeting the version in the user's monitoring map.
+- If the user owns the label:
+  - The timestamps needed by the algorithm in {{distinguished-log-entries}} to
+    conduct a depth-first search for each subsequent distinguished log entry.
+  - For each distinguished log entry, a binary ladder targeting the greatest
+    version of the label that the log entry contains.
+
 ### Greatest-Version Search
 
 For a user to search the combined tree for the greatest version of a label, the
@@ -1337,79 +1354,10 @@ following is provided:
 
 Note that the log entry timestamps are already provided as part of updating the
 user's view of the tree, and that no additional timestamps are necessary to
-identify the starting log entry.
-
-### Monitor
-
-For a user to monitor a label in the combined tree, the following is provided:
+identify the starting log entry. Users verify the proof as described in
+{{greatest-version-searches}}.
 
 <!--
-### Fixed-Version
-
-Searching the combined tree for a specific version of a label follows the
-execution of a binary search through the leaves of the log tree, as described in
-{{fixed-version-searches}}. It is serialized as follows:
-
-~~~ tls-presentation
-
-struct {
-  opaque proof<VRF.Np>;
-  opaque commitment<Hash.Nh>;
-} BinaryLadderStep;
-
-struct {
-  uint64 timestamp;
-  PrefixProof prefix_proof; // TODO: May just need to provide root hash
-} ProofStep;
-
-struct {
-  BinaryLadderStep binary_ladder<0..2^8-1>;
-  ProofStep steps<0..2^8-1>;
-  InclusionProof inclusion;
-} SearchProof;
-~~~
-
-Each element of `binary_ladder` corresponds to the steps of the binary ladder
-described in {{binary-ladder}}. The `proof` field contains the contains the
-output of evaluating the VRF on a specified version of the label, and
-`commitment` contains the commitment to the `UpdateValue` of the label-version
-pair. The elements of `binary_ladder` are in the same order as they were
-computed in {{binary-ladder}}.
-
-Each `ProofStep` structure in `steps` is one log entry that was inspected as
-part of the binary search. The first step corresponds to the "middle" leaf of
-the log tree (calculated with the `root` function in
-{{implicit-binary-search-tree}}). From there, each subsequent step moves left or
-right in the tree according to the procedure discussed in
-{{fixed-version-searches}}.
-
-The `timestamp` field of a `ProofStep` contains the log entry's timestamp, and
-the `prefix_proof` field contains the output of executing a binary ladder in the
-version of the prefix tree stored in the log entry. The binary ladder is
-truncated, meaning that it stops after the first proof of inclusion for a
-version greater than or equal to the target version, or the first proof of
-non-inclusion for a version less than the target version.
-
-Furthermore, for  any ladder steps for which a proof of inclusion is expected
-and a proof of inclusion was already provided in a previous `ProofStep` for a
-log entry to the left of the current one, these ladder steps are omitted from
-`prefix_proof`.
-
-Finally, the `inclusion` field of `SearchProof` contains a batch inclusion
-proof for all of the leaves accessed by the binary search.
-
-The proof can be verified by the following steps:
-
-1. Verify that the `binary_ladder` array has the expected number of entries and
-   compute the VRF output for each label-version pair in the ladder.
-2. Follow the algorithm in {{fixed-version-searches}}.
-3. Verify that the `steps` array has the exact number of entries necessary to
-   execute the binary search (no more or less).
-4. Compute the root of each prefix tree represented by a `prefix_proof` and
-   combine it with the corresponding `timestamp` to obtain the value of each
-   leaf.
-5. Combine the leaf values with the proof in `inclusion` to compute a candidate
-   value for the root of the log tree. Verify the root is correct.
 
 ### Proofs for Third-Party Auditing
 
@@ -1501,11 +1449,12 @@ struct {
 struct {
   FullTreeHead full_tree_head;
 
+  optional<uint32> version;
   BinaryLadderStep binary_ladder<0..2^8-1>;
   CombinedTreeProof search;
   InclusionProof inclusion;
 
-  opaque opening<16>;
+  opaque opening<Nc>;
   UpdateValue value;
 } SearchResponse;
 ~~~
@@ -1519,7 +1468,9 @@ that the versions are output by the algorithm in {{binary-ladder}}.
 The `search` field contains the output of updating the user's view of the tree
 to match `FullTreeHead.tree_head.size` followed by either a fixed-version or
 greatest-version search for the requested label, depending on whether `version`
-was provided in `SearchRequest` or not.
+was provided in `SearchRequest` or not. If searching for the greatest version of
+the label, this version is provided in `SearchResponse.version`; otherwise, the
+field is empty.
 
 The `inclusion` field contains a proof of inclusion for all of the log tree
 leaves where either a search proof was provided in
@@ -1571,7 +1522,7 @@ struct {
   CombinedTreeProof search;
   InclusionProof inclusion;
 
-  opaque opening<16>;
+  opaque opening<Nc>;
   UpdatePrefix prefix;
 } UpdateResponse;
 ~~~
@@ -1592,112 +1543,94 @@ Transparency Log containing information about the labels they wish to monitor.
 
 ~~~ tls-presentation
 struct {
+  uint64 position;
+  uint32 version;
+} MonitorMapEntry;
+
+struct {
   opaque label<0..2^8-1>;
-  uint32 highest_version;
-  uint64 entries<0..2^8-1>;
+  MonitorMapEntry entries<0..2^8-1>;
+  optional<uint64> rightmost;
 } MonitorLabel;
 
 struct {
   optional<uint32> last;
-
-  MonitorLabel owned_labels<0..2^8-1>;
-  MonitorLabel contact_labels<0..2^8-1>;
+  MonitorLabel labels<0..2^8-1>;
 } MonitorRequest;
 ~~~
 
-Users include each of the labels that they own in `owned_labels`. If the
-Transparency Log is deployed with Contact Monitoring (or simply if the user
-wants a higher degree of confidence in the log), they also include any labels
-they've looked up in `contact_labels`.
-
-Each `MonitorLabel` structure contains the label being monitored in `label`,
-the highest version of the label that the user has observed in `highest_version`,
-and a list of `entries` in the log tree corresponding to the keys of the map
-described in {{monitoring-the-tree}}.
+Each MonitorLabel structure in `labels` contains the label to monitor in
+`label`, and a list in the `entries` field corresponding to the map described in
+{{m-algorithm}}. If the user owns the label, they additionally indicate in
+`rightmost` the position of the rightmost distinguished log entry where they
+have verified that the greatest version of the label is correctly represented.
 
 The Transparency Log verifies the MonitorRequest by following these steps, for
 each `MonitorLabel` structure:
 
-1. Verify that the requested labels in `owned_labels` and `contact_labels` are all
-   distinct.
-2. Verify that the user owns every label in `owned_labels`, and is allowed (or was
-   previously allowed) to lookup every label in `contact_labels`, based on the
-   application's policy.
-3. Verify that the `highest_version` for each label is less than or equal to the
-   most recent version of each label.
-4. Verify that each `entries` array is sorted in ascending order, and that all
-   entries are within the bounds of the log.
-5. Verify each entry lies on the direct path of different versions of the label.
+1. Verify that the `label` field of every MonitorLabel is unique. For all
+   MonitorLabel structures with `rightmost` provided, verify that the user owns
+   the label (according to application-layer policy). For all other MonitorLabel
+   structures, verify that the user is currently, or was previously, allowed to
+   lookup all versions of the label contained in a MonitorMapEntry.
+2. Verify that each MonitorMapEntry in the same MonitorLabel structure is sorted
+   in ascending order by `position`. Additionally, verify that each `version`
+   field is unique and that `position` lies on the direct path of the first log
+   entry to contain version `version` of the label.
+3. Verify that `rightmost` is a distinguished log entry to the right of
+   the first version of the label, or that it was the rightmost distinguished
+   log entry immediately after the label was first inserted.
 
-If the request is valid, the Transparency Log responds with a MonitorResponse
-structure:
+While access control decisions generally belong solely to the application, users
+must be able to monitor versions of a label they previously looked up, even if
+they would no longer be allowed to make the same query. One simple way for a
+user to prove that they were previously allowed to lookup a particular version
+of a label would be for them to provide the commitment opening for the version.
+However, there is no provision for this in the protocol; it would need to be
+done in the application layer.
+
+If the request is valid and passes access control, the Transparency Log responds
+with a MonitorResponse structure:
 
 ~~~ tls-presentation
 struct {
-  uint32 version;
-  VRFProof vrf_proofs<0..2^8-1>;
-  ProofStep steps<0..2^8-1>;
-} MonitorProof;
+  uint32 versions<0..2^8-1>;
+} MonitorLabelVersions;
 
 struct {
   FullTreeHead full_tree_head;
-  MonitorProof owned_proofs<0..2^8-1>;
-  MonitorProof contact_proofs<0..2^8-1>;
+  MonitorLabelVersions label_versions<0..2^8-1>;
+  CombinedTreeProof monitor;
   InclusionProof inclusion;
 } MonitorResponse;
 ~~~
 
-The elements of `owned_proofs` and `contact_proofs` correspond one-to-one with
-the elements of `owned_labels` and `contact_labels`. Each `MonitorProof` in
-`contact_proofs` is meant to convince the user that the label they looked up is
-still properly included in the log and has not been surreptitiously concealed.
-Each `MonitorProof` in `owned_proofs` conveys the same guarantee that no past
-lookups have been concealed, and also proves that `MonitorProof.version` is the
-most recent version of the label.
+The `monitor` field contains the output of updating the user's view of the tree
+to match `FullTreeHead.tree_head.size` followed by monitoring each label in
+`labels`, in the order provided. Each MonitorLabel structure where `rightmost`
+was present has a corresponding entry in `label_versions` containing the
+greatest version of the label present in a number of subsequent distinguished
+log entries.
 
-The `version` field of a `MonitorProof` contains the version that was used for
-computing the binary ladder, and therefore the highest version of the label that
-will be proven to exist. The `vrf_proofs` field contains VRF proofs for
-different versions of the label, starting at the first version that's
-different between the binary ladders for `MonitorLabel.highest_version` and
-`MonitorProof.version`.
-
-The `steps` field of a `MonitorProof` contains the proofs required to update the
-user's monitoring data following the algorithm in {{monitoring-the-tree}}. That is, each
-`ProofStep` of a `MonitorProof` contains a binary ladder for the version
-`MonitorProof.version`. The steps are provided in the order that they're
-consumed by the monitoring algorithm. If same proof is consumed by the
-monitoring algorithm multiple times, it is provided in the `MonitorProof`
-structure only the first time.
-
-For `MonitorProof` structures in `owned_labels`, it is also important to prove
-that `MonitorProof.version` is the highest version of the label available. This
-means that such a `MonitorProof` must contains full binary ladders for
-`MonitorProof.version` along the frontier of the log. As such, any `ProofStep`
-under the `owned_labels` field that's along the frontier of the log includes a
-full binary ladder for `MonitorProof.version` instead of a regular binary
-ladder. For additional entries on the frontier of the log that are to the right
-of the leftmost frontier entry already provided, an additional `ProofStep` is
-added to `MonitorProof`. This additional `ProofStep` contains only the proofs of
-non-inclusion from a full binary ladder.
+The `inclusion` field contains a proof of inclusion for all of the log tree
+leaves where either a search proof was provided in
+`CombinedTreeProof.prefix_proofs` or the prefix tree root hash was provided
+directly in `CombinedTreeProof.prefix_roots`. If the user advertised a
+previously-observed tree size in `last`, the proof in `inclusion` also functions
+as a proof of consistency.
 
 Users verify a MonitorResponse by following these steps:
 
-1. Verify that the lengths of `owned_proofs` and `contact_proofs` are the same
-   as the lengths of `owned_labels` and `contact_labels`.
-2. For each `MonitorProof` structure, verify that `MonitorProof.version` is
-   greater than or equal to the highest version of the label that's been
-   previously observed.
-3. For each `MonitorProof` structure, evalute the monitoring algorithm in
-   {{monitoring-the-tree}}. Abort with an error if the monitoring algorithm detects that
-   the tree is constructed incorrectly, or if there are fewer or more steps
-   provided than would be expected (keeping in mind that extra steps may be
-   provided along the frontier of the log, if a `MonitorProof` is a member of
-   `owned_labels`).
-4. Construct a candidate root value for the tree by combining the
-   `PrefixProof` and commitment of `ProofStep`, with the provided inclusion
-   proof.
-5. With the candidate root value, verify the provided `FullTreeHead`.
+1. Verify that the number of entries in `label_versions` is equal to the number
+   of MonitorLabel structures in `labels` with `rightmost` present. If a
+   MonitorLabel has a `rightmost` field that is not the rightmost distinguished
+   log entry, verify that the corresponding MonitorLabelVersion's `versions`
+   field is not empty.
+2. Verify the proof in `monitor` as described in {{proof-combined-tree}}.
+3. Compute a candidate root value for the tree from the proof in `inclusion`,
+   the hashes of log entries used in `search`, and any previously-retained full
+   subtrees of the log tree.
+4. With the candidate root value for the tree, verify `FullTreeHead`.
 
 Some information is omitted from MonitorResponse in the interest of efficiency,
 due to the fact that the user would have already seen and verified it as part of
