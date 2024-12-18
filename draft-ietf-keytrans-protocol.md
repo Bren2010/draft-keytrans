@@ -122,18 +122,7 @@ identifiers, and a new version of a label is created each time the label's
 associated value changes. Transparency Logs have an *epoch* counter which is
 incremented every time a new set of label-version pairs are added.
 
-~~~
-  Epoch   Update      Set of logged Label-Version Pairs
-* n       X:0 -> k    { ..., X:0 }
-* n+1     Y:3 -> l    { ..., X:0, Y:3 }
-* n+2     Z:2 -> m    { ..., X:0, Y:3, Z:2 }
-* n+3     X:1 -> n    { ..., X:0, Y:3, Z:2, X:1 }
-~~~
-{: title="An example log history. At epoch n the user with label X submits their
-first key k. As it is their first key, it is associated with version 0. At epoch
-n+1, user Y updates their key to l."}
-
-KT uses a *prefix tree* to commit to a mapping between each label-version pair
+KT uses a *prefix tree* to establish a mapping between each label-version pair
 and a commitment to the label's value at that version. Every time the prefix
 tree changes, its new root hash is stored in a *log tree*. The benefit of the
 prefix tree is that it is easily searchable, and the benefit of the log tree is
@@ -149,7 +138,7 @@ for computing the intermediate and root values of the trees are given in
 ## Terminology
 
 Trees consist of
-*nodes* which have a byte string as their *hash value*. A node is either a
+*nodes*, which have a byte string as their *hash value*. A node is either a
 *leaf* if it has no children, or a *parent*
 if it has either a *left child* or a *right child*. A node is the *root* of a
 tree if it has no parents, and an *intermediate* if it has both children and
@@ -163,6 +152,9 @@ The *direct path* of a root node is the empty list, and of any other node is the
 concatenation of that node's parent along with the parent's direct path. The
 *copath* of a node is the node's sibling concatenated with the list of siblings
 of all the nodes in its direct path, excluding the root.
+
+The *size* of a tree or subtree is defined as the number of leaf nodes it
+contains.
 
 ## Log Tree
 
@@ -197,7 +189,7 @@ Index:  0     1     2     3     4
 {: title="A log tree containing five leaves."}
 
 Log trees initially consist of a single leaf node. New leaves are
-added to the right-most edge of the tree along with a single parent node, to
+added to the right-most edge of the tree along with a single parent node to
 construct the left-balanced binary tree with `n+1` leaves.
 
 ~~~ aasvg
@@ -282,21 +274,22 @@ hash when also considering the hash of the node [X]."}
 
 ## Prefix Tree
 
-Prefix trees are used for storing key-value pairs, in a way that provides the
-ability to efficiently prove that a search key's value was looked up correctly.
+Prefix trees store a mapping between search keys and their corresponding values,
+with the ability to efficiently prove that a search key's value was looked up
+correctly.
 
-Each leaf node in a prefix tree represents a specific key-value pair, while each parent
-node represents some prefix which all search keys in the subtree headed by that node
-have in common. The subtree headed by a parent's left child contains all search keys
-that share its prefix followed by an additional 0 bit, while the subtree headed
-by a parent's right child contains all search keys that share its prefix followed by
-an additional 1 bit.
+Each leaf node in a prefix tree represents a specific mapping from search key to
+value, while each parent node represents some prefix which all search keys in
+the subtree headed by that node have in common. The subtree headed by a parent's
+left child contains all search keys that share its prefix followed by an
+additional 0 bit, while the subtree headed by a parent's right child contains
+all search keys that share its prefix followed by an additional 1 bit.
 
 The root node, in particular, represents the empty string as a prefix. The
 root's left child contains all search keys that begin with a 0 bit, while the right
 child contains all search keys that begin with a 1 bit.
 
-A prefix tree can be searched by starting at the root node, and moving to the
+A prefix tree can be searched by starting at the root node and moving to the
 left child if the first bit of a search key is 0, or the right child if the first bit
 is 1. This is then repeated for the second bit, third bit, and so on until the
 search either terminates at a leaf node (which may or may not be for the desired
@@ -359,7 +352,7 @@ hash value of the tree.
 ## Combined Tree
 
 Log trees are desirable because they can provide efficient consistency proofs to
-assure verifiers that nothing has been removed from a log that was present in a
+convince verifiers that nothing has been removed from a log that was present in a
 previous version. However, log trees can't be efficiently searched without
 downloading the entire log. Prefix trees are efficient to search and can provide
 inclusion proofs to convince verifiers that the returned search results are
@@ -375,11 +368,13 @@ With some caveats, this combined structure supports both efficient consistency
 proofs and can be efficiently searched.
 
 Note that, although the Transparency Log maintains a single logical prefix tree,
-each modification of this tree results in a new root hash, which is then stored
-in the log tree. Therefore, when instructions refer to "looking up a label-version pair in the
-prefix tree at a given log entry," this actually means searching in the specific
-version of the prefix tree that corresponds to the root hash stored at that log
-entry (where a "log entry" refers to a leaf of the log tree).
+each modification of this tree results in a new root hash which is then stored
+in the log tree. As part of the protocol, the Transparency Log is often
+required to perform lookups in different versions of the prefix tree. Therefore,
+when instructions refer to "looking up a label-version pair in the prefix tree
+at a given log entry," this means performing the search in the specific version
+of the prefix tree whose root hash is stored at that log entry (where a "log
+entry" refers to a leaf of the log tree).
 
 ~~~ aasvg
 Epoch        n-1         n                       n+1
@@ -426,8 +421,8 @@ This is described in more detail in {{putting-it-together}}.
 Intuitively, the leaves of the log tree can be considered a flat array
 representation of a binary tree. This structure is similar to the log tree, but
 distinguished by the fact that not all parent nodes have two children. In this
-representation, "leaf" nodes are stored in even-numbered indices, while
-"intermediate" nodes are stored in odd-numbered indices:
+representation, "leaf" log entries are stored in even-numbered indices, while
+"intermediate" log entries are stored in odd-numbered indices:
 
 ~~~ aasvg
                              X
@@ -657,7 +652,7 @@ can often execute this process with the output of Search or Update operations
 for a label, without waiting to make explicit Monitor queries.
 
 It is also worth noting that the work required to monitor several versions of
-the same label scales sublinearly, due to the fact that the direct paths of the
+the same label scales sublinearly due to the fact that the direct paths of the
 different versions will often intersect. Intersections reduce the total number
 of entries in the map and therefore the amount of work that will be needed to
 monitor the label from then on.
@@ -668,12 +663,14 @@ Finally, unlike searching, there is no abridged version of monitoring.
 # Ciphersuites
 
 Each Transparency Log uses a single fixed ciphersuite, chosen when the log is
-initially created, that specifies the following primitives to be used for
+initially created, that specifies the following primitives and parameters to be used for
 cryptographic computations:
 
 * A hash algorithm
 * A signature algorithm
 * A Verifiable Random Function (VRF) algorithm
+* `Nc`: The size in bytes of commitment openings
+* `Kc`: A fixed string of bytes used in the computation of commitments
 
 The hash algorithm is used for computing the intermediate and root values of
 hash trees. The signature algorithm is used for signatures from both the service
@@ -687,9 +684,131 @@ defined in {{kt-ciphersuites}}.
 
 # Cryptographic Computations
 
+## Tree Head Signature
+
+The head of a Transparency Log, which represents the log's most recent state, is
+represented as:
+
+~~~ tls-presentation
+struct {
+  uint64 tree_size;
+  opaque signature<0..2^16-1>;
+} TreeHead;
+~~~
+
+where `tree_size` counts the number of leaves of the log tree. If the
+Transparency Log is deployed with Third-party Management, then the public key
+used to verify the signature belongs to the third-party manager; otherwise the
+public key used belongs to the service operator.
+
+The signature itself is computed over a `TreeHeadTBS` structure which
+incorporates the log's current state as well as long-term log configuration:
+
+~~~ tls-presentation
+enum {
+  reserved(0),
+  contactMonitoring(1),
+  thirdPartyManagement(2),
+  thirdPartyAuditing(3),
+  (255)
+} DeploymentMode;
+
+struct {
+  CipherSuite ciphersuite;
+  DeploymentMode mode;
+  opaque signature_public_key<0..2^16-1>;
+  opaque vrf_public_key<0..2^16-1>;
+
+  select (Configuration.mode) {
+    case contactMonitoring:
+    case thirdPartyManagement:
+      opaque leaf_public_key<0..2^16-1>;
+    case thirdPartyAuditing:
+      opaque auditor_public_key<0..2^16-1>;
+  };
+} Configuration;
+
+struct {
+  Configuration config;
+  uint64 tree_size;
+  opaque root<Hash.Nh>;
+} TreeHeadTBS;
+~~~
+
+## Update Format
+
+The updates committed to by the prefix tree contain the new value of a label,
+along with additional information depending on the deployment mode of the
+Transparency Log. They are serialized as follows:
+
+~~~ tls-presentation
+struct {
+  select (Configuration.mode) {
+    case thirdPartyManagement:
+      opaque signature<0..2^16-1>;
+  };
+} UpdatePrefix;
+
+struct {
+  UpdatePrefix prefix;
+  opaque value<0..2^32-1>;
+} UpdateValue;
+~~~
+
+The `value` field contains the new value associated with the label.
+
+In the event that third-party management is used, the `prefix` field contains a
+signature from the service operator, using the public key from
+`Configuration.leaf_public_key`, over the following structure:
+
+~~~ tls-presentation
+struct {
+  opaque label<0..2^8-1>;
+  uint32 version;
+  opaque value<0..2^32-1>;
+} UpdateTBS;
+~~~
+
+The `label` field contains the label being updated, `version` contains the new
+version, and `value` contains the same contents as `UpdateValue.value`. Clients
+MUST successfully verify this signature before consuming `UpdateValue.value`.
+
+## Commitment
+
+As discussed in {{combined-tree}}, commitments are stored in the leaves of the
+prefix tree rather than raw `UpdateValue` structures. Commitments are computed
+with HMAC {{!RFC2104}}, using the hash function specified by the ciphersuite. To
+produce a new commitment, the application generates a random `Nc`-byte value
+called `opening` and computes:
+
+~~~ pseudocode
+commitment = HMAC(Kc, CommitmentValue)
+~~~
+
+where `Kc` is a string of bytes defined by the ciphersuite and CommitmentValue
+is specified as:
+
+~~~ tls-presentation
+struct {
+  opaque opening<Nc>;
+  opaque label<0..2^8-1>;
+  UpdateValue update;
+} CommitmentValue;
+~~~
+
+The `label` field of CommitmentValue contains the label being updated and the
+`update` field contains the new value for the label. The output value
+`commitment` may be published, while `opening` should only be revealed to users
+that are authorized to receive the label's contents.
+
+The Transparency Log MAY generate `opening` in a programmatic way. However, it
+SHOULD ensure that `opening` can later be deleted and not feasibly recovered.
+This preserves the Transparency Log's ability to delete certain information in
+compliance with privacy laws.
+
 ## Verifiable Random Function
 
-Each label-version pair created in a log will have a unique
+Each label-version pair created will have a unique
 representation in the prefix tree. This is computed by providing the combined
 label and version as inputs to the VRF:
 
@@ -702,88 +821,6 @@ struct {
 
 The VRF's output evaluated on `VrfInput` is the concrete value inserted into the
 prefix tree.
-
-## Commitment
-
-As discussed in {{combined-tree}}, commitments are stored in the leaves of the
-log tree and correspond to updates. Commitments are computed
-with HMAC {{!RFC2104}}, using the hash function specified by the ciphersuite. To
-produce a new commitment, the application generates a random 16 byte value
-called `opening` and computes:
-<!-- TODO Opening size should be determined by ciphersuite -->
-
-~~~ pseudocode
-commitment = HMAC(fixedKey, CommitmentValue)
-~~~
-
-where `fixedKey` is the 16 byte hex-decoded value:
-
-~~~
-d821f8790d97709796b4d7903357c3f5
-~~~
-<!-- TODO This is weird but nobody has ever said anything. Keep it? Do better? -->
-
-and CommitmentValue is specified as:
-
-~~~ tls-presentation
-struct {
-  opaque opening<16>;
-  opaque label<0..2^8-1>;
-  UpdateValue update;
-} CommitmentValue;
-~~~
-
-This fixed key allows the HMAC function, and thereby the commitment scheme, to
-be modeled as a random oracle. The `label` field of CommitmentValue
-contains the label being updated
-and the `update` field contains the new value for the label.
-
-The output value `commitment` may be published, while `opening` should be kept
-private until the commitment is meant to be revealed.
-
-## Prefix Tree
-
-The leaf nodes of a prefix tree are serialized as:
-
-~~~ tls
-struct {
-    opaque vrf_output<VRF.Nh>;
-    uint64 update_index;
-} PrefixLeaf;
-~~~
-
-where `vrf_output` is the VRF output for the label-version pair, `VRF.Nh` is the
-output size of the ciphersuite VRF in bytes, and `update_index` is the index of
-the log tree's leaf committing to the respective value, i.e., the log tree's
-`tree_size` just after the respective label-version pair was inserted minus one.
-
-The parent nodes of a prefix tree are serialized as:
-
-~~~ tls
-struct {
-  opaque value<Hash.Nh>;
-} PrefixParent;
-~~~
-
-where `Hash.Nh` is the output length of the ciphersuite hash function. The value
-of a parent node is computed by hashing together the values of its left and
-right children:
-
-~~~ pseudocode
-parent.value = Hash(0x01 ||
-                   nodeValue(parent.leftChild) ||
-                   nodeValue(parent.rightChild))
-
-nodeValue(node):
-  if node.type == emptyNode:
-    return 0 // all-zero vector of length Hash.Nh
-  else if node.type == leafNode:
-    return Hash(0x00 || node.vrf_output || node.update_index)
-  else if node.type == parentNode:
-    return node.value
-~~~
-
-where `Hash` denotes the ciphersuite hash function.
 
 ## Log Tree {#crypto-log-tree}
 
@@ -881,10 +918,10 @@ struct {
 
 ## Log Tree
 
-An inclusion proof for a single leaf in a log tree is given by providing the
-copath values of a leaf. Similarly, a bulk inclusion proof for any number of
-leaves is given by providing the fewest node values that can be hashed together
-with the specified leaves to produce the root value. Such a proof is encoded as:
+The inclusion of some leaf in a tree head, or consistency between two tree
+heads, is proven by providing the smallest set of intermediate nodes from the
+log tree that allows the user to compute the tree's root hash from the leaf or
+other intermediate node values they already have. Such a proof is encoded as:
 
 ~~~ tls-presentation
 opaque NodeValue<Hash.Nh>;
@@ -915,9 +952,8 @@ correspond to those output by the algorithm in Section 2.1.2 of {{RFC6962}}.
 
 ## Prefix Tree
 
-A proof from a prefix tree authenticates that a set of values are either members
-of, or are not members of, the total set of values represented by the prefix
-tree. Such a proof is encoded as:
+A proof from a prefix tree authenticates that a search was done correctly for a
+given search key. Such a proof is encoded as:
 
 ~~~ tls
 enum {
@@ -930,8 +966,6 @@ enum {
 struct {
   PrefixSearchResultType result_type;
   select (PrefixSearchResult.result_type) {
-    case inclusion:
-      uint64 update_index;
     case nonInclusionLeaf:
       PrefixLeaf leaf;
   };
@@ -945,13 +979,13 @@ struct {
 ~~~
 
 The `results` field contains the search result for each individual value. It is
-sorted lexicographically by corresponding value. The `result_type` field of each
-`PrefixSearchResult` struct indicates what the terminal node of the search for
-that value was:
+sorted lexicographically by search key (which is always a VRF output in this
+protocol). The `result_type` field of each `PrefixSearchResult` struct indicates
+what the terminal node of the search for that value was:
 
 - `inclusion` for a leaf node matching the requested value.
 - `nonInclusionLeaf` for a leaf node not matching the requested value. In this
-  case, the terminal node's value is provided given that it can not be inferred.
+  case, the terminal node's value is provided since it can not be inferred.
 - `nonInclusionParent` for a parent node that lacks the desired child.
 
 The `depth` field indicates the depth of the terminal node of the search, and is
@@ -966,8 +1000,8 @@ that a node is not present, an all-zero byte string of length `Hash.Nh` is
 listed instead.
 
 The proof is verified by hashing together the provided elements, in the
-left/right arrangement dictated by the tree structure, and checking that the
-result equals the root value of the prefix tree.
+left/right arrangement dictated by the bits of the search keys, and checking
+that the result equals the root value of the prefix tree.
 
 ## Combined Tree {#proof-combined-tree}
 
@@ -1212,6 +1246,8 @@ Users verify the UpdateResponse as if it were a SearchResponse for the most
 recent version of `label`. To aid verification, the update response
 provides the `UpdatePrefix` structure necessary to reconstruct the
 `UpdateValue`.
+
+<!-- TODO: This could probably be a lot more efficient -->
 
 ## Monitor
 
