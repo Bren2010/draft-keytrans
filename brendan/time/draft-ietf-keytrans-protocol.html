@@ -21,15 +21,15 @@ timely manner.
 <meta content="draft-ietf-keytrans-protocol-latest" name="ietf.draft">
 <!-- Generator version information:
   xml2rfc 3.25.0
-    Python 3.12.7
+    Python 3.12.8
     ConfigArgParse 1.7
     google-i18n-address 3.1.1
     intervaltree 3.1.0
     Jinja2 3.1.4
     lxml 5.3.0
     platformdirs 4.3.6
-    pycountry 22.3.5
-    PyYAML 6.0.1
+    pycountry 24.6.1
+    PyYAML 6.0.2
     requests 2.32.3
     setuptools 70.3.0
     wcwidth 0.2.13
@@ -1055,7 +1055,7 @@ svg :is([fill="white"], [fill^="#fff"]) {
 </tr></thead>
 <tfoot><tr>
 <td class="left">McMillion &amp; Linker</td>
-<td class="center">Expires 20 June 2025</td>
+<td class="center">Expires 21 June 2025</td>
 <td class="right">[Page]</td>
 </tr></tfoot>
 </table>
@@ -1068,12 +1068,12 @@ svg :is([fill="white"], [fill^="#fff"]) {
 <dd class="internet-draft">draft-ietf-keytrans-protocol-latest</dd>
 <dt class="label-published">Published:</dt>
 <dd class="published">
-<time datetime="2024-12-17" class="published">17 December 2024</time>
+<time datetime="2024-12-18" class="published">18 December 2024</time>
     </dd>
 <dt class="label-intended-status">Intended Status:</dt>
 <dd class="intended-status">Standards Track</dd>
 <dt class="label-expires">Expires:</dt>
-<dd class="expires"><time datetime="2025-06-20">20 June 2025</time></dd>
+<dd class="expires"><time datetime="2025-06-21">21 June 2025</time></dd>
 <dt class="label-authors">Authors:</dt>
 <dd class="authors">
 <div class="author">
@@ -1131,7 +1131,7 @@ timely manner.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
         time. It is inappropriate to use Internet-Drafts as reference
         material or to cite them other than as "work in progress."<a href="#section-boilerplate.1-3" class="pilcrow">¶</a></p>
 <p id="section-boilerplate.1-4">
-        This Internet-Draft will expire on 20 June 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
+        This Internet-Draft will expire on 21 June 2025.<a href="#section-boilerplate.1-4" class="pilcrow">¶</a></p>
 </section>
 </div>
 <div id="copyright">
@@ -1278,10 +1278,10 @@ timely manner.<a href="#section-abstract-1" class="pilcrow">¶</a></p>
                     <p id="section-toc.1-1.10.2.3.2.2.1"><a href="#section-10.3.2" class="auto internal xref">10.3.2</a>.  <a href="#name-fixed-version-search" class="internal xref">Fixed-Version Search</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.3.2.3">
-                    <p id="section-toc.1-1.10.2.3.2.3.1"><a href="#section-10.3.3" class="auto internal xref">10.3.3</a>.  <a href="#name-greatest-version-search" class="internal xref">Greatest-Version Search</a></p>
+                    <p id="section-toc.1-1.10.2.3.2.3.1"><a href="#section-10.3.3" class="auto internal xref">10.3.3</a>.  <a href="#name-monitor" class="internal xref">Monitor</a></p>
 </li>
                   <li class="compact toc ulBare ulEmpty" id="section-toc.1-1.10.2.3.2.4">
-                    <p id="section-toc.1-1.10.2.3.2.4.1"><a href="#section-10.3.4" class="auto internal xref">10.3.4</a>.  <a href="#name-monitor" class="internal xref">Monitor</a></p>
+                    <p id="section-toc.1-1.10.2.3.2.4.1"><a href="#section-10.3.4" class="auto internal xref">10.3.4</a>.  <a href="#name-greatest-version-search" class="internal xref">Greatest-Version Search</a></p>
 </li>
                 </ul>
 </li>
@@ -2339,7 +2339,7 @@ Each time a power of two is added, this version of the label is looked up.<a hre
 for any versions greater than the target.<a href="#section-6.3-3" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="algorithm">
+<div id="m-algorithm">
 <section id="section-6.4">
         <h3 id="name-algorithm-3">
 <a href="#section-6.4" class="section-number selfRef">6.4. </a><a href="#name-algorithm-3" class="section-name selfRef">Algorithm</a>
@@ -2417,24 +2417,24 @@ retain the rightmost distinguished log entry where they've verified that the
 most recent version of the label is correct. Users advertise this log entry's
 position in their Monitor request. For a number of subsequent distinguished log
 entries, the Transparency Log states the greatest version of the label that the
-log entry's prefix tree contains. It then provides a search-style binary ladder,
-as described in <a href="#binary-ladder" class="auto internal xref">Section 5.1</a>, including any lookups that would typically be
-omitted. Users verify that the version has not unexpectedly increased or
-decreased, and that the binary ladder terminates in way that's consistent with
-the provided version being the greatest that exists.<a href="#section-6.4.1-1" class="pilcrow">¶</a></p>
-<p id="section-6.4.1-2">Importantly, users verify that they receive a binary ladder for the
-distinguished log entry immediately following the one they've advertised, the
-distinguished log entry immediately following that one, and so on. The
-Transparency Log provides whichever intermediate timestamps are necessary to
-demonstrate that this is the case. To avoid overloading itself, the Transparency
-Log has the option to limit the number of distinguished log entries it provides
-binary ladders for in a single response.<a href="#section-6.4.1-2" class="pilcrow">¶</a></p>
-<p id="section-6.4.1-3">If the user is monitoring the label for the first time since it was created (or
-for the first time since they took ownership of it), they advertise no log entry
-to the Transparency Log and initialize their state by setting it to be the
-distinguished log entry that terminates monitoring in step 4 above. The
-Transparency Log provides binary ladders for additional subsequent distinguised
-log entries.<a href="#section-6.4.1-3" class="pilcrow">¶</a></p>
+log entry's prefix tree contains and provides a search-style binary ladder, as
+described in <a href="#binary-ladder" class="auto internal xref">Section 5.1</a>, to prove it. No lookups are omitted from the
+binary ladder according to the rules described in <a href="#binary-ladder" class="auto internal xref">Section 5.1</a>. However,
+lookups for any versions of the label that were already provided in a
+lower-bound binary ladder from the same log entry <em>are</em> omitted.<a href="#section-6.4.1-1" class="pilcrow">¶</a></p>
+<p id="section-6.4.1-2">Users verify that the version has not unexpectedly increased or decreased, and
+that the binary ladder terminates in way that's consistent with the provided
+version being the greatest that exists. Importantly, users also verify that they
+receive a binary ladder for the distinguished log entry immediately following
+the one they've advertised, the distinguished log entry immediately following
+that one, and so on. The Transparency Log provides whichever intermediate
+timestamps are necessary to demonstrate that this is the case. To avoid
+overloading itself, the Transparency Log has the option to limit the number of
+distinguished log entries it provides binary ladders for in a single response.<a href="#section-6.4.1-2" class="pilcrow">¶</a></p>
+<p id="section-6.4.1-3">If the user is monitoring the label for the first time since it was created,
+they advertise the first distinguished log entry to the left of the first log
+entry to contain the label. The Transparency Log provides binary ladders for
+subsequent distinguised log entries.<a href="#section-6.4.1-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -2971,31 +2971,62 @@ log entry specifically looking up the target version.<a href="#section-10.3.2-2.
 <p id="section-10.3.2-3">Users verify the output as specified in <a href="#fv-algorithm" class="auto internal xref">Section 5.3</a>.<a href="#section-10.3.2-3" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="greatest-version-search">
+<div id="monitor">
 <section id="section-10.3.3">
-          <h4 id="name-greatest-version-search">
-<a href="#section-10.3.3" class="section-number selfRef">10.3.3. </a><a href="#name-greatest-version-search" class="section-name selfRef">Greatest-Version Search</a>
+          <h4 id="name-monitor">
+<a href="#section-10.3.3" class="section-number selfRef">10.3.3. </a><a href="#name-monitor" class="section-name selfRef">Monitor</a>
           </h4>
-<p id="section-10.3.3-1">For a user to search the combined tree for the greatest version of a label, the
-following is provided:<a href="#section-10.3.3-1" class="pilcrow">¶</a></p>
+<p id="section-10.3.3-1">For a user to monitor a label in the combined tree, the following is provided:<a href="#section-10.3.3-1" class="pilcrow">¶</a></p>
 <ul class="normal">
 <li class="normal" id="section-10.3.3-2.1">
-              <p id="section-10.3.3-2.1.1">For each log entry along the frontier, starting from the log entry identified
-in <a href="#greatest-version-searches" class="auto internal xref">Section 7</a>: a <code>PrefixProof</code> corresponding to a binary
-ladder.<a href="#section-10.3.3-2.1.1" class="pilcrow">¶</a></p>
+              <p id="section-10.3.3-2.1.1">For each entry in the user's monitoring map:<a href="#section-10.3.3-2.1.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-10.3.3-2.1.2.1">
+                  <p id="section-10.3.3-2.1.2.1.1">The timestamps needed by the algorithm in <a href="#distinguished-log-entries" class="auto internal xref">Section 6.2</a> to
+determine where the monitoring algorithm would first reach a distinguished
+log entry. This may either be the log entry in the user's monitoring map, or
+some other log entry from the list computed in step 2 of <a href="#m-algorithm" class="auto internal xref">Section 6.4</a>.<a href="#section-10.3.3-2.1.2.1.1" class="pilcrow">¶</a></p>
+</li>
+                <li class="normal" id="section-10.3.3-2.1.2.2">
+                  <p id="section-10.3.3-2.1.2.2.1">Where necessary for the algorithm in <a href="#m-algorithm" class="auto internal xref">Section 6.4</a>, a lower-bound binary
+ladder targeting the version in the user's monitoring map.<a href="#section-10.3.3-2.1.2.2.1" class="pilcrow">¶</a></p>
+</li>
+              </ul>
+</li>
+            <li class="normal" id="section-10.3.3-2.2">
+              <p id="section-10.3.3-2.2.1">If the user owns the label:<a href="#section-10.3.3-2.2.1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-10.3.3-2.2.2.1">
+                  <p id="section-10.3.3-2.2.2.1.1">The timestamps needed by the algorithm in <a href="#distinguished-log-entries" class="auto internal xref">Section 6.2</a> to
+conduct a depth-first search for each subsequent distinguished log entry.<a href="#section-10.3.3-2.2.2.1.1" class="pilcrow">¶</a></p>
+</li>
+                <li class="normal" id="section-10.3.3-2.2.2.2">
+                  <p id="section-10.3.3-2.2.2.2.1">For each distinguished log entry, a binary ladder targeting the greatest
+version of the label that the log entry contains.<a href="#section-10.3.3-2.2.2.2.1" class="pilcrow">¶</a></p>
+</li>
+              </ul>
 </li>
           </ul>
-<p id="section-10.3.3-3">Note that the log entry timestamps are already provided as part of updating the
-user's view of the tree, and that no additional timestamps are necessary to
-identify the starting log entry.<a href="#section-10.3.3-3" class="pilcrow">¶</a></p>
 </section>
 </div>
-<div id="monitor">
+<div id="greatest-version-search">
 <section id="section-10.3.4">
-          <h4 id="name-monitor">
-<a href="#section-10.3.4" class="section-number selfRef">10.3.4. </a><a href="#name-monitor" class="section-name selfRef">Monitor</a>
+          <h4 id="name-greatest-version-search">
+<a href="#section-10.3.4" class="section-number selfRef">10.3.4. </a><a href="#name-greatest-version-search" class="section-name selfRef">Greatest-Version Search</a>
           </h4>
-<p id="section-10.3.4-1">For a user to monitor a label in the combined tree, the following is provided:<a href="#section-10.3.4-1" class="pilcrow">¶</a></p>
+<p id="section-10.3.4-1">For a user to search the combined tree for the greatest version of a label, the
+following is provided:<a href="#section-10.3.4-1" class="pilcrow">¶</a></p>
+<ul class="normal">
+<li class="normal" id="section-10.3.4-2.1">
+              <p id="section-10.3.4-2.1.1">For each log entry along the frontier, starting from the log entry identified
+in <a href="#greatest-version-searches" class="auto internal xref">Section 7</a>: a <code>PrefixProof</code> corresponding to a binary
+ladder.<a href="#section-10.3.4-2.1.1" class="pilcrow">¶</a></p>
+</li>
+          </ul>
+<p id="section-10.3.4-3">Note that the log entry timestamps are already provided as part of updating the
+user's view of the tree, and that no additional timestamps are necessary to
+identify the starting log entry. Users verify the proof as described in
+<a href="#greatest-version-searches" class="auto internal xref">Section 7</a>.<a href="#section-10.3.4-3" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
@@ -3057,11 +3088,12 @@ struct {
 struct {
   FullTreeHead full_tree_head;
 
+  optional&lt;uint32&gt; version;
   BinaryLadderStep binary_ladder&lt;0..2^8-1&gt;;
   CombinedTreeProof search;
   InclusionProof inclusion;
 
-  opaque opening&lt;16&gt;;
+  opaque opening&lt;Nc&gt;;
   UpdateValue value;
 } SearchResponse;
 </pre><a href="#section-11.1-4" class="pilcrow">¶</a>
@@ -3074,7 +3106,9 @@ that the versions are output by the algorithm in <a href="#binary-ladder" class=
 <p id="section-11.1-6">The <code>search</code> field contains the output of updating the user's view of the tree
 to match <code>FullTreeHead.tree_head.size</code> followed by either a fixed-version or
 greatest-version search for the requested label, depending on whether <code>version</code>
-was provided in <code>SearchRequest</code> or not.<a href="#section-11.1-6" class="pilcrow">¶</a></p>
+was provided in <code>SearchRequest</code> or not. If searching for the greatest version of
+the label, this version is provided in <code>SearchResponse.version</code>; otherwise, the
+field is empty.<a href="#section-11.1-6" class="pilcrow">¶</a></p>
 <p id="section-11.1-7">The <code>inclusion</code> field contains a proof of inclusion for all of the log tree
 leaves where either a search proof was provided in
 <code>CombinedTreeProof.prefix_proofs</code> or the prefix tree root hash was provided
@@ -3138,7 +3172,7 @@ struct {
   CombinedTreeProof search;
   InclusionProof inclusion;
 
-  opaque opening&lt;16&gt;;
+  opaque opening&lt;Nc&gt;;
   UpdatePrefix prefix;
 } UpdateResponse;
 </pre><a href="#section-11.2-4" class="pilcrow">¶</a>
@@ -3159,132 +3193,110 @@ Transparency Log containing information about the labels they wish to monitor.<a
 <div class="lang-tls-presentation sourcecode" id="section-11.3-2">
 <pre>
 struct {
+  uint64 position;
+  uint32 version;
+} MonitorMapEntry;
+
+struct {
   opaque label&lt;0..2^8-1&gt;;
-  uint32 highest_version;
-  uint64 entries&lt;0..2^8-1&gt;;
+  MonitorMapEntry entries&lt;0..2^8-1&gt;;
+  optional&lt;uint64&gt; rightmost;
 } MonitorLabel;
 
 struct {
   optional&lt;uint32&gt; last;
-
-  MonitorLabel owned_labels&lt;0..2^8-1&gt;;
-  MonitorLabel contact_labels&lt;0..2^8-1&gt;;
+  MonitorLabel labels&lt;0..2^8-1&gt;;
 } MonitorRequest;
 </pre><a href="#section-11.3-2" class="pilcrow">¶</a>
 </div>
-<p id="section-11.3-3">Users include each of the labels that they own in <code>owned_labels</code>. If the
-Transparency Log is deployed with Contact Monitoring (or simply if the user
-wants a higher degree of confidence in the log), they also include any labels
-they've looked up in <code>contact_labels</code>.<a href="#section-11.3-3" class="pilcrow">¶</a></p>
-<p id="section-11.3-4">Each <code>MonitorLabel</code> structure contains the label being monitored in <code>label</code>,
-the highest version of the label that the user has observed in <code>highest_version</code>,
-and a list of <code>entries</code> in the log tree corresponding to the keys of the map
-described in <a href="#monitoring-the-tree" class="auto internal xref">Section 6</a>.<a href="#section-11.3-4" class="pilcrow">¶</a></p>
-<p id="section-11.3-5">The Transparency Log verifies the MonitorRequest by following these steps, for
-each <code>MonitorLabel</code> structure:<a href="#section-11.3-5" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-11.3-6">
-<li id="section-11.3-6.1">
-            <p id="section-11.3-6.1.1">Verify that the requested labels in <code>owned_labels</code> and <code>contact_labels</code> are all
-distinct.<a href="#section-11.3-6.1.1" class="pilcrow">¶</a></p>
+<p id="section-11.3-3">Each MonitorLabel structure in <code>labels</code> contains the label to monitor in
+<code>label</code>, and a list in the <code>entries</code> field corresponding to the map described in
+<a href="#m-algorithm" class="auto internal xref">Section 6.4</a>. If the user owns the label, they additionally indicate in
+<code>rightmost</code> the position of the rightmost distinguished log entry where they
+have verified that the greatest version of the label is correctly represented.<a href="#section-11.3-3" class="pilcrow">¶</a></p>
+<p id="section-11.3-4">The Transparency Log verifies the MonitorRequest by following these steps, for
+each <code>MonitorLabel</code> structure:<a href="#section-11.3-4" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-11.3-5">
+<li id="section-11.3-5.1">
+            <p id="section-11.3-5.1.1">Verify that the <code>label</code> field of every MonitorLabel is unique. For all
+MonitorLabel structures with <code>rightmost</code> provided, verify that the user owns
+the label (according to application-layer policy). For all other MonitorLabel
+structures, verify that the user is currently, or was previously, allowed to
+lookup all versions of the label contained in a MonitorMapEntry.<a href="#section-11.3-5.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-11.3-6.2">
-            <p id="section-11.3-6.2.1">Verify that the user owns every label in <code>owned_labels</code>, and is allowed (or was
-previously allowed) to lookup every label in <code>contact_labels</code>, based on the
-application's policy.<a href="#section-11.3-6.2.1" class="pilcrow">¶</a></p>
+          <li id="section-11.3-5.2">
+            <p id="section-11.3-5.2.1">Verify that each MonitorMapEntry in the same MonitorLabel structure is sorted
+in ascending order by <code>position</code>. Additionally, verify that each <code>version</code>
+field is unique and that <code>position</code> lies on the direct path of the first log
+entry to contain version <code>version</code> of the label.<a href="#section-11.3-5.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-11.3-6.3">
-            <p id="section-11.3-6.3.1">Verify that the <code>highest_version</code> for each label is less than or equal to the
-most recent version of each label.<a href="#section-11.3-6.3.1" class="pilcrow">¶</a></p>
-</li>
-          <li id="section-11.3-6.4">
-            <p id="section-11.3-6.4.1">Verify that each <code>entries</code> array is sorted in ascending order, and that all
-entries are within the bounds of the log.<a href="#section-11.3-6.4.1" class="pilcrow">¶</a></p>
-</li>
-          <li id="section-11.3-6.5">
-            <p id="section-11.3-6.5.1">Verify each entry lies on the direct path of different versions of the label.<a href="#section-11.3-6.5.1" class="pilcrow">¶</a></p>
+          <li id="section-11.3-5.3">
+            <p id="section-11.3-5.3.1">Verify that <code>rightmost</code> is a distinguished log entry to the right of
+the first version of the label, or that it was the rightmost distinguished
+log entry immediately after the label was first inserted.<a href="#section-11.3-5.3.1" class="pilcrow">¶</a></p>
 </li>
         </ol>
-<p id="section-11.3-7">If the request is valid, the Transparency Log responds with a MonitorResponse
-structure:<a href="#section-11.3-7" class="pilcrow">¶</a></p>
+<p id="section-11.3-6">While access control decisions generally belong solely to the application, users
+must be able to monitor versions of a label they previously looked up, even if
+they would no longer be allowed to make the same query. One simple way for a
+user to prove that they were previously allowed to lookup a particular version
+of a label would be for them to provide the commitment opening for the version.
+However, there is no provision for this in the protocol; it would need to be
+done in the application layer.<a href="#section-11.3-6" class="pilcrow">¶</a></p>
+<p id="section-11.3-7">If the request is valid and passes access control, the Transparency Log responds
+with a MonitorResponse structure:<a href="#section-11.3-7" class="pilcrow">¶</a></p>
 <div class="lang-tls-presentation sourcecode" id="section-11.3-8">
 <pre>
 struct {
-  uint32 version;
-  VRFProof vrf_proofs&lt;0..2^8-1&gt;;
-  ProofStep steps&lt;0..2^8-1&gt;;
-} MonitorProof;
+  uint32 versions&lt;0..2^8-1&gt;;
+} MonitorLabelVersions;
 
 struct {
   FullTreeHead full_tree_head;
-  MonitorProof owned_proofs&lt;0..2^8-1&gt;;
-  MonitorProof contact_proofs&lt;0..2^8-1&gt;;
+  MonitorLabelVersions label_versions&lt;0..2^8-1&gt;;
+  CombinedTreeProof monitor;
   InclusionProof inclusion;
 } MonitorResponse;
 </pre><a href="#section-11.3-8" class="pilcrow">¶</a>
 </div>
-<p id="section-11.3-9">The elements of <code>owned_proofs</code> and <code>contact_proofs</code> correspond one-to-one with
-the elements of <code>owned_labels</code> and <code>contact_labels</code>. Each <code>MonitorProof</code> in
-<code>contact_proofs</code> is meant to convince the user that the label they looked up is
-still properly included in the log and has not been surreptitiously concealed.
-Each <code>MonitorProof</code> in <code>owned_proofs</code> conveys the same guarantee that no past
-lookups have been concealed, and also proves that <code>MonitorProof.version</code> is the
-most recent version of the label.<a href="#section-11.3-9" class="pilcrow">¶</a></p>
-<p id="section-11.3-10">The <code>version</code> field of a <code>MonitorProof</code> contains the version that was used for
-computing the binary ladder, and therefore the highest version of the label that
-will be proven to exist. The <code>vrf_proofs</code> field contains VRF proofs for
-different versions of the label, starting at the first version that's
-different between the binary ladders for <code>MonitorLabel.highest_version</code> and
-<code>MonitorProof.version</code>.<a href="#section-11.3-10" class="pilcrow">¶</a></p>
-<p id="section-11.3-11">The <code>steps</code> field of a <code>MonitorProof</code> contains the proofs required to update the
-user's monitoring data following the algorithm in <a href="#monitoring-the-tree" class="auto internal xref">Section 6</a>. That is, each
-<code>ProofStep</code> of a <code>MonitorProof</code> contains a binary ladder for the version
-<code>MonitorProof.version</code>. The steps are provided in the order that they're
-consumed by the monitoring algorithm. If same proof is consumed by the
-monitoring algorithm multiple times, it is provided in the <code>MonitorProof</code>
-structure only the first time.<a href="#section-11.3-11" class="pilcrow">¶</a></p>
-<p id="section-11.3-12">For <code>MonitorProof</code> structures in <code>owned_labels</code>, it is also important to prove
-that <code>MonitorProof.version</code> is the highest version of the label available. This
-means that such a <code>MonitorProof</code> must contains full binary ladders for
-<code>MonitorProof.version</code> along the frontier of the log. As such, any <code>ProofStep</code>
-under the <code>owned_labels</code> field that's along the frontier of the log includes a
-full binary ladder for <code>MonitorProof.version</code> instead of a regular binary
-ladder. For additional entries on the frontier of the log that are to the right
-of the leftmost frontier entry already provided, an additional <code>ProofStep</code> is
-added to <code>MonitorProof</code>. This additional <code>ProofStep</code> contains only the proofs of
-non-inclusion from a full binary ladder.<a href="#section-11.3-12" class="pilcrow">¶</a></p>
-<p id="section-11.3-13">Users verify a MonitorResponse by following these steps:<a href="#section-11.3-13" class="pilcrow">¶</a></p>
-<ol start="1" type="1" class="normal type-1" id="section-11.3-14">
-<li id="section-11.3-14.1">
-            <p id="section-11.3-14.1.1">Verify that the lengths of <code>owned_proofs</code> and <code>contact_proofs</code> are the same
-as the lengths of <code>owned_labels</code> and <code>contact_labels</code>.<a href="#section-11.3-14.1.1" class="pilcrow">¶</a></p>
+<p id="section-11.3-9">The <code>monitor</code> field contains the output of updating the user's view of the tree
+to match <code>FullTreeHead.tree_head.size</code> followed by monitoring each label in
+<code>labels</code>, in the order provided. Each MonitorLabel structure where <code>rightmost</code>
+was present has a corresponding entry in <code>label_versions</code> containing the
+greatest version of the label present in a number of subsequent distinguished
+log entries.<a href="#section-11.3-9" class="pilcrow">¶</a></p>
+<p id="section-11.3-10">The <code>inclusion</code> field contains a proof of inclusion for all of the log tree
+leaves where either a search proof was provided in
+<code>CombinedTreeProof.prefix_proofs</code> or the prefix tree root hash was provided
+directly in <code>CombinedTreeProof.prefix_roots</code>. If the user advertised a
+previously-observed tree size in <code>last</code>, the proof in <code>inclusion</code> also functions
+as a proof of consistency.<a href="#section-11.3-10" class="pilcrow">¶</a></p>
+<p id="section-11.3-11">Users verify a MonitorResponse by following these steps:<a href="#section-11.3-11" class="pilcrow">¶</a></p>
+<ol start="1" type="1" class="normal type-1" id="section-11.3-12">
+<li id="section-11.3-12.1">
+            <p id="section-11.3-12.1.1">Verify that the number of entries in <code>label_versions</code> is equal to the number
+of MonitorLabel structures in <code>labels</code> with <code>rightmost</code> present. If a
+MonitorLabel has a <code>rightmost</code> field that is not the rightmost distinguished
+log entry, verify that the corresponding MonitorLabelVersion's <code>versions</code>
+field is not empty.<a href="#section-11.3-12.1.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-11.3-14.2">
-            <p id="section-11.3-14.2.1">For each <code>MonitorProof</code> structure, verify that <code>MonitorProof.version</code> is
-greater than or equal to the highest version of the label that's been
-previously observed.<a href="#section-11.3-14.2.1" class="pilcrow">¶</a></p>
+          <li id="section-11.3-12.2">
+            <p id="section-11.3-12.2.1">Verify the proof in <code>monitor</code> as described in <a href="#proof-combined-tree" class="auto internal xref">Section 10.3</a>.<a href="#section-11.3-12.2.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-11.3-14.3">
-            <p id="section-11.3-14.3.1">For each <code>MonitorProof</code> structure, evalute the monitoring algorithm in
-<a href="#monitoring-the-tree" class="auto internal xref">Section 6</a>. Abort with an error if the monitoring algorithm detects that
-the tree is constructed incorrectly, or if there are fewer or more steps
-provided than would be expected (keeping in mind that extra steps may be
-provided along the frontier of the log, if a <code>MonitorProof</code> is a member of
-<code>owned_labels</code>).<a href="#section-11.3-14.3.1" class="pilcrow">¶</a></p>
+          <li id="section-11.3-12.3">
+            <p id="section-11.3-12.3.1">Compute a candidate root value for the tree from the proof in <code>inclusion</code>,
+the hashes of log entries used in <code>search</code>, and any previously-retained full
+subtrees of the log tree.<a href="#section-11.3-12.3.1" class="pilcrow">¶</a></p>
 </li>
-          <li id="section-11.3-14.4">
-            <p id="section-11.3-14.4.1">Construct a candidate root value for the tree by combining the
-<code>PrefixProof</code> and commitment of <code>ProofStep</code>, with the provided inclusion
-proof.<a href="#section-11.3-14.4.1" class="pilcrow">¶</a></p>
-</li>
-          <li id="section-11.3-14.5">
-            <p id="section-11.3-14.5.1">With the candidate root value, verify the provided <code>FullTreeHead</code>.<a href="#section-11.3-14.5.1" class="pilcrow">¶</a></p>
+          <li id="section-11.3-12.4">
+            <p id="section-11.3-12.4.1">With the candidate root value for the tree, verify <code>FullTreeHead</code>.<a href="#section-11.3-12.4.1" class="pilcrow">¶</a></p>
 </li>
         </ol>
-<p id="section-11.3-15">Some information is omitted from MonitorResponse in the interest of efficiency,
+<p id="section-11.3-13">Some information is omitted from MonitorResponse in the interest of efficiency,
 due to the fact that the user would have already seen and verified it as part of
 conducting other queries. In particular, VRF proofs for different versions of
 each label are not provided, given that these can be cached from the
-original Search or Update query.<a href="#section-11.3-15" class="pilcrow">¶</a></p>
+original Search or Update query.<a href="#section-11.3-13" class="pilcrow">¶</a></p>
 </section>
 </div>
 </section>
