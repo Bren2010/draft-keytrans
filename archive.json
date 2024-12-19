@@ -1,6 +1,6 @@
 {
   "magic": "E!vIA5L86J2I",
-  "timestamp": "2024-12-17T01:00:50.531782+00:00",
+  "timestamp": "2024-12-19T00:58:48.729041+00:00",
   "repo": "ietf-wg-keytrans/draft-protocol",
   "labels": [
     {
@@ -796,6 +796,32 @@
       "mergeCommit": {
         "oid": "ce7ad760b27ddb560101df394a7affdcbce99073"
       },
+      "comments": [],
+      "reviews": []
+    },
+    {
+      "number": 12,
+      "id": "PR_kwDOLrnaA86FtSCc",
+      "title": "Support for strong authentication of time",
+      "url": "https://github.com/ietf-wg-keytrans/draft-protocol/pull/12",
+      "state": "OPEN",
+      "author": "Bren2010",
+      "authorAssociation": "COLLABORATOR",
+      "assignees": [],
+      "labels": [],
+      "body": "- The main change here is to have each log entry contain the time it was created. This provides a stronger authentication of time compared to just signing it into the tree head and prevents certain classes of attacks.\r\n- Introduces the concept of a \"maximum lifetime\" for log entries. Essentially, if a log entry is too old, users will be able to see that and guide their search away from old portions of the tree, allowing them to be pruned.\r\n- Introduces the concept of a \"reasonable monitoring window\". This is the opposite of the \"maximum lifetime\" idea -- it allows users to tell when certain log entries have been added so recently that other users likely haven't had time to vet their contents. When users see that information has been added within the reasonable monitoring window, they maintain extra state about it to prevent/detect potential attacks. Similarly, when information is older than the reasonable monitoring window, it is taken more at face value.",
+      "createdAt": "2024-12-18T23:02:49Z",
+      "updatedAt": "2024-12-18T23:02:50Z",
+      "baseRepository": "ietf-wg-keytrans/draft-protocol",
+      "baseRefName": "main",
+      "baseRefOid": "a610396bea5711d8c2975d2c4f41402c6a249d88",
+      "headRepository": "ietf-wg-keytrans/draft-protocol",
+      "headRefName": "brendan/time2",
+      "headRefOid": "bc7098fe0fe0b0fd7ced616e36ce9bf8b7b90c76",
+      "closedAt": null,
+      "mergedAt": null,
+      "mergedBy": null,
+      "mergeCommit": null,
       "comments": [],
       "reviews": []
     }
